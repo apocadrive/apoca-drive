@@ -1,0 +1,29 @@
+name: Mise en ligne
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: mise-en-ligne
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Préparer les notifications (functions)
+        run: npm ci --no-audit --no-fund
+        working-directory: functions
+      - name: Envoyer sur Firebase
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          if [ -z "$FIREBASE_TOKEN" ]; then echo "Le secret FIREBASE_TOKEN manque dans GitHub (Settings > Secrets > Actions)."; exit 1; fi
+          npx --yes firebase-tools@14 deploy --only hosting,firestore:rules,functions --project apoca-drive --non-interactive --force

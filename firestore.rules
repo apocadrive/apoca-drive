@@ -1,0 +1,128 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Each signed-in person reads and writes only their own space.
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    // Public data shown on the website (dates taken, destinations). Written only by the server.
+    match /public/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+    // Destinations shown on the website: everyone reads, only the owner edits from the app.
+    match /destinations/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+      match /photos/{pid} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+      }
+    }
+    // Contenu du site modifiable depuis l'appli (Mon site) : tout le monde lit, seul le propriétaire modifie.
+    match /site/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    // Photos des carrés de la page « Réserver » : tout le monde lit, seul le propriétaire modifie.
+    // Vidéo d'accueil envoyée depuis l'appli, découpée en morceaux : tout le monde lit, seul le propriétaire modifie.
+    match /heroVideo/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    match /resaPhotos/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    // Journal (articles) et grille Instagram du site : tout le monde lit, seul le propriétaire modifie.
+    match /journal/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    match /insta/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    match /films/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    match /avis/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    // Avis laissés par les clients sur le site : en attente jusqu'à validation dans l'appli.
+    match /avisClients/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['texte','nom','type','etoiles','at'])
+        && request.resource.data.keys().hasAll(['texte','nom','etoiles','at'])
+        && request.resource.data.texte is string && request.resource.data.texte.size() >= 3 && request.resource.data.texte.size() <= 600
+        && request.resource.data.nom is string && request.resource.data.nom.size() > 0 && request.resource.data.nom.size() <= 60
+        && (!('type' in request.resource.data) || (request.resource.data.type is string && request.resource.data.type.size() <= 40))
+        && request.resource.data.etoiles is int && request.resource.data.etoiles >= 1 && request.resource.data.etoiles <= 5
+        && request.resource.data.at == request.time;
+      allow read, delete: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+      allow update: if false;
+    }
+    // Compteur de visites du site (sans donnée personnelle) : chacun peut ajouter 1 à un compteur du jour, seul le propriétaire lit.
+    match /stats/{day} {
+      function sdel(f) { return request.resource.data.get(f, 0) - resource.data.get(f, 0); }
+      function sone(f) { return request.resource.data.get(f, 0) is int && request.resource.data.get(f, 0) >= 0 && request.resource.data.get(f, 0) <= 1; }
+      allow read: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+      allow create: if day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && request.resource.data.keys().hasOnly(['visits','carte','wa','tel','resa','demande','contact'])
+        && sone('visits') && sone('carte') && sone('wa') && sone('tel') && sone('resa') && sone('demande') && sone('contact')
+        && request.resource.data.get('visits',0) + request.resource.data.get('carte',0) + request.resource.data.get('wa',0) + request.resource.data.get('tel',0) + request.resource.data.get('resa',0) + request.resource.data.get('demande',0) + request.resource.data.get('contact',0) == 1;
+      allow update: if request.resource.data.keys().hasOnly(['visits','carte','wa','tel','resa','demande','contact'])
+        && sdel('visits') >= 0 && sdel('carte') >= 0 && sdel('wa') >= 0 && sdel('tel') >= 0 && sdel('resa') >= 0 && sdel('demande') >= 0 && sdel('contact') >= 0
+        && sdel('visits') + sdel('carte') + sdel('wa') + sdel('tel') + sdel('resa') + sdel('demande') + sdel('contact') == 1;
+      allow delete: if false;
+    }
+    // Vidéo « Film du jour » de la carte QR, découpée en morceaux : tout le monde lit, seul le propriétaire modifie.
+    match /carteJour/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    // Galeries des prestations (page « réalisations » avant le calendrier) : tout le monde lit, seul le propriétaire modifie.
+    match /galerie/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    match /galerieChunks/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    match /galerieInfo/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    // Devis envoyés aux clients : lisibles par qui a le lien (adresse impossible à deviner), seul le propriétaire écrit.
+    match /devis/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
+    // Le client accepte un devis : une seule réponse par devis, rien d'autre.
+    match /devisReponses/{id} {
+      allow create: if exists(/databases/$(database)/documents/devis/$(id))
+        && request.resource.data.keys().hasOnly(['ok','at'])
+        && request.resource.data.ok == true
+        && request.resource.data.at == request.time;
+      allow read: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+      allow update, delete: if false;
+    }
+    // Booking requests from the website: anyone may send one, nobody can read them back.
+    match /bookings/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['nom','email','tel','type','date','dates','lieu','message','at'])
+        && request.resource.data.keys().hasAll(['nom','email','at'])
+        && request.resource.data.nom is string && request.resource.data.nom.size() > 0 && request.resource.data.nom.size() <= 120
+        && request.resource.data.email is string && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$') && request.resource.data.email.size() <= 200
+        && (!('tel' in request.resource.data) || (request.resource.data.tel is string && request.resource.data.tel.size() <= 40))
+        && (!('type' in request.resource.data) || (request.resource.data.type is string && request.resource.data.type.size() <= 40))
+        && (!('date' in request.resource.data) || (request.resource.data.date is string && request.resource.data.date.size() <= 10))
+        && (!('dates' in request.resource.data) || (request.resource.data.dates is string && request.resource.data.dates.size() <= 200))
+        && (!('lieu' in request.resource.data) || (request.resource.data.lieu is string && request.resource.data.lieu.size() <= 160))
+        && (!('message' in request.resource.data) || (request.resource.data.message is string && request.resource.data.message.size() <= 3000))
+        && request.resource.data.at == request.time;
+      allow read, update, delete: if false;
+    }
+  }
+}

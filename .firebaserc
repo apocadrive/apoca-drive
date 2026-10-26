@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "apoca-drive"
+  },
+  "targets": {
+    "apoca-drive": {
+      "hosting": {
+        "app": [
+          "apoca-drive"
+        ],
+        "site": [
+          "apocadrive"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
