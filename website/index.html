@@ -409,6 +409,26 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 
 .gal-cap p,.gal-cap h3{transition:opacity .6s ease,transform .8s cubic-bezier(.16,1,.3,1)}
 
+.gal-cta{gap:8px}
+.gal-cta .btn{white-space:nowrap}
+@media (max-width:520px){.gal-cta{justify-content:flex-end;padding-left:78px;padding-right:2px}.gal-cta .btn{padding-left:18px;padding-right:18px;letter-spacing:.14em}.gal-cta .btn.yt{padding:0;width:54px;height:54px;justify-content:center;border-radius:50%;flex:none}.gal-cta .btn.yt span{display:none}.gal-cta .btn.yt svg{width:28px;height:20px}}
+.gal-cta .btn.yt{background:#fff;color:#16130F;border:1px solid var(--line);display:inline-flex;align-items:center;gap:9px;padding-inline:18px}
+.gal-cta .btn.yt[hidden]{display:none}
+.gal-cta .btn.yt span{font:600 13px/1 var(--f-body);letter-spacing:.06em}
+.ytp{position:fixed;inset:0;z-index:118;background:#0A0908;color:#EDE6D8;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;opacity:0;transition:opacity .35s ease}
+.ytp.on{opacity:1}
+.ytp-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:rgba(10,9,8,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.ytp-top h3{margin:0;font:400 26px/1.1 var(--f-display)}.ytp-top h3 em{color:#D9BE86}
+.ytp-x{width:48px;height:48px;border:0;background:none;color:#EDE6D8;font:300 38px/1 var(--f-display);cursor:pointer}
+.ytp-l{display:flex;flex-direction:column;gap:18px;padding:8px max(16px,env(safe-area-inset-right,0px)) calc(30px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));max-width:860px;margin:0 auto}
+.ytv{position:relative;aspect-ratio:16/9;border:0;padding:0;width:100%;background:#16130f center/cover no-repeat;border-radius:6px;overflow:hidden;cursor:pointer;display:block}
+.ytv::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.55))}
+.ytv i{position:absolute;left:50%;top:50%;width:68px;height:48px;margin:-24px 0 0 -34px;border-radius:12px;background:#FF0000;z-index:1;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.ytv i::before{content:"";border-style:solid;border-width:10px 0 10px 17px;border-color:transparent transparent transparent #fff;margin-left:4px}
+.ytv b{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;color:#fff;font:400 20px/1.2 var(--f-display);text-align:left}
+.ytv iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.ytp-ch{align-self:center;display:inline-flex;align-items:center;gap:10px;margin-top:6px;padding:15px 22px;border-radius:999px;background:#FF0000;color:#fff;text-decoration:none;font:600 13px/1 var(--f-body);letter-spacing:.12em;text-transform:uppercase}
+.ytp-e{margin:10px 0 0;color:rgba(237,230,216,.7);text-align:center}
 .gal-cap{position:absolute;left:18px;right:18px;bottom:20px;z-index:1;color:#fff}
 .gal-cap p{margin:0;font:500 11px/1 var(--f-body);letter-spacing:.32em;text-transform:uppercase;color:#D9BE86}
 .gal-cap h3{margin:10px 0 0;font:400 clamp(40px,11vw,60px)/1 var(--f-display);color:#fff;text-wrap:balance}
@@ -794,7 +814,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
       <div class="gal-load" id="gal-load"><span class="spin"></span>Chargement des réalisations…</div>
       <div class="gal-sec" id="gal-sec" hidden><h4>Mes réalisations</h4><small>Touchez pour agrandir</small></div>
       <div class="gal-grid" id="gal-grid"></div>
-      <div class="gal-cta"><button type="button" class="btn" id="gal-go">Réserver ma date <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="gal-cta"><button type="button" class="btn yt" id="gal-yt" hidden aria-label="Voir mes clips sur YouTube"><svg width="30" height="21" viewBox="0 0 28 20" aria-hidden="true" style="width:30px;height:21px;flex:none"><rect width="28" height="20" rx="5" fill="#FF0000"/><path d="M11 5.5v9l8-4.5z" fill="#fff"/></svg><span>YouTube</span></button><button type="button" class="btn" id="gal-go">Réserver ma date <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </div>
     <div class="bk-p bk-narrow" data-p="5" hidden>
       <p class="lede" style="margin:0">Cochez ce qui vous fait envie, en plus du film. Vous pourrez tout changer ensuite avec moi.</p>
@@ -1203,7 +1223,7 @@ cal();
 /* page « Réserver » : prestation → précision → date → coordonnées (photos modifiables dans l'appli) */
 const BK_CATS = [
   {k:"mariage", t:"Mariage", opts:[["Album photo des mariés","Un bel album imprimé avec vos plus belles photos"],["Panneau de bienvenue","Pour accueillir vos invités à l'entrée"],["Save the date","Une petite vidéo ou carte pour annoncer la date"]], subs:{t:'Quel type de <em>mariage ?</em>', o:[["mariage-civil","Mariage civil"],["mariage-religieux","Mariage religieux"],["mariage-civil-religieux","Mariage civil & religieux"],["mariage-coutumier","Mariage coutumier"],["fiancailles","Fiançailles"]]}},
-  {k:"clip", t:"Clip musique", subs:{t:'Quel style de <em>musique ?</em>', o:[["clip-rap","Rap"],["clip-rnb","R&B"],["clip-afro","Afro"],["clip-pop","Pop"],["clip-gospel","Gospel"],["clip-zouk","Zouk / Kompa"],["clip-drill","Drill"],["clip-autre","Autre style"]]}},
+  {k:"clip", t:"Clip musique"},
   {k:"anniversaire", t:"Anniversaire"},
   {k:"podcast", t:"Podcast"},
   {k:"shooting", t:"Shooting photo & vidéo", price:"150 € · 2 h", incl:"7 photos + 1 vidéo verticale pour vos réseaux", tags:["7 photos","1 vidéo verticale"]},
@@ -1300,6 +1320,7 @@ async function galOpen(k, fallback, tileEl){
 }
 const galHeroItem = L => L.find(x => x.hero) || L.find(x => x.type === "video") || null;
 function galFill(k, data, tok){
+  BK.galInfo = data.info || {}; $("#gal-yt").hidden = (k || "").split("-")[0] !== "clip";
   const hi = galHeroItem(data.items), items = data.items.filter(x => x !== hi), info = data.info || {}, base = (k || "").split("-")[0];
   $("#gal-lede").textContent = info.texte || GAL_DEF[k] || GAL_DEF[base] || "";
   $("#gal-inc").innerHTML = String(info.inclus || GAL_INC[k] || GAL_INC[base] || "").split(",").map(x => x.trim()).filter(Boolean).map(x => `<span>${galEsc(x)}</span>`).join("");
@@ -1342,6 +1363,24 @@ gvw.addEventListener("click", e => { if (e.target.closest(".gvw-x")) gvClose(); 
     else if (dy > 90 && Math.abs(dy) > Math.abs(dx) * 1.5) gvClose(); }, {passive: true}); }
 addEventListener("keydown", e => { if (gvw.hidden) return; if (e.key === "Escape") gvClose(); if (e.key === "ArrowRight") gvShow(gvi + 1, 1); if (e.key === "ArrowLeft") gvShow(gvi - 1, -1); });
 $("#gal-grid").addEventListener("click", e => { const b = e.target.closest("[data-gi]"); if (!b) return; gvOpen(+b.dataset.gi); });
+/* Page « Mes clips sur YouTube » */
+const YT_CH = "https://www.youtube.com/@apocadrive";
+const ytVid = u => { const m = String(u || "").match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(String(u).trim()) ? String(u).trim() : ""); };
+const ytp = document.createElement("div"); ytp.className = "ytp"; ytp.hidden = true; ytp.setAttribute("role", "dialog"); ytp.setAttribute("aria-label", "Mes clips sur YouTube");
+ytp.innerHTML = `<div class="ytp-top"><h3>Mes clips <em>sur YouTube</em></h3><button type="button" class="ytp-x" aria-label="Fermer">×</button></div><div class="ytp-l"></div>`;
+document.body.appendChild(ytp);
+function ytOpen(){
+  const ids = String((BK.galInfo || {}).youtube || "").split(/[\s,]+/).map(ytVid).filter(Boolean);
+  if (!ids.length){ window.open(YT_CH, "_blank", "noopener"); return; }
+  const L = ytp.querySelector(".ytp-l");
+  L.innerHTML = ids.map(id => `<button type="button" class="ytv" data-yt="${id}" style="background-image:url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')"><i aria-hidden="true"></i><b></b></button>`).join("") + `<a class="ytp-ch" href="${YT_CH}" target="_blank" rel="noopener"><svg width="20" height="14" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="5" fill="#fff"/><path d="M11 5.5v9l8-4.5z" fill="#FF0000"/></svg>Voir ma chaîne</a>`;
+  ids.forEach(id => fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent("https://www.youtube.com/watch?v=" + id)}&format=json`).then(r => r.ok ? r.json() : null).then(j => { const b = L.querySelector(`[data-yt="${id}"] b`); if (j && b) b.textContent = j.title || ""; }).catch(() => {}));
+  ytp.hidden = false; ytp.scrollTop = 0; requestAnimationFrame(() => ytp.classList.add("on"));
+}
+function ytClose(){ ytp.classList.remove("on"); setTimeout(() => { ytp.hidden = true; ytp.querySelector(".ytp-l").innerHTML = ""; }, 350); }
+ytp.addEventListener("click", e => { if (e.target.closest(".ytp-x")){ ytClose(); return; } const v = e.target.closest(".ytv[data-yt]"); if (v && !v.querySelector("iframe")) v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.dataset.yt}?autoplay=1&playsinline=1&rel=0" title="Clip" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`; });
+addEventListener("keydown", e => { if (e.key === "Escape" && !ytp.hidden) ytClose(); });
+$("#gal-yt").onclick = ytOpen;
 $("#gal-go").onclick = () => bkAfterGal();
 const bkAfterSub = el => galOpen(BK.subk || (BK.cat && BK.cat.k), BK.subk ? BK.cat.k : null, el);
 let bkSwapT = 0;

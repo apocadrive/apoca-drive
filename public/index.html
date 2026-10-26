@@ -2081,7 +2081,7 @@ const SITE_DEF = {
 };
 const SITE_SECS = [["apropos","À propos"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["journal","Journal"],["insta","Instagram"]];
 const FILM_CATS = [["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Corporate"]];
-const RESA_ITEMS = [["mariage","Mariage",""],["mariage-civil","Mariage civil","Mariage"],["mariage-religieux","Mariage religieux","Mariage"],["mariage-civil-religieux","Mariage civil & religieux","Mariage"],["mariage-coutumier","Mariage coutumier","Mariage"],["fiancailles","Fiançailles","Mariage"],["clip","Clip musique",""],["clip-rap","Rap","Clip musique"],["clip-rnb","R&B","Clip musique"],["clip-afro","Afro","Clip musique"],["clip-pop","Pop","Clip musique"],["clip-gospel","Gospel","Clip musique"],["clip-zouk","Zouk / Kompa","Clip musique"],["clip-drill","Drill","Clip musique"],["clip-autre","Autre style","Clip musique"],["anniversaire","Anniversaire",""],["podcast","Podcast",""],["shooting","Shooting photo & vidéo",""],["outfit","Outfit",""]];
+const RESA_ITEMS = [["mariage","Mariage",""],["mariage-civil","Mariage civil","Mariage"],["mariage-religieux","Mariage religieux","Mariage"],["mariage-civil-religieux","Mariage civil & religieux","Mariage"],["mariage-coutumier","Mariage coutumier","Mariage"],["fiancailles","Fiançailles","Mariage"],["clip","Clip musique",""],["anniversaire","Anniversaire",""],["podcast","Podcast",""],["shooting","Shooting photo & vidéo",""],["outfit","Outfit",""]];
 S.resa = null;
 S.siteJournal = null; S.siteInsta = null;
 S.site = null; S.sitePh = {hero:null, about:null}; S.siteFilms = null; S.siteAvis = null; S.sitePend = null;
@@ -2407,6 +2407,7 @@ function galEditor(k, label){
     <p class="small muted" style="margin:0">Ce que le client voit quand il touche « ${esc(label)} », avant de choisir sa date. Conseil : 20 à 30 photos et 4 à 6 vidéos courtes (10 à 30 s). Choisis avec « ☆ Haut » ce qui s'affiche en grand en haut.</p>
     <label class="f">Petite phrase<input type="text" data-gi="texte" data-gk="${k}" value="${esc(info.texte||"")}" maxlength="160" placeholder="Ex. : Votre tenue, en mouvement."></label>
     <label class="f">Ce qui est compris (séparé par des virgules)<input type="text" data-gi="inclus" data-gk="${k}" value="${esc(info.inclus||"")}" maxlength="200" placeholder="Photos retouchées, Vidéo verticale, Lieu au choix"></label>
+    ${k === "clip" ? `<label class="f">Liens YouTube de tes clips (un par ligne)<textarea data-gi="youtube" data-gk="${k}" rows="4" maxlength="2000" placeholder="https://youtu.be/…&#10;https://www.youtube.com/watch?v=…">${esc(info.youtube||"")}</textarea><small class="muted">Le bouton YouTube de la page Clip ouvre ces vidéos. Sans lien, il ouvre ta chaîne.</small></label>` : ""}
     ${up ? `<div class="row"><span class="spin"></span><span class="small">${esc(up.msg)}</span></div>` : `<div class="row" style="gap:6px;flex-wrap:wrap"><label class="btn sm primary" style="cursor:pointer">+ Photos<input type="file" accept="image/*" multiple data-galph="${k}" hidden></label><label class="btn sm primary" style="cursor:pointer">+ Vidéo<input type="file" accept="video/*" data-galvid="${k}" hidden></label></div>`}
     ${list === undefined ? `<div class="row"><span class="spin"></span><span class="small">Chargement…</span></div>` : !list.length ? `<p class="small muted" style="margin:0">Aucune réalisation pour l'instant : la page montre seulement la photo de la case et le texte.</p>` :
     `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">${(() => { const hid = (list.find(x => x.hero) || list.find(x => x.type === "video") || {}).id; return list.map((x, i) => `<div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#2a241b${x.id===hid?";outline:2px solid #ecc94b;outline-offset:-2px":""}">${x.img?`<img src="${esc(x.img)}" alt="" style="width:100%;height:100%;object-fit:contain;display:block">`:""}${x.id===hid?`<span class="pill" style="position:absolute;left:4px;top:4px;background:#ecc94b;color:#111">★ En haut</span>`:`${x.type==="video"?`<span class="pill" style="position:absolute;left:4px;top:4px">Vidéo</span>`:""}<button class="btn sm" data-act="galhero" data-gk="${k}" data-id="${x.id}" style="position:absolute;right:4px;top:4px;padding:4px 7px">☆ Haut</button>`}
@@ -2899,7 +2900,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-rdv-anim";
+const APP_VER = "2026-10-26-youtube";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
