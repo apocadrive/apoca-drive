@@ -334,7 +334,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 /* page « Réserver » */
 .bk{position:fixed;inset:0;z-index:70;background:var(--paper);color:var(--ink);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .bk:not([hidden]){animation:bkIn .7s cubic-bezier(.22,1,.36,1) both}
-.bk-in{transition:opacity .22s ease}.bk-in.swap{opacity:0}.bk.restoring .bk-in{opacity:0;transition:none}
+.bk-in{transition:opacity .32s ease}.bk-in.swap{opacity:0}.bk.restoring .bk-in{opacity:0;transition:none}
 .bk.out{animation:bkOut .26s ease both;pointer-events:none}
 .bk-in.fresh > .eyebrow,.bk-in.fresh > h2{animation:bkTile .8s cubic-bezier(.22,1,.36,1) both}.bk-in.fresh > h2{animation-delay:.06s}
 .bk-p.bkon .bk-tile{animation:bkTile .9s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*60ms + 120ms)}
@@ -356,7 +356,9 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 @media (min-width:760px){.bk-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.bk-in{padding-left:32px;padding-right:32px}}
 .bk-tile{position:relative;aspect-ratio:1;border:0;padding:0;cursor:pointer;overflow:hidden;background:radial-gradient(120% 90% at 30% 20%,#3a3023 0%,#16130f 70%);color:#fff;text-align:left;display:block;width:100%}
 .bk-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.16,1,.3,1)}
-.bk-tile:hover img,.bk-tile:focus-visible img{transform:scale(1.05)}
+@media (hover:hover){.bk-tile:hover img{transform:scale(1.05)}}.bk-tile:focus-visible img{transform:scale(1.05)}
+.bk-tile,.bk button,.gal-it,.ytv,.bk-ic{-webkit-tap-highlight-color:transparent}
+
 .bk-tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.72) 100%)}
 .bk-tile img.wide,.gal-hero img.wide{object-fit:contain;object-position:50% 50%}
 .bk-tile img.wblur,.gal-hero img.wblur{object-fit:cover;filter:blur(18px) brightness(.55);transform:scale(1.15)}
@@ -400,9 +402,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .gvw-c{position:absolute;left:0;right:0;bottom:calc(16px + env(safe-area-inset-bottom,0px));margin:0;text-align:center;color:rgba(237,230,216,.7);font:500 12px/1 var(--f-body);letter-spacing:.24em}
 @media (hover:none){.gvw-p,.gvw-n{opacity:.55}}
 @media (prefers-reduced-motion:reduce){.gvw,.gvw-m{transition:none}}
-.bk-p.leaving .bk-tile{animation:none!important}
-.bk-p.leaving .bk-tile:not(.picked){opacity:.45;transition:opacity .35s ease}
-.bk-p.leaving .bk-tile.picked img{transform:scale(1.05);transition:transform 1.2s cubic-bezier(.22,1,.36,1)}
+
 .gmorph{position:fixed;z-index:110;overflow:hidden;background:radial-gradient(120% 90% at 30% 20%,#3a3023 0%,#16130f 70%);pointer-events:none;will-change:left,top,width,height}
 .gmorph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
 .gmorph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.6))}
@@ -1315,7 +1315,7 @@ async function galOpen(k, fallback, tileEl){
   const hi = data && galHeroItem(data.items);
   const heroSrc = (hi && hi.img) || ph || (data && ((data.items.find(x => x.type !== "video" && x.img) || {}).img));
   const hero = await galImg(heroSrc);
-  clearTimeout(busyT); if (anim && Date.now() - t0 < 250) await new Promise(r => setTimeout(r, 250 - (Date.now() - t0)));
+  clearTimeout(busyT); 
   const fromRect = anim ? tileEl.getBoundingClientRect() : null, tileImg = tileEl && tileEl.querySelector("img:not(.wblur)");
   const clean = () => { if (tileEl){ tileEl.classList.remove("busy", "picked"); } if (pane) pane.classList.remove("leaving"); };
   if (tok !== galTok || BK.cur !== from || bk.hidden){ clean(); return; }
@@ -1396,7 +1396,7 @@ function bkShow(n){
   BK.cur = n;
   const inEl = bk.querySelector(".bk-in"), shown = bk.querySelector(".bk-p:not([hidden])");
   clearTimeout(bkSwapT);
-  if (!bk.hidden && shown && +shown.dataset.p !== n && !galReduce()){ inEl.classList.add("swap"); bkSwapT = setTimeout(() => { bkShowNow(n); inEl.classList.remove("swap"); }, 230); }
+  if (!bk.hidden && shown && +shown.dataset.p !== n && !galReduce()){ inEl.classList.add("swap"); bkSwapT = setTimeout(() => { bkShowNow(n); requestAnimationFrame(() => inEl.classList.remove("swap")); }, 330); }
   else { inEl.classList.remove("swap"); bkShowNow(n); }
 }
 function bkShowNow(n){
@@ -1417,11 +1417,11 @@ function bkAnim(){
   const cur = bk.querySelector(".bk-p:not([hidden])");
   if (!cur) return;
   cur.classList.remove("bkon", "bkdone"); const inEl = bk.querySelector(".bk-in"); inEl.classList.remove("fresh");
-  requestAnimationFrame(() => requestAnimationFrame(() => { inEl.classList.add("fresh");
+  void cur.offsetWidth; { inEl.classList.add("fresh");
     cur.querySelectorAll(".bk-tile").forEach((t, i) => t.style.setProperty("--i", i));
     cur.classList.add("bkon");
     bkAT = setTimeout(() => { cur.classList.add("bkdone"); inEl.classList.remove("fresh"); }, 1900);
-  }));
+  }
 }
 function bkGo(n){ history.pushState({bk:n}, "", "#reserver"); bkShow(n); }
 let bkLast = null;
@@ -1471,7 +1471,7 @@ addEventListener("keydown", e => { if (e.key === "Escape" && !bk.hidden) bkClose
 })();
 addEventListener("popstate", e => { const n = e.state && e.state.bk; if (!n){ if (!bk.hidden) bkHide(); return; } if (bk.hidden){ bk.hidden = false; document.body.style.overflow = "hidden"; bkTiles(); } if (n >= 2 && !BK.cat) return bkShow(1); if (n === 2 && !BK.cat.subs) return bkShow(1); if (n === 5 && !BK.cat.opts) return bkShow(1); if (n === 6 && !BK.galItems) return bkShow(1); bkShow(n); });
 $("#bk-cats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; if (b.closest(".bk-p").classList.contains("leaving")) return; BK.cat = BK_CATS[+b.dataset.c]; BK.sub = ""; BK.subk = ""; BK.opts = []; if (BK.cat.subs){ galPrefetch([BK.cat.k].concat(BK.cat.subs.o.map(o => o[0]))); const pn = b.closest(".bk-p"), go = () => { pn.classList.remove("leaving"); b.classList.remove("picked"); bkTiles(); bkGo(2); };
-    if (galReduce()) go(); else { pn.classList.add("leaving"); b.classList.add("picked"); setTimeout(go, 200); } } else bkAfterSub(b); });
+    go(); } else bkAfterSub(b); });
 $("#bk-subs").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; if (b.closest(".bk-p").classList.contains("leaving")) return; BK.sub = BK.cat.subs.o[+b.dataset.s][1]; BK.subk = BK.cat.subs.o[+b.dataset.s][0]; bkAfterSub(b); });
 $("#bk-opts").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return; const l = BK.cat.opts[+b.dataset.o][0], i = BK.opts.indexOf(l); if (i < 0) BK.opts.push(l); else BK.opts.splice(i, 1); bkOpts(); });
 $("#bk-opt-ok").onclick = () => bkGo(3);
