@@ -411,10 +411,19 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 
 .gal-cta{gap:8px}
 .gal-cta .btn{white-space:nowrap}
-@media (max-width:520px){.gal-cta{justify-content:flex-end;padding-left:78px;padding-right:2px}.gal-cta .btn{padding-left:18px;padding-right:18px;letter-spacing:.14em}.gal-cta .btn.yt{padding:0;width:54px;height:54px;justify-content:center;border-radius:50%;flex:none}.gal-cta .btn.yt span{display:none}.gal-cta .btn.yt svg{width:28px;height:20px}}
-.gal-cta .btn.yt{background:#fff;color:#16130F;border:1px solid var(--line);display:inline-flex;align-items:center;gap:9px;padding-inline:18px}
+@media (max-width:520px){.gal-cta{justify-content:flex-end;padding-left:86px;padding-right:2px}.gal-cta .btn{padding-left:18px;padding-right:18px;letter-spacing:.14em}}
+.gal-cta .btn.yt{position:relative;overflow:hidden;flex:none;width:66px;height:66px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:20px;border:1px solid rgba(255,255,255,.5);color:#fff;
+  background:linear-gradient(155deg,rgba(255,92,92,.95) 0%,rgba(236,16,16,.92) 42%,rgba(176,0,0,.95) 100%);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -8px 16px rgba(110,0,0,.45),inset 0 10px 18px rgba(255,255,255,.16),0 12px 28px rgba(220,0,0,.38),0 2px 6px rgba(120,0,0,.25);
+  transition:transform .35s cubic-bezier(.22,1,.36,1),box-shadow .35s ease}
+.gal-cta .btn.yt::before{content:"";position:absolute;left:7%;right:7%;top:5%;height:46%;border-radius:15px 15px 45% 45%/15px 15px 30% 30%;background:linear-gradient(180deg,rgba(255,255,255,.62),rgba(255,255,255,.04));pointer-events:none}
+.gal-cta .btn.yt::after{content:"";position:absolute;inset:-20%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.45) 50%,transparent 60%);transform:translateX(-120%);animation:ytSheen 5.5s cubic-bezier(.22,1,.36,1) 1.5s infinite;pointer-events:none}
+@keyframes ytSheen{0%{transform:translateX(-120%)}25%,100%{transform:translateX(120%)}}
+.gal-cta .btn.yt svg{position:relative;z-index:1;margin-left:3px;filter:drop-shadow(0 1px 2px rgba(90,0,0,.45))}
+.gal-cta .btn.yt span{display:none}
+.gal-cta .btn.yt:active{transform:scale(.93);box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -6px 12px rgba(110,0,0,.5),0 6px 14px rgba(220,0,0,.3)}
+.gal-cta{align-items:center}
 .gal-cta .btn.yt[hidden]{display:none}
-.gal-cta .btn.yt span{font:600 13px/1 var(--f-body);letter-spacing:.06em}
 .ytp{position:fixed;inset:0;z-index:118;background:#fff;color:var(--ink,#16130F);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;opacity:0;transition:opacity .35s ease}
 .ytp.on{opacity:1}
 .ytp-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line,#E6DFD3)}
@@ -814,7 +823,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
       <div class="gal-load" id="gal-load"><span class="spin"></span>Chargement des réalisations…</div>
       <div class="gal-sec" id="gal-sec" hidden><h4>Mes réalisations</h4><small>Touchez pour agrandir</small></div>
       <div class="gal-grid" id="gal-grid"></div>
-      <div class="gal-cta"><button type="button" class="btn yt" id="gal-yt" hidden aria-label="Voir mes clips sur YouTube"><svg width="30" height="21" viewBox="0 0 28 20" aria-hidden="true" style="width:30px;height:21px;flex:none"><rect width="28" height="20" rx="5" fill="#FF0000"/><path d="M11 5.5v9l8-4.5z" fill="#fff"/></svg><span>YouTube</span></button><button type="button" class="btn" id="gal-go">Réserver ma date <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+      <div class="gal-cta"><button type="button" class="btn yt" id="gal-yt" hidden aria-label="Voir mes clips sur YouTube"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2v13.6c0 .8.9 1.3 1.6.8l10.2-6.8c.6-.4.6-1.2 0-1.6L9.6 4.4C8.9 3.9 8 4.4 8 5.2z" fill="#fff"/></svg><span>YouTube</span></button><button type="button" class="btn" id="gal-go">Réserver ma date <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
     </div>
     <div class="bk-p bk-narrow" data-p="5" hidden>
       <p class="lede" style="margin:0">Cochez ce qui vous fait envie, en plus du film. Vous pourrez tout changer ensuite avec moi.</p>
