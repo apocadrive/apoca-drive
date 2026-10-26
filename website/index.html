@@ -132,10 +132,8 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .frame .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;font:300 13px/1.6 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:rgba(237,230,216,.55)}
 
 /* scroll reveal (visible at rest; only animates where supported) */
-@supports (animation-timeline:view()){
-  .soft{animation:soft linear both;animation-timeline:view();animation-range:entry 0% cover 25%}
-  @keyframes soft{from{transform:translateY(40px)}to{transform:none}}
-}
+.js-sr .sr{opacity:0;transform:translateY(24px);transition:opacity .9s cubic-bezier(.22,1,.36,1),transform 1.1s cubic-bezier(.22,1,.36,1);transition-delay:var(--d,0s)}
+.js-sr .sr.on{opacity:1;transform:none}
 
 /* à propos */
 .about{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(40px,7vw,110px);align-items:center}
@@ -333,14 +331,15 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 
 /* page « Réserver » */
 .bk{position:fixed;inset:0;z-index:70;background:var(--paper);color:var(--ink);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.bk:not([hidden]){animation:bkIn .6s cubic-bezier(.16,1,.3,1) both}
+.bk:not([hidden]){animation:bkIn .7s cubic-bezier(.22,1,.36,1) both}
+.bk-in{transition:opacity .22s ease}.bk-in.swap{opacity:0}.bk.restoring .bk-in{opacity:0;transition:none}
 .bk.out{animation:bkOut .26s ease both;pointer-events:none}
-.bk-p.bkon{animation:bkStep .6s cubic-bezier(.16,1,.3,1) both}
-.bk-p.bkon .bk-tile{animation:bkTile .75s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i,0)*70ms + 90ms)}
-@keyframes bkIn{from{opacity:0;transform:translateY(22px) scale(.985)}to{opacity:1;transform:none}}
+.bk-in.fresh > .eyebrow,.bk-in.fresh > h2{animation:bkTile .8s cubic-bezier(.22,1,.36,1) both}.bk-in.fresh > h2{animation-delay:.06s}
+.bk-p.bkon .bk-tile{animation:bkTile .9s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--i,0)*60ms + 120ms)}
+@keyframes bkIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes bkOut{to{opacity:0;transform:translateY(10px)}}
 @keyframes bkStep{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-@keyframes bkTile{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes bkTile{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 .bk-p.bkdone,.bk-p.bkdone .bk-tile{animation:none!important;opacity:1!important;transform:none!important}
 @media (prefers-reduced-motion:reduce){.bk:not([hidden]),.bk.out,.bk-p.bkon,.bk-p.bkon .bk-tile{animation:none!important}}
 .bk-top{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
@@ -374,12 +373,14 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .gal-hero.empty{aspect-ratio:16/9}
 .gal-hero video.hv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0%;opacity:0;transition:opacity 1.3s ease}
 .gal-hero video.hv.on{opacity:1}
-.gal-it img{opacity:0;transition:opacity .7s ease}.gal-it img.ok{opacity:1}
-.bk-tile.busy{transform:scale(.97);opacity:.8;transition:transform .25s ease,opacity .25s ease}
+.gal-it img{opacity:0;transition:opacity .9s ease}.gal-it img.ok{opacity:1}
+.bk-tile.busy{opacity:.85}
 .bk-tile.busy::before{content:"";position:absolute;right:12px;top:12px;z-index:3;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;animation:galspin .8s linear infinite}
 @keyframes galspin{to{transform:rotate(360deg)}}
-.bk-gal.bkon > *{animation:bkTile .8s cubic-bezier(.16,1,.3,1) both}
-.bk-gal.bkon > :nth-child(2){animation-delay:.08s}.bk-gal.bkon > :nth-child(3){animation-delay:.14s}.bk-gal.bkon > :nth-child(n+4){animation-delay:.2s}
+.bk-gal.bkon > *{animation:bkTile .9s cubic-bezier(.22,1,.36,1) both}
+.bk-gal.bkon > :nth-child(2){animation-delay:.1s}.bk-gal.bkon > :nth-child(3){animation-delay:.18s}.bk-gal.bkon > :nth-child(n+4){animation-delay:.26s}
+.bk-gal.bkon .gal-hero #gal-hero img:not(.wblur){animation:galKb 2.2s cubic-bezier(.22,1,.36,1) both}
+@keyframes galKb{from{transform:scale(1.06)}to{transform:none}}
 .bk-gal.bkdone > *{animation:none}
 @media (prefers-reduced-motion:reduce){.bk-gal.bkon > *{animation:none}.gal-it img,.gal-hero video.hv{transition:none}}
 .ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:90;width:40px;height:40px;margin-left:-20px;border-radius:50%;background:#fff;box-shadow:0 6px 20px rgba(22,19,15,.18);display:grid;place-items:center;opacity:0;transform:translateY(-50px);pointer-events:none}
@@ -398,22 +399,20 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 @media (hover:none){.gvw-p,.gvw-n{opacity:.55}}
 @media (prefers-reduced-motion:reduce){.gvw,.gvw-m{transition:none}}
 .bk-p.leaving .bk-tile{animation:none!important}
-.bk-p.leaving .bk-tile:not(.picked){opacity:0;transform:scale(.94);filter:blur(2px);transition:opacity .32s ease,transform .32s ease,filter .32s ease}
-.bk-p.leaving .bk-tile.picked{transform:scale(1.03);box-shadow:0 22px 50px rgba(22,19,15,.35);z-index:2;transition:transform .32s cubic-bezier(.2,.8,.2,1),box-shadow .32s ease}
+.bk-p.leaving .bk-tile:not(.picked){opacity:.45;transition:opacity .35s ease}
+.bk-p.leaving .bk-tile.picked img{transform:scale(1.05);transition:transform 1.2s cubic-bezier(.22,1,.36,1)}
 .gmorph{position:fixed;z-index:110;overflow:hidden;background:radial-gradient(120% 90% at 30% 20%,#3a3023 0%,#16130f 70%);pointer-events:none;will-change:left,top,width,height}
 .gmorph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%}
 .gmorph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.6))}
-.bk-gal.bkon > .gal-hero{animation:none}
-.bk-gal.bkon.morph > :not(.gal-hero){animation-delay:.42s}.bk-gal.bkon.morph > :nth-child(3){animation-delay:.5s}.bk-gal.bkon.morph > :nth-child(n+4){animation-delay:.58s}
+
 .gal-cap p,.gal-cap h3{transition:opacity .6s ease,transform .8s cubic-bezier(.16,1,.3,1)}
-.gal-hero.pre .gal-cap p,.gal-hero.pre .gal-cap h3{opacity:0;transform:translateY(14px)}
-.gal-hero.pre .gal-cap h3{transition-delay:.12s}
+
 .gal-cap{position:absolute;left:18px;right:18px;bottom:20px;z-index:1;color:#fff}
 .gal-cap p{margin:0;font:500 11px/1 var(--f-body);letter-spacing:.32em;text-transform:uppercase;color:#D9BE86}
 .gal-cap h3{margin:10px 0 0;font:400 clamp(40px,11vw,60px)/1 var(--f-display);color:#fff;text-wrap:balance}
 .gal-cap h3 em{color:var(--lc,#D9BE86);transition:color 1.2s ease}
-.gal-cap h3{min-height:2em;text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.35);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.16,1,.3,1),filter 1.1s ease}
-.gal-cap h3.out{opacity:0;transform:translateY(12px);filter:blur(6px)}
+.gal-cap h3{min-height:2em;text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.35);transition:opacity 1s ease,transform 1.1s cubic-bezier(.22,1,.36,1)}
+.gal-cap h3.out{opacity:0;transform:translateY(8px)}
 @media (prefers-reduced-motion:reduce){.gal-cap h3{transition:opacity .6s ease}.gal-cap h3.out{transform:none;filter:none}}
 .gal-sec{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .gal-sec h4{margin:0;font:400 30px/1.1 var(--f-display)}
@@ -1256,7 +1255,7 @@ function galImg(src){ return new Promise(res => { if (!src) return res(null); co
   im.onload = () => (im.decode ? im.decode().catch(() => {}) : Promise.resolve()).then(fin); im.onerror = fin; setTimeout(fin, 1500); im.src = src; }); }
 const galHeroHTML = p => !p ? "" : (p.w > p.h * 1.1 ? `<img class="wblur" src="${galEsc(p.src)}" alt=""><img class="wide" src="${galEsc(p.src)}" alt="">` : `<img src="${galEsc(p.src)}" alt="">`);
 const galWait = (p, ms) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
-const galReduce = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+const galReduce = () => !!window.__bkFast || matchMedia("(prefers-reduced-motion: reduce)").matches;
 function galMorph(from, src, dest){
   const box = $(".gal-hero"); const to = box.getBoundingClientRect(); if (!to.width) return;
   const c = document.createElement("div"); c.className = "gmorph"; if (src){ const im = document.createElement("img"); im.src = src; im.alt = ""; c.appendChild(im); }
@@ -1278,7 +1277,7 @@ async function galOpen(k, fallback, tileEl){
   const hi = data && galHeroItem(data.items);
   const heroSrc = (hi && hi.img) || ph || (data && ((data.items.find(x => x.type !== "video" && x.img) || {}).img));
   const hero = await galImg(heroSrc);
-  clearTimeout(busyT); if (anim && Date.now() - t0 < 330) await new Promise(r => setTimeout(r, 330 - (Date.now() - t0)));
+  clearTimeout(busyT); if (anim && Date.now() - t0 < 250) await new Promise(r => setTimeout(r, 250 - (Date.now() - t0)));
   const fromRect = anim ? tileEl.getBoundingClientRect() : null, tileImg = tileEl && tileEl.querySelector("img:not(.wblur)");
   const clean = () => { if (tileEl){ tileEl.classList.remove("busy", "picked"); } if (pane) pane.classList.remove("leaving"); };
   if (tok !== galTok || BK.cur !== from || bk.hidden){ clean(); return; }
@@ -1287,9 +1286,7 @@ async function galOpen(k, fallback, tileEl){
   $("#gal-h").innerHTML = GAL_H[k] || GAL_H[b0] || (BK.cat ? ESC(BK.cat.t) : ""); $("#gal-h").classList.remove("out");
   $("#gal-load").hidden = true; $("#gal-grid").innerHTML = ""; $("#gal-sec").hidden = true; BK.galItems = [];
   galFill(k, data || {items:[], info:{}}, tok);
-  const gp = $('[data-p="6"]'); gp.classList.toggle("morph", !!fromRect);
-  bkGo(6); clean(); galRotate(k);
-  if (fromRect) galMorph(fromRect, (tileImg && tileImg.src) || (hero && hero.src), hero && new URL(hero.src, location.href).href);
+  bkGo(6); setTimeout(clean, 260); galRotate(k);
   if (!data){ data = await galData(k, fallback); if (tok === galTok && BK.cur === 6) galFill(k, data, tok); }
 }
 const galHeroItem = L => L.find(x => x.hero) || L.find(x => x.type === "video") || null;
@@ -1338,8 +1335,16 @@ addEventListener("keydown", e => { if (gvw.hidden) return; if (e.key === "Escape
 $("#gal-grid").addEventListener("click", e => { const b = e.target.closest("[data-gi]"); if (!b) return; gvOpen(+b.dataset.gi); });
 $("#gal-go").onclick = () => bkAfterGal();
 const bkAfterSub = el => galOpen(BK.subk || (BK.cat && BK.cat.k), BK.subk ? BK.cat.k : null, el);
+let bkSwapT = 0;
 function bkShow(n){
   BK.cur = n;
+  const inEl = bk.querySelector(".bk-in"), shown = bk.querySelector(".bk-p:not([hidden])");
+  clearTimeout(bkSwapT);
+  if (!bk.hidden && shown && +shown.dataset.p !== n && !galReduce()){ inEl.classList.add("swap"); bkSwapT = setTimeout(() => { bkShowNow(n); inEl.classList.remove("swap"); }, 230); }
+  else { inEl.classList.remove("swap"); bkShowNow(n); }
+}
+function bkShowNow(n){
+  if (BK.cur !== n) return;
   bk.querySelectorAll(".bk-p").forEach(x => x.hidden = +x.dataset.p !== n);
   $("#bk-t").innerHTML = n === 2 ? BK.cat.subs.t : BK_T[n];
   $("#bk-step").textContent = n === 1 ? "Réserver ma date" : [BK.cat && BK.cat.t, n > 2 ? BK.sub : ""].filter(Boolean).join(" · ");
@@ -1355,11 +1360,11 @@ function bkAnim(){
   clearTimeout(bkAT);
   const cur = bk.querySelector(".bk-p:not([hidden])");
   if (!cur) return;
-  cur.classList.remove("bkon", "bkdone");
-  requestAnimationFrame(() => requestAnimationFrame(() => {
+  cur.classList.remove("bkon", "bkdone"); const inEl = bk.querySelector(".bk-in"); inEl.classList.remove("fresh");
+  requestAnimationFrame(() => requestAnimationFrame(() => { inEl.classList.add("fresh");
     cur.querySelectorAll(".bk-tile").forEach((t, i) => t.style.setProperty("--i", i));
     cur.classList.add("bkon");
-    bkAT = setTimeout(() => cur.classList.add("bkdone"), 1500);
+    bkAT = setTimeout(() => { cur.classList.add("bkdone"); inEl.classList.remove("fresh"); }, 1900);
   }));
 }
 function bkGo(n){ history.pushState({bk:n}, "", "#reserver"); bkShow(n); }
@@ -1383,13 +1388,23 @@ document.addEventListener("click", e => { const a = e.target.closest('a[href="#r
 $("#bk-x").onclick = bkClose;
 $("#bk-back").onclick = () => history.back();
 addEventListener("keydown", e => { if (e.key === "Escape" && !bk.hidden) bkClose(); });
+/* Apparition douce des sections au défilement (une seule fois) */
+(() => { if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const els = []; document.querySelectorAll("section.soft > .in").forEach(inn => [...inn.children].forEach((c, i) => { c.classList.add("sr"); c.style.setProperty("--d", Math.min(i, 4) * 0.08 + "s"); els.push(c); }));
+  document.documentElement.classList.add("js-sr");
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target); } }), {rootMargin: "0px 0px -8% 0px", threshold: 0.08});
+  els.forEach(e => io.observe(e));
+  setTimeout(() => els.forEach(e => { const r = e.getBoundingClientRect(); if (r.top < innerHeight) e.classList.add("on"); }), 50); })();
 /* Tirer vers le bas pour actualiser, dans la fenêtre de réservation */
 (() => {
   const ind = document.createElement("div"); ind.className = "ptr"; ind.setAttribute("aria-hidden", "true"); ind.innerHTML = "<i></i>"; document.body.appendChild(ind);
   let y0 = null, d = 0, busy = false;
   try { const r = JSON.parse(sessionStorage.getItem("bkRestore") || "null"); sessionStorage.removeItem("bkRestore");
-    if (r && r.c >= 0 && r.p > 1) setTimeout(() => { if (bk.hidden) return; const t = bk.querySelector(`#bk-cats [data-c="${r.c}"]`); if (!t) return; t.click();
-      if (r.s >= 0 && r.p !== 2) setTimeout(() => { const u = bk.querySelector(`#bk-subs [data-s="${r.s}"]`); if (u) u.click(); }, 350); }, 500); } catch(e){}
+    if (r && r.c >= 0 && r.p > 1){ bk.classList.add("restoring"); window.__bkFast = true;
+      const end = () => { window.__bkFast = false; requestAnimationFrame(() => { bk.querySelector(".bk-in").style.transition = "opacity .6s ease"; bk.classList.remove("restoring"); setTimeout(() => { bk.querySelector(".bk-in").style.transition = ""; }, 700); }); };
+      const go = () => { if (bk.hidden){ end(); return; } const t = bk.querySelector(`#bk-cats [data-c="${r.c}"]`); if (!t){ end(); return; } t.click();
+        if (r.s >= 0 && r.p !== 2) setTimeout(() => { const u = bk.querySelector(`#bk-subs [data-s="${r.s}"]`); if (u) u.click(); setTimeout(end, 600); }, 30); else setTimeout(end, 300); };
+      setTimeout(go, 60); setTimeout(() => { if (bk.classList.contains("restoring")) end(); }, 3500); } } catch(e){}
   const set = (o, t, r) => { ind.style.opacity = o; ind.style.transform = `translateY(${t}px) rotate(${r}deg)`; };
   bk.addEventListener("touchstart", e => { if (busy || bk.scrollTop > 0 || e.touches.length !== 1) { y0 = null; return; } y0 = e.touches[0].clientY; d = 0; ind.style.transition = "none"; }, {passive: true});
   bk.addEventListener("touchmove", e => { if (y0 === null) return; d = e.touches[0].clientY - y0; if (d <= 0 || bk.scrollTop > 0){ set(0, -50, 0); return; } const p = Math.min(d * .45, 90); set(Math.min(p / 60, 1), p - 40, p * 4); }, {passive: true});
@@ -1400,7 +1415,7 @@ addEventListener("keydown", e => { if (e.key === "Escape" && !bk.hidden) bkClose
 })();
 addEventListener("popstate", e => { const n = e.state && e.state.bk; if (!n){ if (!bk.hidden) bkHide(); return; } if (bk.hidden){ bk.hidden = false; document.body.style.overflow = "hidden"; bkTiles(); } if (n >= 2 && !BK.cat) return bkShow(1); if (n === 2 && !BK.cat.subs) return bkShow(1); if (n === 5 && !BK.cat.opts) return bkShow(1); if (n === 6 && !BK.galItems) return bkShow(1); bkShow(n); });
 $("#bk-cats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; if (b.closest(".bk-p").classList.contains("leaving")) return; BK.cat = BK_CATS[+b.dataset.c]; BK.sub = ""; BK.subk = ""; BK.opts = []; if (BK.cat.subs){ galPrefetch([BK.cat.k].concat(BK.cat.subs.o.map(o => o[0]))); const pn = b.closest(".bk-p"), go = () => { pn.classList.remove("leaving"); b.classList.remove("picked"); bkTiles(); bkGo(2); };
-    if (galReduce()) go(); else { pn.classList.add("leaving"); b.classList.add("picked"); setTimeout(go, 340); } } else bkAfterSub(b); });
+    if (galReduce()) go(); else { pn.classList.add("leaving"); b.classList.add("picked"); setTimeout(go, 200); } } else bkAfterSub(b); });
 $("#bk-subs").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; if (b.closest(".bk-p").classList.contains("leaving")) return; BK.sub = BK.cat.subs.o[+b.dataset.s][1]; BK.subk = BK.cat.subs.o[+b.dataset.s][0]; bkAfterSub(b); });
 $("#bk-opts").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return; const l = BK.cat.opts[+b.dataset.o][0], i = BK.opts.indexOf(l); if (i < 0) BK.opts.push(l); else BK.opts.splice(i, 1); bkOpts(); });
 $("#bk-opt-ok").onclick = () => bkGo(3);
