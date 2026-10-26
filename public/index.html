@@ -2162,6 +2162,8 @@ function viewSite(){
             <div class="grid2"><label class="f">Catégorie<select data-ff="cat" data-fid="${x.id}">${opts(FILM_CATS, x.cat||"mariage")}</select></label><label class="f">Lieu<input type="text" data-ff="lieu" data-fid="${x.id}" value="${esc(x.lieu||"")}" maxlength="60"></label></div>
           </div></div>
         ${ui.siteUp === "f" + x.id ? `<div class="row"><span class="spin"></span><span class="small">Envoi de la photo…</span></div>` : `<div class="row" style="flex-wrap:wrap;gap:6px"><label class="btn sm" style="cursor:pointer">Changer la photo<input type="file" accept="image/*" data-fcov="${x.id}" hidden></label>${i ? `<button class="btn sm" data-act="sftop" data-id="${x.id}">Mettre en premier</button>` : ""}</div>`}
+        <label class="f">Description (s'affiche sous la photo, mot après mot)<textarea data-ff="histoire" data-fid="${x.id}" rows="3" maxlength="400" placeholder="Ex. : Un regard, une lumière dorée, et tout Lyon qui s'arrête un instant.">${esc(x.histoire||"")}</textarea></label>
+        <button class="btn sm primary" data-act="ffok" style="align-self:flex-start">Valider la description</button>
         <label class="row" style="gap:8px;font-size:14px"><input type="checkbox" data-fh="${x.id}" ${x.hidden?"checked":""}> Masquer cette photo sur le site</label>
         <button class="btn ghost sm" data-act="sfdel" data-id="${x.id}" style="align-self:flex-start;color:var(--rec)">${ui.sfDel===x.id?"Confirmer la suppression":"Supprimer la photo"}</button></section>`;
       return `<section class="panel">
@@ -2172,7 +2174,7 @@ function viewSite(){
           </div></div>
         <label class="f">Lien de la vidéo<input type="text" inputmode="url" autocapitalize="off" data-ff="url" data-fid="${x.id}" value="${esc(x.url||"")}"></label>
         <div class="grid2"><label class="f">Date (facultatif)<input type="text" data-ff="quand" data-fid="${x.id}" value="${esc(x.quand||"")}" maxlength="30" placeholder="Ex. : juin 2026"></label><label class="f">Invités (facultatif)<input type="text" data-ff="invites" data-fid="${x.id}" value="${esc(x.invites||"")}" maxlength="12" placeholder="Ex. : 180"></label></div>
-        <label class="f">L'histoire en quelques lignes (facultatif)<textarea data-ff="histoire" data-fid="${x.id}" rows="3" maxlength="400" placeholder="L'ambiance, un moment fort, ce qui rendait cette journée unique.">${esc(x.histoire||"")}</textarea></label>
+        <label class="f">Description (s'affiche sous le film, mot après mot)<textarea data-ff="histoire" data-fid="${x.id}" rows="3" maxlength="400" placeholder="L'ambiance, un moment fort, ce qui rendait cette journée unique.">${esc(x.histoire||"")}</textarea></label>
         ${ui.siteUp === "f" + x.id ? `<div class="row"><span class="spin"></span><span class="small">Envoi de l'image…</span></div>` : `<div class="row" style="flex-wrap:wrap;gap:6px"><label class="btn sm" style="cursor:pointer">${x.cover ? "Changer l'image" : "Choisir une image"}<input type="file" accept="image/*" data-fcov="${x.id}" hidden></label>${i ? `<button class="btn sm" data-act="sftop" data-id="${x.id}">Mettre en premier</button>` : ""}</div>`}
         <label class="row" style="gap:8px;font-size:14px"><input type="checkbox" data-fh="${x.id}" ${x.hidden?"checked":""}> Masquer ce film sur le site</label>
         <button class="btn ghost sm" data-act="sfdel" data-id="${x.id}" style="align-self:flex-start;color:var(--rec)">${ui.sfDel===x.id?"Confirmer la suppression":"Supprimer le film"}</button></section>`; }).join("");
@@ -2524,6 +2526,7 @@ function siteClick(a, b){
     case "ytadd": { if (S.galInfo.clip === undefined){ toast("Un instant, chargement…"); return true; } const inp = document.getElementById("yt-new"), id = ytIdOf(inp && inp.value); if (!id){ toast("Ce lien YouTube n'est pas reconnu"); return true; } const L = ytList(S.galInfo.clip); if (L.includes(id)){ toast("Cette vidéo est déjà dans la liste"); return true; } L.unshift(id); ytSave(L).then(() => toast("Vidéo ajoutée"), siteErr); return true; }
     case "ytdel": { const i = +b.dataset.i; if (ui.ytDel !== i){ ui.ytDel = i; render(); return true; } ui.ytDel = null; const L = ytList(S.galInfo.clip); L.splice(i, 1); ytSave(L).then(() => toast("Vidéo retirée"), siteErr); return true; }
     case "ytup": { const i = +b.dataset.i, L = ytList(S.galInfo.clip); [L[i-1], L[i]] = [L[i], L[i-1]]; ytSave(L).then(() => {}, siteErr); return true; }
+    case "ffok": { const t = document.activeElement; if (t && t.dataset && t.dataset.ff) t.blur(); else toast("Enregistré"); return true; }
     case "galhero": { const L = S.gal[b.dataset.gk] || [], id = b.dataset.id; Promise.all(L.filter(x => x.hero && x.id !== id).map(x => window.__apocaGal.save(x.id, {hero: false})).concat(window.__apocaGal.save(id, {hero: true}))).then(() => toast("Affichée en haut de la page"), siteErr); return true; }
     case "galtop": { const min = Math.min(0, ...(S.gal[b.dataset.gk]||[]).map(x => x.order ?? 0)); window.__apocaGal.save(b.dataset.id, {order: min - 1}).then(() => toast("Placé en premier"), siteErr); return true; }
     case "galdel": { const id = b.dataset.id; if (ui.galDel !== id){ ui.galDel = id; render(); return true; } ui.galDel = null; const x = (S.gal[b.dataset.gk]||[]).find(y => y.id === id); if (x) window.__apocaGal.del(x).then(() => toast("Supprimé"), siteErr); return true; }
@@ -2918,7 +2921,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-youtube2";
+const APP_VER = "2026-10-26-desc";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
