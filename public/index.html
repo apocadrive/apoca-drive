@@ -902,7 +902,7 @@ async function removeShoot(id){
 const sorted = () => Object.entries(S.shoots).map(([id,s]) => ({id, ...s})).sort((a,b) => (a.date||"9999").localeCompare(b.date||"9999") || (a.time||"").localeCompare(b.time||""));
 function newShoot(date){
   const id = uid();
-  S.shoots[id] = {kind:"shoot", title:"Nouveau tournage", client:"", category:"autre", type:"Vidéo", status:"À confirmer", date:date||todayStr(), time:"09:00", city:"Paris", place:"", contact:"", notes:"", ratio:"16:9", palette:"docu", created:Date.now(), prep:{}, gear:[], plans:[]};
+  S.shoots[id] = {kind:"shoot", title:"Nouveau tournage", client:"", category:"autre", type:"Vidéo", status:"À confirmer", date:date||todayStr(), time:"09:00", city:"", place:"", contact:"", notes:"", ratio:"16:9", palette:"docu", created:Date.now(), prep:{}, gear:[], plans:[]};
   touch(id); openShoot(id, "infos");
 }
 function pushHist(){ ui.hist.push({view:ui.view, id:ui.id, tab:ui.tab, qid:ui.qid}); if (ui.hist.length > 40) ui.hist.shift(); }
@@ -2955,7 +2955,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-mariage";
+const APP_VER = "2026-10-26-mariage2";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
