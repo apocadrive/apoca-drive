@@ -450,7 +450,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .ytp-e{margin:10px 0 0;color:var(--mute,#8A8178);text-align:center}
 .gal-cap{position:absolute;left:18px;right:18px;bottom:20px;z-index:1;color:#fff}
 .gal-cap p{margin:0;font:500 11px/1 var(--f-body);letter-spacing:.32em;text-transform:uppercase;color:#D9BE86}
-.gal-cap h3{margin:10px 0 0;font:400 clamp(40px,11vw,60px)/1 var(--f-display);color:#fff;text-wrap:balance}
+.gal-cap h3{margin:10px 0 0;font:400 clamp(34px,9.5vw,56px)/1.04 var(--f-display);color:#fff;text-wrap:balance}
 .gal-cap h3 em{color:var(--lc,#D9BE86);transition:color 1.2s ease}
 .gal-cap h3{min-height:2em;text-shadow:0 2px 18px rgba(0,0,0,.5),0 1px 3px rgba(0,0,0,.35);transition:opacity 1s ease,transform 1.1s cubic-bezier(.22,1,.36,1)}
 .gal-cap h3.out{opacity:0;transform:translateY(8px)}
@@ -1282,12 +1282,13 @@ const BK_CATS = [
   {k:"shooting", t:"Shooting photo & vidéo", price:"150 € · 2 h", incl:"7 photos + 1 vidéo verticale pour vos réseaux", tags:["7 photos","1 vidéo verticale"]},
   {k:"outfit", t:"Outfit"}
 ];
-let RESA = {};
+let RESA = {}, resaReady = false, resaRes; const resaWait = new Promise(r => { resaRes = r; });
+const resaDef = k => resaReady ? RESA_DEF[k] : "";
 const BK = {cat:null, sub:"", opts:[]}, bk = $("#reserver");
 const BK_T = {6:'Mes <em>réalisations.</em>', 5:'Vos <em>options.</em>', 1:'Quel est <em>votre projet ?</em>', 3:'Choisissez <em>votre date.</em>', 4:'Parlez-moi de <em>vous.</em>'};
 const ESC = x => String(x).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const RESA_DEF = {"mariage-coutumier":"resa-coutumier.jpg"};
-const tile = (k, label, sm, attr, badge) => `<button type="button" class="bk-tile" ${attr}>${badge ? `<em class="bk-badge">${badge}</em>` : ""}${(RESA[k] || RESA_DEF[k]) ? `<img src="${RESA[k] || RESA_DEF[k]}" alt="" loading="lazy">` : `<div class="ph"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="6" width="18" height="13" rx="1.5"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></div>`}<span>${ESC(label)}${sm?`<small>${sm}</small>`:""}</span></button>`;
+const tile = (k, label, sm, attr, badge) => `<button type="button" class="bk-tile" ${attr}>${badge ? `<em class="bk-badge">${badge}</em>` : ""}${(RESA[k] || resaDef(k)) ? `<img src="${RESA[k] || resaDef(k)}" alt="" loading="lazy">` : `<div class="ph"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="3" y="6" width="18" height="13" rx="1.5"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></div>`}<span>${ESC(label)}${sm?`<small>${sm}</small>`:""}</span></button>`;
 function bkTiles(){
   $("#bk-cats").innerHTML = BK_CATS.map((c, i) => tile(c.k, c.t, c.price ? ESC(c.price) : c.subs ? `${c.subs.o.length} choix` : "", `data-c="${i}"`, c.tags ? c.tags.map(ESC).join(" + ") : "")).join("");
   if (BK.cat && BK.cat.subs) $("#bk-subs").innerHTML = BK.cat.subs.o.map(([k, l], i) => tile(k, l, "", `data-s="${i}"`)).join("");
@@ -1354,7 +1355,8 @@ async function galOpen(k, fallback, tileEl){
   const pane = tileEl && tileEl.closest(".bk-p"), anim = tileEl && !galReduce();
   if (anim){ pane.classList.add("leaving"); tileEl.classList.add("picked"); }
   const t0 = Date.now(); let busyT = tileEl ? setTimeout(() => tileEl.classList.add("busy"), 450) : 0;
-  const b0 = (k || "").split("-")[0], ph = RESA[k] || RESA_DEF[k] || RESA[b0] || RESA_DEF[b0];
+  await galWait(resaWait, 3000);
+  const b0 = (k || "").split("-")[0], ph = RESA[k] || RESA[b0] || resaDef(k) || resaDef(b0);
   let data = await galWait(galData(k, fallback), 2500);
   const hi = data && galHeroItem(data.items);
   const heroSrc = (hi && hi.img) || ph || (data && ((data.items.find(x => x.type !== "video" && x.img) || {}).img));
@@ -1447,7 +1449,7 @@ function bkShowNow(n){
   if (BK.cur !== n) return;
   bk.querySelectorAll(".bk-p").forEach(x => x.hidden = +x.dataset.p !== n);
   $("#bk-t").innerHTML = n === 2 ? BK.cat.subs.t : BK_T[n];
-  $("#bk-step").textContent = n === 1 ? "Réserver ma date" : [BK.cat && BK.cat.t, n > 2 ? BK.sub : ""].filter(Boolean).join(" · ");
+  $("#bk-step").textContent = n === 1 ? "Réserver ma date" : (BK.sub && BK.cat && n > 2 && BK.sub.indexOf(BK.cat.t) === 0) ? BK.sub : [BK.cat && BK.cat.t, n > 2 ? BK.sub : ""].filter(Boolean).join(" · ");
   $("#bk-back").hidden = n === 1;
   if (n === 5) bkOpts();
   if (n === 3 || n === 4){ const o = $("#bk-offer"), c = BK.cat; o.hidden = !(c && c.price); if (c && c.price) o.innerHTML = `<p class="bk-inc">Inclus dans la formule</p><div class="bk-tags">${(c.tags||[]).map(t => `<i>${ESC(t)}</i>`).join("")}</div><b>${ESC(c.price)}</b><span>Photos et vidéo prêtes pour Instagram, TikTok et vos stories</span>`; }
@@ -1530,7 +1532,7 @@ $("#bk-noopt").onclick = () => { BK.opts = []; bkGo(3); };
 $("#bk-date-ok").onclick = () => bkGo(4);
 $("#bk-nodate").onclick = () => { SELD.length = 0; selSync(); cal(); bkGo(4); };
 if (location.hash === "#reserver") setTimeout(() => bkOpen(false), 0);
-window.__apocaResa = m => { RESA = m || {}; if (!bk.hidden) bkTiles(); };
+window.__apocaResa = m => { RESA = m || {}; resaReady = true; resaRes(); if (!bk.hidden) bkTiles(); };
 if (window.__apocaResaQueued) window.__apocaResa(window.__apocaResaQueued);
 
 /* paiement en ligne (lien Stripe, SumUp, PayPal… collé dans l'appli : Mon site › Réserver) */
