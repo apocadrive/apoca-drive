@@ -2250,7 +2250,7 @@ function viewSite(){
       return head + `<div class="panel" style="flex-direction:row;align-items:center;gap:12px;padding:10px;min-width:0${parent?";margin-left:14px":""}">
         <div style="width:64px;height:64px;flex:0 0 64px;border-radius:8px;overflow:hidden;background:#2a241b">${img?`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:contain;display:block">`:""}</div>
         <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><b style="font-size:15px">${esc(l)}</b>
-        ${ui.siteUp === "r"+k ? `<span class="small"><span class="spin"></span> Envoi…</span>` : `<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Photo de la case :</span><label class="btn sm" style="cursor:pointer">${img?"Changer":"Choisir"}<input type="file" accept="image/*" data-rp="${k}" hidden></label>${img?`<button class="btn ghost sm" data-act="rprm" data-k="${k}">Retirer</button>`:""}</div><button class="btn sm primary" data-act="galk" data-k="${k}" style="justify-content:center">${ui.galK===k?"Fermer la galerie":`＋ Ajouter des photos et vidéos${S.gal && S.gal[k] && S.gal[k].length ? ` (${S.gal[k].length})` : ""}`}</button>`}</div></div>${ui.galK===k ? galEditor(k, l) : ""}`; }).join("");
+        ${ui.siteUp === "r"+k ? `<span class="small"><span class="spin"></span> Envoi…</span>` : `<div class="row" style="gap:6px;flex-wrap:wrap;align-items:center"><span class="small muted">Photo de la case :</span><label class="btn sm" style="cursor:pointer">${img?"Changer":"Choisir"}<input type="file" accept="image/*" data-rp="${k}" hidden></label>${img?`<button class="btn ghost sm" data-act="rprm" data-k="${k}">Retirer</button>`:""}</div><button class="btn sm primary" data-act="galk" data-k="${k}" style="justify-content:center">${ui.galK===k?"Fermer la galerie":`＋ Ajouter des photos et vidéos${S.gal && S.gal[k] && S.gal[k].length ? ` (${S.gal[k].length})` : ""}`}</button>${k === "clip" ? `<button class="btn sm" data-act="ytgo" style="justify-content:center;background:#FF0000;color:#fff;border-color:#FF0000">▶ Vidéos YouTube</button>` : ""}`}</div></div>${ui.galK===k ? galEditor(k, l) : ""}`; }).join("");
   } else if (t === "carte"){
     h += carteEditor();
   } else if (t === "contact"){
@@ -2398,6 +2398,20 @@ async function cqVideo(file){
 S.gal = {}; S.galInfo = {}; let galUnsub = null, galInfoUnsub = null;
 function galWatch(k){ if (galUnsub){ galUnsub(); galUnsub = null; } if (galInfoUnsub){ galInfoUnsub(); galInfoUnsub = null; } if (!k || !window.__apocaGal) return;
   galUnsub = window.__apocaGal.listen(k, list => { S.gal[k] = list; softRender(); }); galInfoUnsub = window.__apocaGal.listenInfo(k, d => { S.galInfo[k] = d; softRender(); }); }
+const ytIdOf = u => { const m = String(u || "").match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(String(u || "").trim()) ? String(u).trim() : ""); };
+const ytList = info => String((info || {}).youtube || "").split(/[\s,]+/).map(ytIdOf).filter(Boolean);
+function ytEditor(info){
+  const L = ytList(info);
+  return `<div style="border:1px solid rgba(255,0,0,.45);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:rgba(255,0,0,.06)">
+    <h3 style="margin:0;display:flex;align-items:center;gap:8px"><svg width="26" height="18" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="5" fill="#FF0000"/><path d="M11 5.5v9l8-4.5z" fill="#fff"/></svg>Vidéos YouTube <span class="pill cnt">${L.length}</span></h3>
+    <p class="small muted" style="margin:0">Ce que le client voit quand il touche le bouton YouTube sur la page Clip. Colle le lien d'un clip que tu as tourné, même s'il est sur la chaîne de l'artiste.</p>
+    <div class="row" style="gap:6px"><input type="url" id="yt-new" placeholder="Colle le lien YouTube ici" style="flex:1;min-width:0"><button class="btn primary" data-act="ytadd">Ajouter</button></div>
+    ${L.length ? `<div style="display:flex;flex-direction:column;gap:8px">${L.map((id, i) => `<div style="position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000 url('https://i.ytimg.com/vi/${id}/hqdefault.jpg') center/cover">
+      <span style="position:absolute;left:50%;top:50%;width:54px;height:38px;margin:-19px 0 0 -27px;border-radius:10px;background:#FF0000;display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      <div style="position:absolute;right:6px;top:6px;display:flex;gap:6px">${i ? `<button class="btn sm" data-act="ytup" data-i="${i}" style="padding:4px 9px">↑</button>` : ""}<button class="btn sm" data-act="ytdel" data-i="${i}" style="padding:4px 9px;color:var(--rec)">${ui.ytDel === i ? "Sûr ?" : "×"}</button></div></div>`).join("")}</div>` : `<p class="small muted" style="margin:0">Aucune vidéo pour l'instant.</p>`}
+  </div>`;
+}
+function ytSave(L){ const info = S.galInfo.clip || (S.galInfo.clip = {}); info.youtube = L.map(id => "https://youtu.be/" + id).join("\n"); render(); return window.__apocaGal.saveInfo("clip", {youtube: info.youtube}); }
 function galEditor(k, label){
   const list = S.gal[k], info = S.galInfo[k] || {};
   if (!window.__apocaGal) return `<div class="panel small muted">Disponible dans l'application en ligne.</div>`;
@@ -2407,7 +2421,7 @@ function galEditor(k, label){
     <p class="small muted" style="margin:0">Ce que le client voit quand il touche « ${esc(label)} », avant de choisir sa date. Conseil : 20 à 30 photos et 4 à 6 vidéos courtes (10 à 30 s). Choisis avec « ☆ Haut » ce qui s'affiche en grand en haut.</p>
     <label class="f">Petite phrase<input type="text" data-gi="texte" data-gk="${k}" value="${esc(info.texte||"")}" maxlength="160" placeholder="Ex. : Votre tenue, en mouvement."></label>
     <label class="f">Ce qui est compris (séparé par des virgules)<input type="text" data-gi="inclus" data-gk="${k}" value="${esc(info.inclus||"")}" maxlength="200" placeholder="Photos retouchées, Vidéo verticale, Lieu au choix"></label>
-    ${k === "clip" ? `<label class="f">Liens YouTube de tes clips (un par ligne)<textarea data-gi="youtube" data-gk="${k}" rows="4" maxlength="2000" placeholder="https://youtu.be/…&#10;https://www.youtube.com/watch?v=…">${esc(info.youtube||"")}</textarea><small class="muted">Le bouton YouTube de la page Clip ouvre ces vidéos. Sans lien, il ouvre ta chaîne.</small></label>` : ""}
+    ${k === "clip" ? ytEditor(info) : ""}
     ${up ? `<div class="row"><span class="spin"></span><span class="small">${esc(up.msg)}</span></div>` : `<div class="row" style="gap:6px;flex-wrap:wrap"><label class="btn sm primary" style="cursor:pointer">+ Photos<input type="file" accept="image/*" multiple data-galph="${k}" hidden></label><label class="btn sm primary" style="cursor:pointer">+ Vidéo<input type="file" accept="video/*" data-galvid="${k}" hidden></label></div>`}
     ${list === undefined ? `<div class="row"><span class="spin"></span><span class="small">Chargement…</span></div>` : !list.length ? `<p class="small muted" style="margin:0">Aucune réalisation pour l'instant : la page montre seulement la photo de la case et le texte.</p>` :
     `<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px">${(() => { const hid = (list.find(x => x.hero) || list.find(x => x.type === "video") || {}).id; return list.map((x, i) => `<div style="position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;background:#2a241b${x.id===hid?";outline:2px solid #ecc94b;outline-offset:-2px":""}">${x.img?`<img src="${esc(x.img)}" alt="" style="width:100%;height:100%;object-fit:contain;display:block">`:""}${x.id===hid?`<span class="pill" style="position:absolute;left:4px;top:4px;background:#ecc94b;color:#111">★ En haut</span>`:`${x.type==="video"?`<span class="pill" style="position:absolute;left:4px;top:4px">Vidéo</span>`:""}<button class="btn sm" data-act="galhero" data-gk="${k}" data-id="${x.id}" style="position:absolute;right:4px;top:4px;padding:4px 7px">☆ Haut</button>`}
@@ -2506,6 +2520,10 @@ function siteClick(a, b){
     case "cqdel": { const bs = carteBtns(); bs.splice(+b.dataset.i, 1); cqSaveBtns(bs); return true; }
     case "cqadd": { const bs = carteBtns(); const vi = bs.findIndex(x => x.k === "vcf"); bs.splice(vi < 0 ? bs.length : vi, 0, {k:"c" + uid(), custom:true, label:"Nouveau bouton", url:"https://", on:false}); cqSaveBtns(bs); toast("Bouton ajouté · écris le texte et le lien, puis coche-le"); return true; }
     case "galk": ui.galK = ui.galK === b.dataset.k ? null : b.dataset.k; galWatch(ui.galK); render(); return true;
+    case "ytgo": { if (ui.galK !== "clip"){ ui.galK = "clip"; galWatch("clip"); } render(); setTimeout(() => { const e = document.getElementById("yt-new"); if (e) e.scrollIntoView({block: "center", behavior: "smooth"}); }, 250); return true; }
+    case "ytadd": { if (S.galInfo.clip === undefined){ toast("Un instant, chargement…"); return true; } const inp = document.getElementById("yt-new"), id = ytIdOf(inp && inp.value); if (!id){ toast("Ce lien YouTube n'est pas reconnu"); return true; } const L = ytList(S.galInfo.clip); if (L.includes(id)){ toast("Cette vidéo est déjà dans la liste"); return true; } L.unshift(id); ytSave(L).then(() => toast("Vidéo ajoutée"), siteErr); return true; }
+    case "ytdel": { const i = +b.dataset.i; if (ui.ytDel !== i){ ui.ytDel = i; render(); return true; } ui.ytDel = null; const L = ytList(S.galInfo.clip); L.splice(i, 1); ytSave(L).then(() => toast("Vidéo retirée"), siteErr); return true; }
+    case "ytup": { const i = +b.dataset.i, L = ytList(S.galInfo.clip); [L[i-1], L[i]] = [L[i], L[i-1]]; ytSave(L).then(() => {}, siteErr); return true; }
     case "galhero": { const L = S.gal[b.dataset.gk] || [], id = b.dataset.id; Promise.all(L.filter(x => x.hero && x.id !== id).map(x => window.__apocaGal.save(x.id, {hero: false})).concat(window.__apocaGal.save(id, {hero: true}))).then(() => toast("Affichée en haut de la page"), siteErr); return true; }
     case "galtop": { const min = Math.min(0, ...(S.gal[b.dataset.gk]||[]).map(x => x.order ?? 0)); window.__apocaGal.save(b.dataset.id, {order: min - 1}).then(() => toast("Placé en premier"), siteErr); return true; }
     case "galdel": { const id = b.dataset.id; if (ui.galDel !== id){ ui.galDel = id; render(); return true; } ui.galDel = null; const x = (S.gal[b.dataset.gk]||[]).find(y => y.id === id); if (x) window.__apocaGal.del(x).then(() => toast("Supprimé"), siteErr); return true; }
@@ -2900,7 +2918,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-youtube";
+const APP_VER = "2026-10-26-youtube2";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);

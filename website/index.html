@@ -421,7 +421,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .ytp-top h3{margin:0;font:400 26px/1.1 var(--f-display)}.ytp-top h3 em{color:#D9BE86}
 .ytp-x{width:48px;height:48px;border:0;background:none;color:#EDE6D8;font:300 38px/1 var(--f-display);cursor:pointer}
 .ytp-l{display:flex;flex-direction:column;gap:18px;padding:8px max(16px,env(safe-area-inset-right,0px)) calc(30px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));max-width:860px;margin:0 auto}
-.ytv{position:relative;aspect-ratio:16/9;border:0;padding:0;width:100%;background:#16130f center/cover no-repeat;border-radius:6px;overflow:hidden;cursor:pointer;display:block}
+.ytv{position:relative;aspect-ratio:16/9;text-decoration:none;box-shadow:0 18px 40px rgba(0,0,0,.45);border:0;padding:0;width:100%;background:#16130f center/cover no-repeat;border-radius:6px;overflow:hidden;cursor:pointer;display:block}
 .ytv::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(0,0,0,.55))}
 .ytv i{position:absolute;left:50%;top:50%;width:68px;height:48px;margin:-24px 0 0 -34px;border-radius:12px;background:#FF0000;z-index:1;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.4)}
 .ytv i::before{content:"";border-style:solid;border-width:10px 0 10px 17px;border-color:transparent transparent transparent #fff;margin-left:4px}
@@ -1371,14 +1371,13 @@ ytp.innerHTML = `<div class="ytp-top"><h3>Mes clips <em>sur YouTube</em></h3><bu
 document.body.appendChild(ytp);
 function ytOpen(){
   const ids = String((BK.galInfo || {}).youtube || "").split(/[\s,]+/).map(ytVid).filter(Boolean);
-  if (!ids.length){ window.open(YT_CH, "_blank", "noopener"); return; }
   const L = ytp.querySelector(".ytp-l");
-  L.innerHTML = ids.map(id => `<button type="button" class="ytv" data-yt="${id}" style="background-image:url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')"><i aria-hidden="true"></i><b></b></button>`).join("") + `<a class="ytp-ch" href="${YT_CH}" target="_blank" rel="noopener"><svg width="20" height="14" viewBox="0 0 28 20" aria-hidden="true"><rect width="28" height="20" rx="5" fill="#fff"/><path d="M11 5.5v9l8-4.5z" fill="#FF0000"/></svg>Voir ma chaîne</a>`;
+  L.innerHTML = ids.length ? ids.map(id => `<a class="ytv" data-yt="${id}" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener" style="background-image:url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')"><i aria-hidden="true"></i><b></b></a>`).join("") : `<p class="ytp-e">Les clips arrivent bientôt ici.</p>`;
   ids.forEach(id => fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent("https://www.youtube.com/watch?v=" + id)}&format=json`).then(r => r.ok ? r.json() : null).then(j => { const b = L.querySelector(`[data-yt="${id}"] b`); if (j && b) b.textContent = j.title || ""; }).catch(() => {}));
   ytp.hidden = false; ytp.scrollTop = 0; requestAnimationFrame(() => ytp.classList.add("on"));
 }
 function ytClose(){ ytp.classList.remove("on"); setTimeout(() => { ytp.hidden = true; ytp.querySelector(".ytp-l").innerHTML = ""; }, 350); }
-ytp.addEventListener("click", e => { if (e.target.closest(".ytp-x")){ ytClose(); return; } const v = e.target.closest(".ytv[data-yt]"); if (v && !v.querySelector("iframe")) v.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.dataset.yt}?autoplay=1&playsinline=1&rel=0" title="Clip" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`; });
+ytp.addEventListener("click", e => { if (e.target.closest(".ytp-x")) ytClose(); });
 addEventListener("keydown", e => { if (e.key === "Escape" && !ytp.hidden) ytClose(); });
 $("#gal-yt").onclick = ytOpen;
 $("#gal-go").onclick = () => bkAfterGal();
