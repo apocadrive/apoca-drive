@@ -702,6 +702,36 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
 .drw-ft .btn{justify-content:center;border-radius:999px}
 .drw-ft .btn.ghost{background:transparent;color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.drw,.drw-bd,.drw nav a{transition:none!important}}
+
+/* ===== Palette façon Ettienne : ivoire, sauge, vert olive profond, or ===== */
+:root{--ivory:#FCFAF5;--sg:#E0ECE0;--sg-hi:#E6F3E6;--ol:#27382B;--ol-hi:#334536;--ol-lo:#1E2D22;--sage:#91A494;--gold-e:#C8A163;
+  --ink:#202723;--ink-2:#4F5A52;--mute:#7D877F;--line:#E1DED5}
+body{background:var(--ivory)}
+#apropos,#films,#journal,#faq{background:radial-gradient(120% 90% at 50% -10%,#F9F5E6 0%,transparent 60%),radial-gradient(80% 70% at 100% 0%,rgba(245,234,213,.5) 0%,transparent 55%),var(--ivory);color:var(--ink)}
+#collections,#avis{background:radial-gradient(100% 100% at 50% 0%,var(--sg-hi) 0%,transparent 70%),var(--sg);color:var(--ink)}
+#collections .offer,#collections .offer.star{background:var(--ivory)}
+.close{background:linear-gradient(rgba(30,45,34,.78),rgba(30,45,34,.9)),var(--cbg,none) center/cover no-repeat,var(--ol);color:var(--ivory)}
+#etapes,#destinations,footer{background:radial-gradient(90% 120% at 0% 0%,var(--ol-hi) 0%,transparent 55%),radial-gradient(90% 120% at 100% 100%,var(--ol-lo) 0%,transparent 55%),var(--ol);color:var(--ivory)}
+#etapes .eyebrow,#destinations .eyebrow,.close .eyebrow{color:var(--gold-e)}
+#etapes .eyebrow::before,#destinations .eyebrow::before,.close .eyebrow::before{background:var(--gold-e)}
+#etapes h2,#destinations h2,.close h2{color:var(--ivory)}
+#etapes h2 em,#destinations h2 em,.close h2 em,.steps li span{color:var(--gold-e)}
+.steps li span::after{background:linear-gradient(90deg,rgba(200,161,99,.6),rgba(200,161,99,0))}
+.steps li h3{color:var(--ivory)}.steps li p,#destinations .lede{color:rgba(252,250,245,.72)}
+.close .btn{background:var(--gold-e);border-color:var(--gold-e);color:var(--ol)}
+footer{color:rgba(252,250,245,.72);border-top:0}
+#insta{background:var(--ivory);color:var(--ink);border-block:1px solid rgba(225,222,213,.6)}
+#insta .eyebrow{color:var(--gold)}#insta .eyebrow::before{background:var(--gold)}#insta h2 em{color:var(--gold)}
+.orn{display:flex;align-items:center;justify-content:center;gap:clamp(28px,6vw,64px);color:var(--gold-e);margin:0 auto clamp(36px,6vw,56px)}
+.orn svg{display:block}.orn .fl{transform:scaleX(-1)}
+section.has-wm{position:relative;overflow:hidden}
+.wm{position:absolute;pointer-events:none;width:clamp(220px,40vw,320px);height:auto;z-index:0}
+.has-wm > .in{position:relative;z-index:1}
+#apropos .wm{left:-64px;top:40px;color:rgba(145,164,148,.15)}
+#etapes .wm{right:-64px;top:48px;color:rgba(252,250,245,.04)}
+#etapes .wm.b{left:-48px;right:auto;top:auto;bottom:-48px;color:rgba(252,250,245,.03)}
+
+
 </style>
 
 <header id="hd" class="wrap"><div class="in hd">
@@ -726,7 +756,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
   <a class="hscroll" href="#apropos">Défiler<span></span></a>
 </section>
 
-<section id="apropos" class="wrap soft"><div class="in about">
+<section id="apropos" class="wrap soft has-wm"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true" class="wm"><g stroke-linecap="round" stroke-linejoin="round"><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(0 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(72 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(144 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(216 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(288 24 24)"/><circle cx="24" cy="24" r="3.2" fill="currentColor" stroke="none" opacity=".85"/></g></svg><div class="in about">
   <figure class="ab-ph"><div class="ab-main"><img id="ab-img" src="apropos.jpg" alt="Le filmmaker d'Apoca Drive en tournage, caméra sur stabilisateur" width="665" height="1300" loading="lazy"></div><div class="ab-badge" aria-hidden="true"><b>Filmmaker</b><span>France · Monde</span><i>Apoca Drive</i></div><div class="ab-mark" aria-hidden="true"><img src="logo-sym-g.png" alt="" width="217" height="240"></div></figure>
   <div class="ab-tx">
     <p class="eyebrow">À propos</p>
@@ -739,7 +769,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
   </div>
 </div></section>
 
-<section id="collections" class="wrap soft" data-sec="collections"><div class="in">
+<section id="collections" class="wrap soft" data-sec="collections"><div class="in"><div class="orn" aria-hidden="true"><svg class="" width="100" height="34" viewBox="0 0 100 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="3" cy="17" r="2.2" fill="currentColor" stroke="none"/><path d="M3 17H98"/><path d="M26 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M58 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M38 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/><path d="M70 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/></svg><svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round"><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(0 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(72 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(144 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(216 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(288 24 24)"/><circle cx="24" cy="24" r="2.6" fill="currentColor" stroke="none"/></g></svg><svg class="fl" width="100" height="34" viewBox="0 0 100 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="3" cy="17" r="2.2" fill="currentColor" stroke="none"/><path d="M3 17H98"/><path d="M26 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M58 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M38 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/><path d="M70 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/></svg></div>
   <div class="coll-h"><p class="eyebrow">Collections</p><h2>Trois façons de <em>raconter</em> votre histoire.</h2></div>
   <div class="coll">
     <div class="offer"><span class="tag"></span><h3>Essentielle</h3><p class="price"><b>Sur devis</b></p><ul><li>Présence adaptée à votre journée</li><li>Film de votre histoire</li><li>Livraison dans votre espace privé</li></ul></div>
@@ -749,7 +779,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
   <p class="small">Chaque collection s'adapte à votre projet. Le déplacement est inclus dans le devis, en France comme à l'étranger.</p>
 </div></section>
 
-<section id="etapes" class="steps wrap soft" data-sec="etapes"><div class="in">
+<section id="etapes" class="steps wrap soft has-wm" data-sec="etapes"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true" class="wm"><g stroke-linecap="round" stroke-linejoin="round"><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(0 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(72 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(144 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(216 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(288 24 24)"/><circle cx="24" cy="24" r="3.2" fill="currentColor" stroke="none" opacity=".85"/></g></svg><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true" class="wm b"><g stroke-linecap="round" stroke-linejoin="round"><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(0 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(72 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(144 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(216 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(288 24 24)"/><circle cx="24" cy="24" r="3.2" fill="currentColor" stroke="none" opacity=".85"/></g></svg><div class="in">
   <p class="eyebrow">Comment ça se passe</p>
   <h2 style="margin-top:18px">De la première rencontre <em>au film.</em></h2>
   <ol>
@@ -792,7 +822,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
   <p class="note-app" style="margin-top:22px"><span class="demo">Exemple</span> Destinations d'exemple. Les vraies s'ajoutent depuis l'appli Apoca Drive.</p>
 </div></section>
 
-<section id="avis" class="avis wrap" hidden><div class="in">
+<section id="avis" class="avis wrap" hidden><div class="in"><div class="orn" aria-hidden="true"><svg class="" width="100" height="34" viewBox="0 0 100 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="3" cy="17" r="2.2" fill="currentColor" stroke="none"/><path d="M3 17H98"/><path d="M26 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M58 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M38 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/><path d="M70 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/></svg><svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round"><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(0 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(72 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(144 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(216 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(288 24 24)"/><circle cx="24" cy="24" r="2.6" fill="currentColor" stroke="none"/></g></svg><svg class="fl" width="100" height="34" viewBox="0 0 100 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="3" cy="17" r="2.2" fill="currentColor" stroke="none"/><path d="M3 17H98"/><path d="M26 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M58 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M38 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/><path d="M70 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/></svg></div>
   <p class="eyebrow">Ils racontent</p>
   <h2 style="margin-top:18px">Leurs mots, <em>après le film.</em></h2>
   <div class="av-sum" id="avsum" hidden></div>
