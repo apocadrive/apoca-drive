@@ -230,13 +230,24 @@ window.__apocaSiteAdmin = {
   async publish(id, d) { await setDoc(doc(fs, `avis/${id}`), JSON.parse(JSON.stringify(d))); await deleteDoc(doc(fs, `avisClients/${id}`)); },
   delPending(id) { return deleteDoc(doc(fs, `avisClients/${id}`)); },
   // Vidéo d'accueil : découpée en morceaux de 900 Ko dans la base (pas besoin d'activer le stockage de fichiers).
-  async setHeroVideo(file, onProgress) {
+  // Image d'attente (première image de la vidéo) pour l'accueil du site, affichée pendant le chargement.
+  async heroPoster(makePoster) {
+    const m = (await getDocs(collection(fs, "heroVideo"))).docs.map((d) => d.data());
+    const meta = await new Promise((r) => { const u = onSnapshot(doc(fs, "site/heroVideoMeta"), (s) => { u(); r(s.exists() ? s.data() : null); }, () => r(null)); });
+    if (!meta) return "";
+    const parts = m.filter((d) => d.v === meta.updated).sort((a, b) => a.i - b.i);
+    if (parts.length !== meta.n) return "";
+    const poster = await makePoster(new Blob(parts.map((d) => d.b.toUint8Array()), { type: meta.type || "video/mp4" }));
+    if (poster) await setDoc(doc(fs, "site/heroVideoMeta"), { poster }, { merge: true });
+    return poster;
+  },
+  async setHeroVideo(file, onProgress, poster) {
     const buf = new Uint8Array(await file.arrayBuffer()), CH = 900 * 1024, n = Math.ceil(buf.length / CH), v = Date.now();
     for (let i = 0; i < n; i++) {
       await setDoc(doc(fs, `heroVideo/${i}`), { i, v, b: Bytes.fromUint8Array(buf.subarray(i * CH, Math.min(buf.length, (i + 1) * CH))) });
       onProgress && onProgress((i + 1) / n);
     }
-    await setDoc(doc(fs, "site/heroVideoMeta"), { n, type: file.type || "video/mp4", size: buf.length, name: String(file.name || "").slice(0, 80), updated: v });
+    await setDoc(doc(fs, "site/heroVideoMeta"), { n, type: file.type || "video/mp4", size: buf.length, name: String(file.name || "").slice(0, 80), updated: v, poster: poster || "" });
     const old = await getDocs(collection(fs, "heroVideo"));
     await Promise.all(old.docs.filter((d) => d.data().v !== v).map((d) => deleteDoc(d.ref)));
   },

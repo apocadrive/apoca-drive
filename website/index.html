@@ -104,6 +104,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .hbg img,.hbg video{object-fit:cover}
 .hbg .hdemo{opacity:0;transition:opacity 1.4s ease}.hbg .hdemo.on{opacity:1}
 .hbg img{animation:kb 22s ease-out both}
+.hbg img[data-p="1"]{animation:none}
 .hbg #hvid,.hbg #himg{opacity:0;transition:opacity 1.8s ease}.hbg #hvid.on,.hbg #himg.on{opacity:1}
 .hero.wait .reveal{animation:none;opacity:0}
 @keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}
@@ -1016,7 +1017,7 @@ const E = t => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({"&":"&amp;"
 const has = (o, k) => o && Object.prototype.hasOwnProperty.call(o, k);
 const val = (o, k, d) => has(o, k) && o[k] != null ? String(o[k]).trim() : d;
 const SITE = {content:{}, heroPhoto:"", aboutPhoto:"", films:undefined, avis:undefined};
-try { if (localStorage.getItem("apoca_hv")) SITE.hvLoading = 1; } catch (e) {}
+try { if (localStorage.getItem("apoca_hv")) SITE.hvLoading = 1; SITE.heroPoster = localStorage.getItem("apoca_hvp") || ""; } catch (e) {}
 const digits = t => String(t||"").replace(/[^\d+]/g, "");
 const waNum = t => { let d = digits(t).replace(/^\+/, ""); if (d.startsWith("00")) d = d.slice(2); if (d.startsWith("0")) d = "33" + d.slice(1); return d; };
 const social = (u, base) => { u = String(u||"").trim(); if (!u) return ""; if (/^https?:\/\//.test(u)) return u; return base + u.replace(/^@/, ""); };
@@ -1048,14 +1049,15 @@ function applyAll(){
   const acc = val(h, "accroche", "Mariages civils, religieux et coutumiers, clips et shootings, en photo et en vidéo, partout en France."); $("#h-acc").textContent = acc; $("#h-acc").hidden = !acc;
   const vid = $("#hvid"), img = $("#himg"), v = val(h, "video", "") || SITE.heroVideo || "";
   const known = !!v || SITE.heroVideo !== undefined || window.__heroGiveUp;
-  if (!known || (SITE.hvLoading && SITE.heroVideo === undefined && !window.__heroGiveUp)){ demoStop(); img.hidden = true; hcv.hidden = true; vid.hidden = true; }
+  const showPoster = () => { const P = SITE.heroPoster; if (!P){ img.hidden = true; return; } if (img.dataset.p !== "1" || img.getAttribute("src") !== P){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.dataset.p = "1"; img.src = P; if (img.complete && img.naturalWidth) img.classList.add("on"); } img.hidden = false; };
+  if (!known || (SITE.hvLoading && SITE.heroVideo === undefined && !window.__heroGiveUp)){ demoStop(); showPoster(); hcv.hidden = true; vid.hidden = true; }
   else {
   const demoOn = !v && h.demo !== false && !SITE.hvLoading;
   document.querySelectorAll(".hdemo").forEach(x => x.hidden = !demoOn);
   if (demoOn) demoStart(); else demoStop();
-  if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); vid.onplaying = () => vid.classList.add("on"); vid.src = v; vid.play && vid.play().catch(() => {}); } vid.hidden = false; img.hidden = true; hcv.hidden = true; }
+  if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); vid.onplaying = () => { vid.classList.add("on"); setTimeout(() => { if (vid.classList.contains("on")) img.hidden = true; }, 2000); }; vid.src = v; vid.play && vid.play().catch(() => {}); } vid.hidden = false; if (vid.classList.contains("on")) img.hidden = true; else showPoster(); hcv.hidden = true; }
   else if (demoOn){ img.hidden = true; vid.hidden = true; hcv.hidden = true; }
-  else if (SITE.heroPhoto){ if (img.src !== SITE.heroPhoto){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.src = SITE.heroPhoto; } img.hidden = false; vid.hidden = true; hcv.hidden = true; }
+  else if (SITE.heroPhoto){ img.dataset.p = ""; if (img.src !== SITE.heroPhoto){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.src = SITE.heroPhoto; } img.hidden = false; vid.hidden = true; hcv.hidden = true; }
   else { img.hidden = true; vid.hidden = true; hcv.hidden = false; hStart(); }
   }
   if (SITE.__content || window.__heroGiveUp) $("#accueil").classList.remove("wait");
@@ -1604,6 +1606,7 @@ const HVC = "apoca-hero-v1";
 onSnapshot(doc(fs, "site/heroVideoMeta"), async (s) => {
   const m = s.exists() ? s.data() : null;
   if (!m || !m.n){ hvStamp = null; try { localStorage.removeItem("apoca_hv"); } catch (e) {} q("heroVideo", ""); return; }
+  if (m.poster){ try { localStorage.setItem("apoca_hvp", m.poster); } catch (e) {} q("heroPoster", m.poster); }
   if (String(hvStamp) === String(m.updated)) return; hvStamp = String(m.updated); q("hvLoading", 1);
   try {
     const parts = (await getDocs(collection(fs, "heroVideo"))).docs.map((d) => d.data()).filter((d) => d.v === m.updated && d.i < m.n).sort((a, b) => a.i - b.i);

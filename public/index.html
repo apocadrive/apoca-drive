@@ -2089,7 +2089,7 @@ const STAR_OPTS = [["5","★★★★★  5"],["4","★★★★  4"],["3","★�
 const starTxt = n => { n = Math.max(0, Math.min(5, +n||0)); return n ? "★".repeat(n) + "☆".repeat(5-n) : ""; };
 let siteUnsub = null;
 function siteStart(){ if (siteUnsub || !window.__apocaSiteAdmin) return; siteUnsub = window.__apocaSiteAdmin.listen((k, v) => {
-  if (k === "content") S.site = v; else if (k === "heroPhoto") S.sitePh.hero = v; else if (k === "aboutPhoto") S.sitePh.about = v; else if (k === "heroVideoMeta") S.heroVid = v; else if (k === "films") S.siteFilms = v; else if (k === "avis") S.siteAvis = v; else if (k === "journal") S.siteJournal = v; else if (k === "insta") S.siteInsta = v;
+  if (k === "content") S.site = v; else if (k === "heroPhoto") S.sitePh.hero = v; else if (k === "aboutPhoto") S.sitePh.about = v; else if (k === "heroVideoMeta"){ S.heroVid = v; if (v && v.n && !v.poster && !S.hvPosterTry && window.__apocaSiteAdmin.heroPoster){ S.hvPosterTry = 1; window.__apocaSiteAdmin.heroPoster(videoPoster).catch(() => {}); } } else if (k === "films") S.siteFilms = v; else if (k === "avis") S.siteAvis = v; else if (k === "journal") S.siteJournal = v; else if (k === "insta") S.siteInsta = v;
   if (ui.view === "site") softRender(); });
   if (window.__apocaSiteAdmin.listenStats) window.__apocaSiteAdmin.listenStats(m => { S.stats = m; if (ui.view === "site") softRender(); });
   if (window.__apocaSiteAdmin.listenResa) window.__apocaSiteAdmin.listenResa(m => { S.resa = m; if (ui.view === "site") softRender(); });
@@ -2123,7 +2123,7 @@ function viewSite(){
       ${sfIn("hero.titreOr","Fin du titre (en doré)","filmés comme au cinéma.",80)}
       ${sfIn("hero.accroche","Phrase sous le titre","Mariages, clips et événements…",140)}</section>
       <section class="panel"><h3 style="margin:0">Vidéo d'accueil</h3>
-      <p class="small muted" style="margin:0">${S.heroVid ? `Votre vidéo passe en boucle sur l'accueil, à la place de la photo${S.heroVid.size ? ` (${(S.heroVid.size/1048576).toFixed(1).replace(".", ",")} Mo)` : ""}.` : "Un montage court (10 à 30 secondes), sans son : il passe en boucle en plein écran. Exportez-le en 1080p ou 720p, 40 Mo maximum."}</p>
+      <p class="small muted" style="margin:0">${S.heroVid ? `Votre vidéo passe en boucle sur l'accueil, à la place de la photo${S.heroVid.size ? ` (${(S.heroVid.size/1048576).toFixed(1).replace(".", ",")} Mo)` : ""}.` : "Un montage court (10 à 30 secondes), sans son : il passe en boucle en plein écran. Exportez-le en 1080p ou 720p, 40 Mo maximum."}${S.heroVid && S.heroVid.size > 12 * 1048576 ? `<br><b style="color:#ecc94b">Elle est lourde pour un téléphone : exporte-la avec le réglage « Apoca Accueil » dans DaVinci (5 Mo environ) et renvoie-la ici.</b>` : ""}</p>
       ${ui.heroVidUp != null ? `<div class="row"><span class="spin"></span><span class="small">Envoi de la vidéo… ${Math.round(ui.heroVidUp*100)} %. Gardez l'appli ouverte.</span></div>`
         : `<div class="row" style="flex-wrap:wrap;gap:8px"><label class="btn primary" style="cursor:pointer">${S.heroVid ? "Changer la vidéo" : "Envoyer ma vidéo"}<input type="file" accept="video/mp4,video/quicktime,video/*" data-hv="1" hidden></label>${S.heroVid ? `<button class="btn ghost" data-act="hvrm">Retirer la vidéo</button>` : ""}</div>`}
       ${S.heroVid ? "" : `<label class="row" style="gap:10px;font-size:15px"><input type="checkbox" data-hdemo="1" ${(S.site.hero||{}).demo === false ? "" : "checked"}> Afficher des vidéos de mariage d'exemple en attendant</label><p class="small muted" style="margin:0">Extraits libres de droits (pas vos images). Décochez pour revenir à votre photo.</p>`}</section>`;
@@ -2300,7 +2300,9 @@ async function siteHeroVideo(file){
   if (!/^video\//.test(file.type || "video/")) return toast("Choisissez un fichier vidéo.");
   if (file.size > 40 * 1048576) return toast(`Vidéo trop lourde (${Math.round(file.size/1048576)} Mo). Exportez-la plus courte ou en 720p : 40 Mo maximum.`);
   ui.heroVidUp = 0; render();
-  try { await window.__apocaSiteAdmin.setHeroVideo(file, p => { ui.heroVidUp = p; if (ui.view === "site") softRender(); }); toast("Vidéo en ligne · visible sur le site"); }
+  if (file.size > 12 * 1048576) toast(`Vidéo lourde (${Math.round(file.size/1048576)} Mo) : sur téléphone elle mettra du temps. Idéal : moins de 8 Mo (réglage « Apoca Accueil » dans DaVinci).`);
+  const poster = await videoPoster(file).catch(() => "");
+  try { await window.__apocaSiteAdmin.setHeroVideo(file, p => { ui.heroVidUp = p; if (ui.view === "site") softRender(); }, poster); toast("Vidéo en ligne · visible sur le site"); }
   catch(e){ toast("La vidéo n'a pas pu être envoyée. Vérifiez la connexion et réessayez."); }
   ui.heroVidUp = null; render();
 }
@@ -2921,7 +2923,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-desc";
+const APP_VER = "2026-10-26-poster";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
