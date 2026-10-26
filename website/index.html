@@ -358,7 +358,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .bk-ic{width:44px;height:44px;border:0;background:none;color:var(--ink);cursor:pointer;display:grid;place-items:center}
 .bk-ic[hidden]{display:grid!important;visibility:hidden}
 .bk-logo{height:26px;width:auto}
-.bk-brand{display:flex;align-items:center;gap:10px}
+.bk-brand{cursor:pointer;display:flex;align-items:center;gap:10px}
 .bk-sym{height:30px;width:auto}
 .bk-in{max-width:1100px;margin:0 auto;padding:28px 16px calc(110px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:22px}
 .bk-in h2{font-size:clamp(36px,9vw,58px);margin:0}
@@ -1501,6 +1501,19 @@ function fWords(t){ let i = 0; return String(t).split(/(\s+)/).map(w => /^\s+$/.
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target); } }), {rootMargin: "0px 0px -8% 0px", threshold: 0.08});
   els.forEach(e => io.observe(e));
  })();
+/* Logo et nom : retour immédiat à l'accueil, d'où que l'on soit */
+document.addEventListener("click", e => {
+  const l = e.target.closest("a.logo, .bk-brand"); if (!l) return; e.preventDefault();
+  try { if (!gvw.hidden) gvClose(); } catch(x){} try { if (!ytp.hidden) ytClose(); } catch(x){}
+  try { const r = document.getElementById("rv"); if (r && !r.hidden) rvClose(); } catch(x){}
+  try { const j = document.getElementById("jr"); if (j && !j.hidden) j.hidden = true; } catch(x){}
+  try { if (!lb.hidden) lb.hidden = true; } catch(x){}
+  if (document.body.classList.contains("drw-on")){ document.body.classList.remove("drw-on"); const d = document.getElementById("drawer"); if (d) d.setAttribute("aria-hidden", "true"); }
+  if (!bk.hidden) bkHide();
+  document.body.style.overflow = "";
+  history.replaceState(null, "", location.pathname + location.search);
+  window.scrollTo({top: 0, behavior: Math.abs(scrollY) > 2500 ? "auto" : "smooth"});
+});
 /* Tirer vers le bas pour actualiser, dans la fenêtre de réservation */
 (() => {
   const ind = document.createElement("div"); ind.className = "ptr"; ind.setAttribute("aria-hidden", "true"); ind.innerHTML = "<i></i>"; document.body.appendChild(ind);
