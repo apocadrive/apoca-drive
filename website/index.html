@@ -139,8 +139,8 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 
 /* à propos */
 .about{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(40px,7vw,110px);align-items:center}
-.ab-ph{margin:0 18px 18px 0;position:relative;max-width:520px}
-.ab-ph img{display:block;width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 25%;position:relative;z-index:1;background:var(--night)}
+.ab-ph{margin:0 18px 34px 0;position:relative;max-width:620px}
+.ab-ph img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 36%;position:relative;z-index:1;background:var(--night)}
 .ab-ph::after{content:"";position:absolute;inset:18px -18px -18px 18px;border:1px solid var(--gold)}
 .ab-tx{display:flex;flex-direction:column;gap:24px;min-width:0}
 .serv{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:16px 34px}
@@ -585,12 +585,12 @@ button.wa{border:0;padding:0;cursor:pointer;font:inherit}
 .coll-h,#etapes .in>.eyebrow,#etapes .in>h2,#avis .in>.eyebrow,#avis .in>h2,#insta .in>.eyebrow,#insta .in>h2{text-align:center;justify-content:center;align-items:center;margin-left:auto;margin-right:auto}
 .coll-h{align-items:center}
 /* à propos : photo arrondie + badge */
-.ab-ph img{border-radius:28px}
-.ab-ph::after{border-radius:32px}
-.ab-badge{position:absolute;z-index:2;top:22px;right:-6px;width:118px;padding:18px 10px;border-radius:20px;background:rgba(21,19,15,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#EDE6D8;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-.ab-badge b{font:400 22px/1 var(--f-display);color:var(--gold-2)}
+.ab-ph img{border-radius:18px}
+.ab-ph::after{border-radius:22px}
+.ab-badge{position:absolute;z-index:2;left:18px;bottom:-16px;padding:11px 18px;border-radius:999px;background:rgba(21,19,15,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#EDE6D8;display:flex;flex-direction:row;align-items:center;gap:12px;white-space:nowrap;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.ab-badge b{font:400 19px/1 var(--f-display);color:var(--gold-2)}
 .ab-badge span{font:400 9px/1.3 var(--f-body);letter-spacing:.24em;text-transform:uppercase}
-.ab-badge i{font:400 20px/1 "Allura",cursive;font-style:normal;color:var(--gold-2)}
+.ab-badge i{display:none}
 /* collections : cartes */
 #collections{background:var(--paper-2)}
 .coll{border-top:0;gap:18px}
