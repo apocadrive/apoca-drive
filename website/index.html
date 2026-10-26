@@ -803,16 +803,10 @@ section.has-wm{position:relative;overflow:hidden}
     </div>
   </div>
   <div class="grid-films" id="gfilms">
-    <a class="film" data-k="mariage" href="#films"><div class="frame"><div class="ph">[ Votre plus beau film de mariage ]</div><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>[Prénoms du couple]</b><span>Mariage · [Lieu]</span></div></a>
-    <a class="film" data-k="clip" href="#films"><div class="frame"><div class="ph">[ Clip ]</div><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>[Artiste]</b><span>Clip · [Ville]</span></div></a>
-    <a class="film" data-k="event" href="#films"><div class="frame"><div class="ph">[ Événement ]</div><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>[Événement]</b><span>Événement · [Ville]</span></div></a>
-    <a class="film" data-k="mariage" href="#films"><div class="frame"><div class="ph">[ Mariage ]</div><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>[Prénoms]</b><span>Mariage · [Lieu]</span></div></a>
-    <a class="film" data-k="clip" href="#films"><div class="frame"><div class="ph">[ Clip ]</div><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>[Artiste]</b><span>Clip · [Ville]</span></div></a>
-    
   </div>
 </div></section>
 
-<section id="destinations" class="dest wrap"><div class="in">
+<section id="destinations" class="dest wrap" hidden><div class="in">
   <div class="dest-h">
     <div><p class="eyebrow">Carnet de voyage</p><h2>Basé en France. Filmé <em>partout.</em></h2><p class="lede">Chaque destination où j'ai posé ma caméra. Choisissez un pays pour voir ce que j'y ai filmé.</p></div>
     <div class="count"><div><b id="n-pays">0</b><span>Pays</span></div><div><b id="n-villes">0</b><span>Villes</span></div></div>
@@ -820,7 +814,6 @@ section.has-wm{position:relative;overflow:hidden}
   <div class="map" id="map"><canvas id="mapc" aria-hidden="true"></canvas></div>
   <div class="strip" id="strip" role="group" aria-label="Destinations"></div>
   <div class="gal" id="gal" aria-live="polite"></div>
-  <p class="note-app" style="margin-top:22px"><span class="demo">Exemple</span> Destinations d'exemple. Les vraies s'ajoutent depuis l'appli Apoca Drive.</p>
 </div></section>
 
 <section id="avis" class="avis wrap" hidden><div class="in"><div class="orn" aria-hidden="true"><svg class="" width="100" height="34" viewBox="0 0 100 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="3" cy="17" r="2.2" fill="currentColor" stroke="none"/><path d="M3 17H98"/><path d="M26 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M58 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M38 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/><path d="M70 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/></svg><svg width="46" height="46" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round"><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(0 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(72 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(144 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(216 24 24)"/><path d="M24 24 C 20 16, 20 9, 24 6 C 28 9, 28 16, 24 24 Z" transform="rotate(288 24 24)"/><circle cx="24" cy="24" r="2.6" fill="currentColor" stroke="none"/></g></svg><svg class="fl" width="100" height="34" viewBox="0 0 100 34" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" aria-hidden="true"><circle cx="3" cy="17" r="2.2" fill="currentColor" stroke="none"/><path d="M3 17H98"/><path d="M26 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M58 17c3-6 9-8 14-7-2 5-8 8-14 7z"/><path d="M38 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/><path d="M70 17c-3 6-9 8-14 7 2-5 8-8 14-7z"/></svg></div>
@@ -880,7 +873,7 @@ section.has-wm{position:relative;overflow:hidden}
       <div class="cal" id="cal">
         <div class="cal-h"><button type="button" id="prev" aria-label="Mois précédent">‹</button><b id="mlabel"></b><button type="button" id="next" aria-label="Mois suivant">›</button></div>
         <div class="cal-g" id="grid"></div>
-        <div class="legend"><span><i></i>Disponible</span><span><s>14</s> Déjà réservé</span><span class="demo">Exemple</span></div>
+        <div class="legend"><span><i></i>Disponible</span><span><s>14</s> Déjà réservé</span></div>
       </div>
       <button type="button" class="btn" id="bk-date-ok" disabled>Continuer </button>
       <button type="button" class="bk-link" id="bk-nodate">Je ne connais pas encore la date</button>
@@ -1052,7 +1045,7 @@ function applyAll(){
   const showPoster = () => { const P = SITE.heroPoster; if (!P){ img.hidden = true; return; } if (img.dataset.p !== "1" || img.getAttribute("src") !== P){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.dataset.p = "1"; img.src = P; if (img.complete && img.naturalWidth) img.classList.add("on"); } img.hidden = false; };
   if (!known || (SITE.hvLoading && SITE.heroVideo === undefined && !window.__heroGiveUp)){ demoStop(); showPoster(); hcv.hidden = true; vid.hidden = true; }
   else {
-  const demoOn = !v && h.demo !== false && !SITE.hvLoading;
+  const demoOn = !v && h.demo === true && !SITE.hvLoading;
   document.querySelectorAll(".hdemo").forEach(x => x.hidden = !demoOn);
   if (demoOn) demoStart(); else demoStop();
   if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); vid.onplaying = () => { vid.classList.add("on"); setTimeout(() => { if (vid.classList.contains("on")) img.hidden = true; }, 2000); }; vid.src = v; vid.play && vid.play().catch(() => {}); } vid.hidden = false; if (vid.classList.contains("on")) img.hidden = true; else showPoster(); hcv.hidden = true; }
@@ -1097,7 +1090,7 @@ function applyAll(){
     fBtns(fl.map(f => ({k: f.cat||"mariage", ph: isPh(f)})));
     let any = fl.length > 0 && !hide.films;
     const vids = fl.filter(f => !isPh(f)), phs = fl.filter(isPh);
-    if (!vids.length && h.demo !== false && !hide.films){
+    if (!vids.length && h.demo === true && !hide.films){
       /* pas encore de films : cadres d'exemple avec des extraits libres de droits (Mixkit), remplacés dès qu'un film est ajouté dans l'appli */
       const EX = [[40599,"Le oui","Mariage","mariage"],[40591,"La mariée","Mariage","mariage"],[5218,"Les alliances","Fiançailles","mariage"],[40590,"Le jardin","Mariage","mariage"],[5227,"La réception","Événement","event"]];
       $("#gfilms").innerHTML = phs.map(phHtml).join("") + EX.map(([id, t, c, k]) => `<a class="film" data-lieu="${c}" data-k="${k}" href="#reserver"><div class="frame"><video class="fv" muted loop playsinline preload="none" poster="https://assets.mixkit.co/videos/${id}/${id}-thumb-720-0.jpg" data-src="https://assets.mixkit.co/videos/${id}/${id}-720.mp4"></video><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>${t}</b><span>${c}</span></div></a>`).join("");
@@ -1106,8 +1099,8 @@ function applyAll(){
       document.querySelectorAll("#gfilms video.fv").forEach(v => io ? io.observe(v) : (v.src = v.dataset.src));
       any = true;
     }
-    vis("#films", any); vis('a[href="#films"]', any); filmDecor();
-  } else vis("#films", !hide.films);
+    vis("#films", any); vis('a[href="#films"]:not(#h-films)', any); $("#h-films").href = any ? "#films" : "#reserver"; filmDecor();
+  } else vis("#films", false);
   /* avis */
   if (Array.isArray(SITE.avis)){
     const av = SITE.avis.filter(x => !x.hidden && x.texte).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0));
@@ -1238,6 +1231,7 @@ window.__apocaDestinations = list => {
   D = vis.map(d => ({id:d.id, pays:d.paysNom||"", ville:d.ville, flag:d.pays && d.pays.length===2 ? String.fromCodePoint(...[...d.pays.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65)) : "📍", lat:+d.lat||0, lon:+d.lon||0, an:d.an||"", n:d.count||0, cover:d.cover||"", videos:d.videos||[], texte:d.texte||""}));
   renderDest();
 };
+document.querySelectorAll('a[href="#destinations"]').forEach(x => x.hidden = true);
 renderDest();
 if (window.__apocaDestQueued) window.__apocaDestinations(window.__apocaDestQueued);
 /* graticule: meridians and parallels every 30°, equator and Greenwich marked */
