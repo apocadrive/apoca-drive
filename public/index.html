@@ -1076,7 +1076,7 @@ function viewAgenda(){
   const lateN = all.filter(s => s.date && s.date <= today && postInfo(s).late).length, todoN = all.filter(s => s.date && s.date < today && !postInfo(s).delivered).length;
   if (todoN) html += `<button class="note${lateN?" warn":""}" data-act="go" data-v="post" style="border:0;text-align:left;width:100%;cursor:pointer">${lateN?`<strong style="color:var(--rec)">${lateN} livraison${lateN>1?"s":""} en retard.</strong> `:""}${todoN} tournage${todoN>1?"s":""} en post-production. Voir le suivi ›</button>`;
   html += `<button class="btn" data-act="sbgo" style="justify-content:center;padding:12px;background:#151b25;color:#ecc94b;border-color:#a88d33">${ICON.cal.replace('<svg','<svg width="18" height="18"')} Shoot Days · plan de travail</button>`;
-  html += `<div class="row between"><h2>À venir</h2><button class="btn primary" data-act="new">+ Nouveau tournage</button></div>`;
+  html += `<div class="row between"><h2>À venir</h2><button class="btn primary" data-act="wednew">💍 Nouveau mariage</button></div>`;
   if (!all.length){
     html += `<div class="empty"><strong style="color:var(--ink)">Aucun tournage pour l'instant</strong>Ajoutez votre première date avec « Nouveau tournage », ou ouvrez un exemple pour voir comment ça marche.<button class="btn day" data-act="example">Ouvrir un exemple</button></div>`;
   } else {
@@ -1203,7 +1203,8 @@ function plusHTML(){
   } else {
     body = `<div class="row between"><h2>Ajouter</h2><button class="x" data-act="pclose" aria-label="Fermer">×</button></div>
       <div class="menu">
-        <button data-act="pnew">${ICON.cal}<span>Nouveau tournage<small>Bloquer une date dans l'agenda</small></span></button>
+        <button data-act="wednew"><span style="font-size:20px;width:24px;text-align:center">💍</span><span>Nouveau mariage<small>Les mariés, la date, et ça s'affiche sur l'accueil</small></span></button>
+        <button data-act="sbgo">${ICON.cal}<span>Nouveau shooting<small>Dans Shoot Days : nom, jour, date, prix, lieu</small></span></button>
         <button data-act="qnew">${ICON.doc}<span>Nouveau devis<small>Avec votre logo, à télécharger en PDF</small></span></button>
         <button data-act="pstep2">${ICON.euro}<span>Noter un paiement<small>Un client vous a donné de l'argent</small></span></button>
         <button data-act="inew">${ICON.doc}<span>Nouvelle facture<small>Facture vierge</small></span></button>
@@ -2533,7 +2534,7 @@ function siteClick(a, b){
   switch(a){
     case "stab": ui.siteTab = b.dataset.v; ui.sfForm = ui.saForm = ui.sjForm = null; ui.sfDel = ui.saDel = ui.sjDel = ui.igDel = null; render(true); return true;
     case "hvrm": { if (ui.hvDel !== 1){ ui.hvDel = 1; toast("Appuyez encore une fois pour retirer la vidéo"); setTimeout(() => { ui.hvDel = 0; }, 4000); return true; } ui.hvDel = 0; A.delHeroVideo().then(() => { S.heroVid = null; toast("Vidéo retirée"); render(); }, siteErr); return true; }
-    case "wednew": ui.menu = false; ui.wedForm = null; pushHist(); ui.view = "wed"; render(true); return true;
+    case "wednew": ui.menu = false; ui.plus = null; ui.wedForm = null; pushHist(); ui.view = "wed"; render(true); return true;
     case "wdtype": wdGrab(); ui.wedForm.type = b.dataset.v; render(); return true;
     case "wdsave": { wdGrab(); const f = ui.wedForm; if (!f.maries || !f.maries.trim()){ toast("Indique le nom des mariés"); return true; } if (!f.date){ toast("Choisis la date"); return true; }
       const id = uid(), m = f.maries.trim();
@@ -2647,7 +2648,7 @@ document.addEventListener("click", async e => {
     case "open": openShoot(b.dataset.id); break;
     case "sdopen": openShoot(b.dataset.id, "days"); break;
     case "new": newShoot(); break;
-    case "day": { const ex = sorted().filter(x=>x.date===b.dataset.d); if (ex.length) openShoot(ex[0].id); else newShoot(b.dataset.d); break; }
+    case "day": { const ex = sorted().filter(x=>x.date===b.dataset.d); if (ex.length) openShoot(ex[0].id); else { ui.wedForm = {type: "Mariage civil", date: b.dataset.d, time: "14:00"}; pushHist(); ui.view = "wed"; render(true); } break; }
     case "mon": { const d = +b.dataset.d; if (!d){ ui.month = null; } else { const base = ui.month ? parseD(ui.month+"-01") : new Date(); const n = new Date(base.getFullYear(), base.getMonth()+d, 1); ui.month = `${n.getFullYear()}-${pad(n.getMonth()+1)}`; } render(); break; }
     case "past": ui.showPast = !ui.showPast; render(); break;
     case "example": { const ex = JSON.parse($("#example").textContent); const id = "exemple-" + uid(); S.shoots[id] = ex; touch(id); openShoot(id, "plans"); break; }
@@ -2767,7 +2768,7 @@ document.addEventListener("click", async e => {
     case "payfill": { const t = +s.price||0; const r = restOf(s); const v = b.dataset.v === "rest" ? r : Math.round(t * (+b.dataset.v) / 100 * 100) / 100; $("#pay-amt").value = Math.max(0, v); if (b.dataset.v !== "rest") $("#pay-note").value = b.dataset.v === "30" ? "Acompte" : "Moitié"; else $("#pay-note").value = "Solde"; break; }
     case "payadd": { const amt = parseFloat(String($("#pay-amt").value).replace(",", ".")); if (!(amt > 0)){ toast("Indiquez le montant reçu"); break; } s.payments = s.payments || []; s.payments.push({id:uid(), amount:Math.round(amt*100)/100, date:$("#pay-date").value || todayStr(), method:$("#pay-meth").value, note:$("#pay-note").value.trim()}); touch(ui.id); render(); toast(`${money(amt)} noté · reste ${money(Math.max(0,restOf(s)))}`); break; }
     case "alertnext": pushHist(); ui.view = "notif"; render(true); break;
-    case "sbgo": { ui.menu = false; if (ui.view === "shoot" && cur()){ ui.tab = "days"; render(true); break; } const all = sorted(); const nx = all.find(x => (x.date||"9999") >= todayStr()) || all[all.length-1]; if (nx) openShoot(nx.id, "days"); else { if (ui.view !== "agenda"){ pushHist(); ui.view = "agenda"; } render(true); toast("Créez d'abord un tournage : les Shoot Days se trouvent dans chaque tournage"); } break; }
+    case "sbgo": { ui.menu = false; ui.plus = null; if (ui.view === "shoot" && cur()){ ui.tab = "days"; render(true); break; } const all = sorted(); const nx = all.find(x => (x.date||"9999") >= todayStr()) || all[all.length-1]; if (nx) openShoot(nx.id, "days"); else { if (ui.view !== "agenda"){ pushHist(); ui.view = "agenda"; } render(true); toast("Créez d'abord un tournage : les Shoot Days se trouvent dans chaque tournage"); } break; }
     case "sbsel": ui.sbSel = ui.sbSel === b.dataset.sc ? null : b.dataset.sc; render(); break;
     case "sbday": if (ui.sbSel) sbMove(s, ui.sbSel, "day", +b.dataset.i); else if (stripOf(s).scenes.length) toast("Touchez d'abord une scène à placer"); break;
     case "sbpool": if (ui.sbSel) sbMove(s, ui.sbSel, "pool"); break;
@@ -2955,7 +2956,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-mariage2";
+const APP_VER = "2026-10-26-mariage3";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
