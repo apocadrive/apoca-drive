@@ -104,6 +104,8 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .hbg img,.hbg video{object-fit:cover}
 .hbg .hdemo{opacity:0;transition:opacity 1.4s ease}.hbg .hdemo.on{opacity:1}
 .hbg img{animation:kb 22s ease-out both}
+.hbg #hvid,.hbg #himg{opacity:0;transition:opacity 1.8s ease}.hbg #hvid.on,.hbg #himg.on{opacity:1}
+.hero.wait .reveal{animation:none;opacity:0}
 @keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}
 .hveil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,.62) 0%,rgba(14,13,11,.12) 28%,rgba(14,13,11,.28) 55%,rgba(14,13,11,.86) 100%)}
 .hin{position:relative;z-index:2;padding-bottom:calc(clamp(86px,12vh,130px) + env(safe-area-inset-bottom,0px))}
@@ -672,7 +674,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
 </div></header>
 
 <main id="top">
-<section class="hero" id="accueil" aria-label="Accueil">
+<section class="hero wait" id="accueil" aria-label="Accueil">
   <div class="hbg" aria-hidden="true"><canvas id="hcv"></canvas><img id="himg" alt="" hidden><video id="hvid" muted loop playsinline autoplay preload="auto" hidden></video><video id="hdemo1" class="hdemo" muted playsinline preload="auto" hidden></video><video id="hdemo2" class="hdemo" muted playsinline preload="auto" hidden></video></div>
   <div class="hveil"></div>
   <div class="hin wrap"><div class="in hcontent">
@@ -974,13 +976,18 @@ function applyAll(){
   $("#h-titre").innerHTML = E(t1) + (t2 ? ` <em>${E(t2)}</em>` : "");
   const acc = val(h, "accroche", "Mariages civils, religieux et coutumiers, clips et shootings, en photo et en vidéo, partout en France."); $("#h-acc").textContent = acc; $("#h-acc").hidden = !acc;
   const vid = $("#hvid"), img = $("#himg"), v = val(h, "video", "") || SITE.heroVideo || "";
+  const known = !!v || SITE.heroVideo !== undefined || window.__heroGiveUp;
+  if (!known || (SITE.hvLoading && SITE.heroVideo === undefined && !window.__heroGiveUp)){ demoStop(); img.hidden = true; hcv.hidden = true; vid.hidden = true; }
+  else {
   const demoOn = !v && h.demo !== false;
   document.querySelectorAll(".hdemo").forEach(x => x.hidden = !demoOn);
   if (demoOn) demoStart(); else demoStop();
-  if (v){ if (vid.getAttribute("src") !== v){ vid.src = v; vid.play && vid.play().catch(() => {}); } vid.hidden = false; img.hidden = true; hcv.hidden = true; }
+  if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); vid.onplaying = () => vid.classList.add("on"); vid.src = v; vid.play && vid.play().catch(() => {}); } vid.hidden = false; img.hidden = true; hcv.hidden = true; }
   else if (demoOn){ img.hidden = true; vid.hidden = true; hcv.hidden = true; }
-  else if (SITE.heroPhoto){ if (img.src !== SITE.heroPhoto) img.src = SITE.heroPhoto; img.hidden = false; vid.hidden = true; hcv.hidden = true; }
+  else if (SITE.heroPhoto){ if (img.src !== SITE.heroPhoto){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.src = SITE.heroPhoto; } img.hidden = false; vid.hidden = true; hcv.hidden = true; }
   else { img.hidden = true; vid.hidden = true; hcv.hidden = false; hStart(); }
+  }
+  if (SITE.__content || window.__heroGiveUp) $("#accueil").classList.remove("wait");
   /* à propos */
   const a1 = val(a, "titre", "Plus que des images,"), a2 = val(a, "titreOr", "des émotions.");
   $("#ab-titre").innerHTML = E(a1) + (a2 ? ` <em>${E(a2)}</em>` : "");
@@ -1063,8 +1070,10 @@ function applyAll(){
   const hs = $(".hscroll"); if (hs) hs.href = !hide.apropos ? "#apropos" : "#collections";
 }
 const offCss = document.createElement("style"); offCss.textContent = ".off{display:none!important}"; document.head.appendChild(offCss);
-window.__apocaApply = (k, v) => { SITE[k] = v; applyAll(); };
-(window.__apocaQ || []).forEach(([k, v]) => { SITE[k] = v; }); applyAll();
+window.__apocaApply = (k, v) => { SITE[k] = v; if (k === "content") SITE.__content = 1; applyAll(); };
+setTimeout(() => { $("#accueil").classList.remove("wait"); }, 1200);
+{ const giveUp = () => { if (SITE.heroVideo === undefined){ window.__heroGiveUp = true; applyAll(); } }; setTimeout(() => { if (SITE.hvLoading) setTimeout(giveUp, 14000); else giveUp(); }, 6000); }
+(window.__apocaQ || []).forEach(([k, v]) => { SITE[k] = v; if (k === "content") SITE.__content = 1; }); applyAll();
 /* avis : formulaire pour les clients (lien apocadrive.web.app/#avis-client) */
 const rv = $("#rv"), rvStars = $("#rv-stars"); let rvN = 5, rvLast = null;
 function rvDraw(){ rvStars.innerHTML = [1,2,3,4,5].map(n => `<button type="button" role="radio" aria-checked="${n===rvN}" aria-label="${n} étoile${n>1?"s":""}" class="${n<=rvN?"on":""}" data-n="${n}">★</button>`).join(""); }
@@ -1390,11 +1399,11 @@ $("#bk-back").onclick = () => history.back();
 addEventListener("keydown", e => { if (e.key === "Escape" && !bk.hidden) bkClose(); });
 /* Apparition douce des sections au défilement (une seule fois) */
 (() => { if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  const els = []; document.querySelectorAll("section.soft > .in").forEach(inn => [...inn.children].forEach((c, i) => { c.classList.add("sr"); c.style.setProperty("--d", Math.min(i, 4) * 0.08 + "s"); els.push(c); }));
+  const els = []; document.querySelectorAll("section.soft > .in").forEach(inn => [...inn.children].forEach((c, i) => { if (c.getBoundingClientRect().top < innerHeight) return; c.classList.add("sr"); c.style.setProperty("--d", Math.min(i, 4) * 0.08 + "s"); els.push(c); }));
   document.documentElement.classList.add("js-sr");
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("on"); io.unobserve(e.target); } }), {rootMargin: "0px 0px -8% 0px", threshold: 0.08});
   els.forEach(e => io.observe(e));
-  setTimeout(() => els.forEach(e => { const r = e.getBoundingClientRect(); if (r.top < innerHeight) e.classList.add("on"); }), 50); })();
+ })();
 /* Tirer vers le bas pour actualiser, dans la fenêtre de réservation */
 (() => {
   const ind = document.createElement("div"); ind.className = "ptr"; ind.setAttribute("aria-hidden", "true"); ind.innerHTML = "<i></i>"; document.body.appendChild(ind);
@@ -1495,12 +1504,12 @@ let hvStamp = null;
 onSnapshot(doc(fs, "site/heroVideoMeta"), async (s) => {
   const m = s.exists() ? s.data() : null;
   if (!m || !m.n){ hvStamp = null; q("heroVideo", ""); return; }
-  if (hvStamp === m.updated) return; hvStamp = m.updated;
+  if (hvStamp === m.updated) return; hvStamp = m.updated; q("hvLoading", 1);
   try {
     const parts = (await getDocs(collection(fs, "heroVideo"))).docs.map((d) => d.data()).filter((d) => d.v === m.updated && d.i < m.n).sort((a, b) => a.i - b.i);
-    if (parts.length !== m.n) return;
+    if (parts.length !== m.n){ q("heroVideo", ""); return; }
     q("heroVideo", URL.createObjectURL(new Blob(parts.map((d) => d.b.toUint8Array()), { type: m.type || "video/mp4" })));
-  } catch (e) {}
+  } catch (e) { q("heroVideo", ""); }
 }, () => {});
 onSnapshot(doc(fs, "site/heroPhoto"), (s) => q("heroPhoto", s.exists() ? (s.data().img || "") : ""), () => {});
 onSnapshot(doc(fs, "site/aboutPhoto"), (s) => q("aboutPhoto", s.exists() ? (s.data().img || "") : ""), () => {});
