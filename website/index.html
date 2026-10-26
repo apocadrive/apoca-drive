@@ -1045,7 +1045,7 @@ function applyAll(){
   const showPoster = () => { const P = SITE.heroPoster; if (!P){ img.hidden = true; return; } if (img.dataset.p !== "1" || img.getAttribute("src") !== P){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.dataset.p = "1"; img.src = P; if (img.complete && img.naturalWidth) img.classList.add("on"); } img.hidden = false; };
   if (!known || (SITE.hvLoading && SITE.heroVideo === undefined && !window.__heroGiveUp)){ demoStop(); showPoster(); hcv.hidden = true; vid.hidden = true; }
   else {
-  const demoOn = !v && h.demo === true && !SITE.hvLoading;
+  const demoOn = false;
   document.querySelectorAll(".hdemo").forEach(x => x.hidden = !demoOn);
   if (demoOn) demoStart(); else demoStop();
   if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); vid.onplaying = () => { vid.classList.add("on"); setTimeout(() => { if (vid.classList.contains("on")) img.hidden = true; }, 2000); }; vid.src = v; vid.play && vid.play().catch(() => {}); } vid.hidden = false; if (vid.classList.contains("on")) img.hidden = true; else showPoster(); hcv.hidden = true; }
@@ -1090,7 +1090,7 @@ function applyAll(){
     fBtns(fl.map(f => ({k: f.cat||"mariage", ph: isPh(f)})));
     let any = fl.length > 0 && !hide.films;
     const vids = fl.filter(f => !isPh(f)), phs = fl.filter(isPh);
-    if (!vids.length && h.demo === true && !hide.films){
+    if (false){
       /* pas encore de films : cadres d'exemple avec des extraits libres de droits (Mixkit), remplacés dès qu'un film est ajouté dans l'appli */
       const EX = [[40599,"Le oui","Mariage","mariage"],[40591,"La mariée","Mariage","mariage"],[5218,"Les alliances","Fiançailles","mariage"],[40590,"Le jardin","Mariage","mariage"],[5227,"La réception","Événement","event"]];
       $("#gfilms").innerHTML = phs.map(phHtml).join("") + EX.map(([id, t, c, k]) => `<a class="film" data-lieu="${c}" data-k="${k}" href="#reserver"><div class="frame"><video class="fv" muted loop playsinline preload="none" poster="https://assets.mixkit.co/videos/${id}/${id}-thumb-720-0.jpg" data-src="https://assets.mixkit.co/videos/${id}/${id}-720.mp4"></video><span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>${t}</b><span>${c}</span></div></a>`).join("");

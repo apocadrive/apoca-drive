@@ -2126,7 +2126,7 @@ function viewSite(){
       <p class="small muted" style="margin:0">${S.heroVid ? `Votre vidéo passe en boucle sur l'accueil, à la place de la photo${S.heroVid.size ? ` (${(S.heroVid.size/1048576).toFixed(1).replace(".", ",")} Mo)` : ""}.` : "Un montage court (10 à 30 secondes), sans son : il passe en boucle en plein écran. Exportez-le en 1080p ou 720p, 40 Mo maximum."}${S.heroVid && S.heroVid.size > 12 * 1048576 ? `<br><b style="color:#ecc94b">Elle est lourde pour un téléphone : exporte-la avec le réglage « Apoca Accueil » dans DaVinci (5 Mo environ) et renvoie-la ici.</b>` : ""}</p>
       ${ui.heroVidUp != null ? `<div class="row"><span class="spin"></span><span class="small">Envoi de la vidéo… ${Math.round(ui.heroVidUp*100)} %. Gardez l'appli ouverte.</span></div>`
         : `<div class="row" style="flex-wrap:wrap;gap:8px"><label class="btn primary" style="cursor:pointer">${S.heroVid ? "Changer la vidéo" : "Envoyer ma vidéo"}<input type="file" accept="video/mp4,video/quicktime,video/*" data-hv="1" hidden></label>${S.heroVid ? `<button class="btn ghost" data-act="hvrm">Retirer la vidéo</button>` : ""}</div>`}
-      ${S.heroVid ? "" : `<label class="row" style="gap:10px;font-size:15px"><input type="checkbox" data-hdemo="1" ${(S.site.hero||{}).demo === true ? "checked" : ""}> Afficher des vidéos de mariage d'exemple en attendant</label><p class="small muted" style="margin:0">Extraits libres de droits (pas vos images). Décochez pour revenir à votre photo.</p>`}</section>`;
+      ${S.heroVid ? "" : `<p class="small muted" style="margin:0">Sans vidéo, l'accueil affiche ta photo.</p>`}</section>`;
   } else if (t === "apropos"){
     h += sitePhoto("about", "Votre photo", "Une photo de vous en tournage, en hauteur de préférence. Sans photo choisie ici, la photo actuelle du site reste.");
     const st = Array.isArray((S.site.about||{}).stats) ? S.site.about.stats : [];
@@ -2923,7 +2923,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-stable";
+const APP_VER = "2026-10-26-stable2";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
