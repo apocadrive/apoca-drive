@@ -236,6 +236,29 @@ html,body{max-width:100%;overflow-x:clip}
 .home .hdots{padding:0;width:48px;height:44px;justify-content:center;flex:none}
 .home .htop .row{flex-wrap:nowrap}
 .home .glass{background:rgba(15,18,22,.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18);color:#f4f6f8;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+
+.home .glass.rdvb{position:relative;overflow:hidden;justify-content:flex-start;gap:12px;padding:12px 14px;text-align:left;border-color:rgba(236,201,75,.35)}
+.rdvb::before{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,236,170,.16) 48%,rgba(255,255,255,.28) 50%,rgba(255,236,170,.16) 52%,transparent 65%);transform:translateX(-120%);animation:rdvShine 7s ease-in-out 1.2s infinite;pointer-events:none}
+@keyframes rdvShine{0%{transform:translateX(-120%)}22%,100%{transform:translateX(120%)}}
+.rdvb.in{animation:rdvIn .9s cubic-bezier(.16,1,.3,1) both}
+@keyframes rdvIn{from{opacity:0;transform:translateY(16px) scale(.97);filter:blur(4px)}to{opacity:1;transform:none;filter:none}}
+.rdv-cal{flex:0 0 42px;height:46px;border-radius:9px;background:#fff;color:#16130f;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.35);transform-origin:50% 0}
+.rdv-cal i{display:block;background:#d9433b;color:#fff;font:700 9px/15px system-ui;letter-spacing:.08em;text-transform:uppercase;text-align:center;font-style:normal}
+.rdv-cal b{flex:1;display:grid;place-items:center;font:700 20px/1 system-ui}
+.rdvb.in .rdv-cal{animation:rdvFlip .9s cubic-bezier(.2,.9,.25,1.3) .25s both}
+@keyframes rdvFlip{from{transform:perspective(200px) rotateX(-90deg);opacity:0}to{transform:none;opacity:1}}
+.rdvb.soon .rdv-cal{animation:rdvRing 3.2s ease-in-out infinite}
+@keyframes rdvRing{0%,80%,100%{transform:rotate(0)}84%{transform:rotate(-9deg)}88%{transform:rotate(8deg)}92%{transform:rotate(-5deg)}96%{transform:rotate(3deg)}}
+.rdv-tx{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.rdv-tx b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rdv-tx small{color:rgba(255,255,255,.72);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rdvb.in .rdv-tx{animation:rdvIn .8s cubic-bezier(.16,1,.3,1) .35s both}
+.rdv-cd{flex:none;align-self:center;font:600 12px/1 system-ui;color:#ecc94b;background:rgba(236,201,75,.12);border:1px solid rgba(236,201,75,.35);padding:6px 9px;border-radius:999px;white-space:nowrap}
+.rdvb.in .rdv-cd{animation:rdvIn .8s cubic-bezier(.16,1,.3,1) .5s both}
+.rdvb.soon{animation:rdvGlow 2.6s ease-in-out infinite}
+.rdvb.soon.in{animation:rdvIn .9s cubic-bezier(.16,1,.3,1) both,rdvGlow 2.6s ease-in-out 1s infinite}
+@keyframes rdvGlow{0%,100%{box-shadow:0 0 0 0 rgba(236,201,75,0)}50%{box-shadow:0 0 0 4px rgba(236,201,75,.18),0 0 24px rgba(236,201,75,.25)}}
+@media (prefers-reduced-motion:reduce){.rdvb,.rdvb *,.rdvb::before{animation:none!important}}
 .home .word{font-family:var(--f-display);font-weight:900;font-size:clamp(54px,17vw,104px);line-height:.84;letter-spacing:.01em;text-transform:uppercase;margin:0;text-shadow:0 2px 24px rgba(0,0,0,.35)}
 .home .word span{display:block;color:#f0a047}
 .home .tag{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;opacity:.9}
@@ -979,7 +1002,11 @@ function viewHome(){
   let popHTML = "";
   if (sdUp.length){ const f = sdUp[0], dd = daysUntil(f.v.date);
     popHTML = `<button class="sdpop" data-act="sdopen" data-id="${f.id}" aria-label="Shooting à venir"><span class="sdpop-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span class="sdpop-t"><b>${dd===0?"Shooting aujourd'hui":dd===1?"Shooting demain":"Shooting dans "+dd+" jours"}</b><small>${esc(f.v.name || "Sans nom")}${f.v.place ? " · " + esc(f.v.place) : ""}</small></span></button>`; }
-  { const ups = rdvUpcoming(); if (ups.length){ const r = ups[0]; nextHTML = `<button class="glass" data-act="rdvopen" data-id="${r.id}" style="justify-content:flex-start;gap:10px;padding:12px;text-align:left"><span style="font-size:20px">🗓️</span><span style="display:flex;flex-direction:column;gap:2px;min-width:0"><b style="font-size:15px">${esc(rdvWhen(r))} · ${esc(r.nom||"Rendez-vous")}</b><small style="color:rgba(255,255,255,.75)">${esc(r.lieu||"")}${ups.length>1?` · +${ups.length-1} autre${ups.length>2?"s":""}`:""}</small></span></button>` + nextHTML; } }
+  { const ups = rdvUpcoming(); if (ups.length){ const r = ups[0], at = rdvAt(r), d = new Date(at), first = !ui.rdvAnimDone; ui.rdvAnimDone = true;
+    nextHTML = `<button class="glass rdvb${first?" in":""}${at - Date.now() < 2*3600e3 ? " soon" : ""}" data-act="rdvopen" data-id="${r.id}">
+      <span class="rdv-cal" aria-hidden="true"><i>${d.toLocaleDateString("fr-FR",{month:"short"}).replace(".","")}</i><b>${d.getDate()}</b></span>
+      <span class="rdv-tx"><b>${esc(r.nom||"Rendez-vous")}</b><small>${esc(rdvWhen(r))}${r.lieu ? " · " + esc(r.lieu) : ""}${ups.length>1?` · +${ups.length-1} autre${ups.length>2?"s":""}`:""}</small></span>
+      <span class="rdv-cd" data-at="${at}">${rdvLeft(at)}</span></button>` + nextHTML; } }
   if (newReq()) nextHTML = `<button class="glass" data-act="go" data-v="requests" style="justify-content:center;padding:12px;font-size:15px;color:#fff;background:rgba(169,128,47,.55);border-color:#d9be86">${ICON.bell.replace('<svg','<svg width="18" height="18"')} ${newReq()} nouvelle${newReq()>1?"s":""} demande${newReq()>1?"s":""} de client</button>` + nextHTML;
   const poster = h.url && h.fit === "contain";
   const bg = !h.url ? `<div class="hfall"></div>` : poster ? `<img class="hblur" src="${esc(h.url)}" alt=""><img class="hpost" src="${esc(h.url)}" alt="Affiche Apoca Drive">` : `<img class="hbg" src="${esc(h.url)}" alt="" style="object-position:${pos}">`;
@@ -2292,6 +2319,8 @@ S.rdv = {};
 const RDV_OPTS = [[5,"5 min"],[15,"15 min"],[30,"30 min"],[60,"1 h"],[120,"2 h"],[1440,"1 jour"],[2880,"2 jours"],[4320,"3 jours"],[10080,"1 semaine"]];
 const rdvAt = r => { if (!r.date) return 0; const [y,m,d] = r.date.split("-").map(Number); const [hh,mm] = (r.heure||"09:00").split(":").map(Number); return new Date(y, m-1, d, hh||0, mm||0).getTime(); };
 function rdvUpcoming(){ const now = Date.now(); return Object.entries(S.rdv||{}).map(([id, r]) => ({id, ...r})).filter(r => !r.done && rdvAt(r) > now - 3600e3).sort((a, b) => rdvAt(a) - rdvAt(b)); }
+function rdvLeft(at){ const m = Math.round((at - Date.now()) / 60000); if (m <= 0) return "maintenant"; if (m < 60) return `dans ${m} min`; const h = Math.floor(m / 60), r = m % 60; if (h < 24) return `dans ${h} h${r ? " " + pad(r) : ""}`; const j = Math.round(m / 1440); return `dans ${j} jour${j > 1 ? "s" : ""}`; }
+setInterval(() => { document.querySelectorAll(".rdv-cd[data-at]").forEach(e => { const at = +e.dataset.at; e.textContent = rdvLeft(at); const b = e.closest(".rdvb"); if (b) b.classList.toggle("soon", at - Date.now() < 2*3600e3); }); }, 30000);
 function rdvWhen(r){ const at = rdvAt(r); if (!at) return ""; const d = new Date(at), t = new Date(); t.setHours(0,0,0,0); const dd = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()) - t) / 864e5);
   const h = `${d.getHours()} h${d.getMinutes() ? pad(d.getMinutes()) : ""}`; return dd === 0 ? `Aujourd'hui ${h}` : dd === 1 ? `Demain ${h}` : `${d.toLocaleDateString("fr-FR",{weekday:"short",day:"numeric",month:"short"})} · ${h}`; }
 function rdvSave(id, r){ S.rdv[id] = r; r.at = rdvAt(r); if (S.db) S.db.doc("rdv/" + id).set(JSON.parse(JSON.stringify(r))).catch(e => toast(errMsg(e))); }
@@ -2870,7 +2899,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-haut";
+const APP_VER = "2026-10-26-rdv-anim";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
