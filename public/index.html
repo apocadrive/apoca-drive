@@ -237,6 +237,12 @@ html,body{max-width:100%;overflow-x:clip}
 .home .htop .row{flex-wrap:nowrap}
 .home .glass{background:rgba(15,18,22,.45);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.18);color:#f4f6f8;border-radius:10px;padding:7px 12px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
 
+.home .glass.wedb{position:relative;overflow:hidden;justify-content:flex-start;gap:12px;padding:12px 14px;text-align:left;border-color:rgba(236,201,75,.3)}
+.wed-r{flex:0 0 42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:rgba(236,201,75,.14);border:1px solid rgba(236,201,75,.4)}
+.wedb.in{animation:rdvIn .9s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--i,0)*90ms + .1s)}
+.home .glass.wedadd{justify-content:center;padding:11px;font-size:15px;color:#ecc94b;border-style:dashed;border-color:rgba(236,201,75,.45)}
+.wedf .chips{margin-top:6px}
+
 .home .glass.rdvb{position:relative;overflow:hidden;justify-content:flex-start;gap:12px;padding:12px 14px;text-align:left;border-color:rgba(236,201,75,.35)}
 .rdvb::before{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,236,170,.16) 48%,rgba(255,255,255,.28) 50%,rgba(255,236,170,.16) 52%,transparent 65%);transform:translateX(-120%);animation:rdvShine 7s ease-in-out 1.2s infinite;pointer-events:none}
 @keyframes rdvShine{0%{transform:translateX(-120%)}22%,100%{transform:translateX(120%)}}
@@ -971,7 +977,7 @@ function render(scrollTop){
     if (ui.view === "shoot") ui.view = "agenda";
     const t = new Date();
     header = `<div class="top"><div class="wrap">${BACK}<button class="brandbtn brand" data-act="nav" data-v="home" aria-label="Écran d'accueil">Apoca<b>drive</b></button><span class="sub">${esc(DOW[t.getDay()].toUpperCase())} ${pad(t.getDate())}.${pad(t.getMonth()+1)}.${t.getFullYear()}<br>${S.mode==="db"?"SYNCHRO ON":"HORS LIGNE"}</span>${DOTS}</div><div class="stripes"></div></div>`;
-    body = ui.view === "rdv" ? viewRdv() : ui.view === "send" ? viewSend() : ui.view === "site" ? viewSite() : ui.view === "dest" ? viewDest() : ui.view === "requests" ? viewRequests() : ui.view === "notif" ? viewNotif() : ui.view === "contracts" ? viewContracts() : ui.view === "contract" ? (cur() ? viewContract() : viewContracts()) : ui.view === "prices" ? viewPrices() : ui.view === "team" ? viewTeam() : ui.view === "stats" ? viewStats() : ui.view === "post" ? viewPost() : ui.view === "quotes" ? viewQuotes() : ui.view === "invoices" ? viewQuotes("invoice") : ui.view === "quote" ? viewQuote() : ui.view === "company" ? viewCompany() : ui.view === "kit" ? viewKit() : ui.view === "tools" ? viewTools() : ui.view === "clients" ? viewClients() : viewAgenda();
+    body = ui.view === "wed" ? viewWed() : ui.view === "rdv" ? viewRdv() : ui.view === "send" ? viewSend() : ui.view === "site" ? viewSite() : ui.view === "dest" ? viewDest() : ui.view === "requests" ? viewRequests() : ui.view === "notif" ? viewNotif() : ui.view === "contracts" ? viewContracts() : ui.view === "contract" ? (cur() ? viewContract() : viewContracts()) : ui.view === "prices" ? viewPrices() : ui.view === "team" ? viewTeam() : ui.view === "stats" ? viewStats() : ui.view === "post" ? viewPost() : ui.view === "quotes" ? viewQuotes() : ui.view === "invoices" ? viewQuotes("invoice") : ui.view === "quote" ? viewQuote() : ui.view === "company" ? viewCompany() : ui.view === "kit" ? viewKit() : ui.view === "tools" ? viewTools() : ui.view === "clients" ? viewClients() : viewAgenda();
   }
   const nav = `<nav class="nav"><div class="in">
     <button data-act="nav" data-v="home" aria-current="false">${ICON.house}Accueil</button>
@@ -1002,6 +1008,9 @@ function viewHome(){
   let popHTML = "";
   if (sdUp.length){ const f = sdUp[0], dd = daysUntil(f.v.date);
     popHTML = `<button class="sdpop" data-act="sdopen" data-id="${f.id}" aria-label="Shooting à venir"><span class="sdpop-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span class="sdpop-t"><b>${dd===0?"Shooting aujourd'hui":dd===1?"Shooting demain":"Shooting dans "+dd+" jours"}</b><small>${esc(f.v.name || "Sans nom")}${f.v.place ? " · " + esc(f.v.place) : ""}</small></span></button>`; }
+  { const weds = up.filter(x => x.category === "mariage" && x !== next && !x.example).slice(0, 3);
+    nextHTML += weds.map((w, i) => { const d = daysUntil(w.date), dt = parseD(w.date); return `<button class="glass wedb${ui.wedAnim ? "" : " in"}" style="--i:${i}" data-act="open" data-id="${w.id}"><span class="wed-r" aria-hidden="true">💍</span><span class="rdv-tx"><b>${esc(w.client || w.title)}</b><small>${esc(dt.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}))}${w.city ? " · " + esc(w.city) : ""}</small></span><span class="rdv-cd">${d===0?"Aujourd'hui":d===1?"Demain":"J-"+d}</span></button>`; }).join("");
+    nextHTML += `<button class="glass wedadd" data-act="wednew">💍 Ajouter un mariage</button>`; ui.wedAnim = 1; }
   { const ups = rdvUpcoming(); if (ups.length){ const r = ups[0], at = rdvAt(r), d = new Date(at), first = !ui.rdvAnimDone; ui.rdvAnimDone = true;
     nextHTML = `<button class="glass rdvb${first?" in":""}${at - Date.now() < 2*3600e3 ? " soon" : ""}" data-act="rdvopen" data-id="${r.id}">
       <span class="rdv-cal" aria-hidden="true"><i>${d.toLocaleDateString("fr-FR",{month:"short"}).replace(".","")}</i><b>${d.getDate()}</b></span>
@@ -1210,6 +1219,7 @@ function menuHTML(){
       <button data-act="go" data-v="quotes">${ICON.doc}<span>Mes devis<small>Créer, modifier et télécharger en PDF</small></span><span class="pill cnt">${Object.values(S.quotes).filter(q=>!isInv(q)).length}</span></button>
       <button data-act="go" data-v="invoices">${ICON.doc}<span>Mes factures<small>Depuis un devis accepté ou vierges</small></span><span class="pill cnt">${Object.values(S.quotes).filter(isInv).length}</span></button>
       <button data-act="go" data-v="contracts">${ICON.pen}<span>Contrats<small>Contrat de prestation prêt à signer</small></span></button>
+      <button data-act="wednew"><span style="font-size:20px;width:24px;text-align:center">💍</span><span>Ajouter un mariage<small>Les mariés, la date, et ça s'affiche sur l'accueil</small></span></button>
       <button data-act="go" data-v="rdv">${ICON.cal}<span>Rendez-vous<small>Tes rendez-vous avec rappels sur ton iPhone</small></span><span class="pill cnt">${rdvUpcoming().length}</span></button>
       <button data-act="go" data-v="requests">${ICON.bell}<span>Demandes du site<small>Les réservations envoyées par vos clients</small></span>${newReq()?`<span class="pill rec cnt">${newReq()}</span>`:`<span class="pill cnt">${Object.keys(S.requests).length}</span>`}</button>
       <button data-act="go" data-v="site"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M7 9h6M7 12h10"/></svg><span>Mon site<small>Accueil, À propos, films, avis et contact de votre site</small></span></button>
@@ -2318,6 +2328,21 @@ async function siteInstaAdd(files){
   for (const f of files){ try { const img = await photoData(f, 900); await window.__apocaSiteAdmin.saveInsta(uid(), {img, created: Date.now()}); n++; } catch(e){} }
   ui.siteUp = null; render(); toast(n ? `${n} photo${n>1?"s":""} ajoutée${n>1?"s":""} · visible${n>1?"s":""} sur le site` : "Les photos n'ont pas pu être envoyées.");
 }
+/* ---------- Ajout rapide d'un mariage ---------- */
+const WED_TYPES = ["Mariage civil","Mariage religieux","Mariage civil & religieux","Mariage coutumier","Fiançailles"];
+function viewWed(){
+  const f = ui.wedForm || (ui.wedForm = {type: "Mariage civil", date: todayStr(), time: "14:00"});
+  return `<h2>Nouveau mariage</h2><section class="panel wedf">
+    <label class="f">Les mariés<input type="text" id="wd-maries" value="${esc(f.maries||"")}" maxlength="80" placeholder="Ex. : Sarah & Malik"></label>
+    <div class="grid2"><label class="f">Date<input type="date" id="wd-date" value="${esc(f.date||"")}"></label><label class="f">Heure<input type="time" id="wd-time" value="${esc(f.time||"")}"></label></div>
+    <div class="f">Type<div class="chips">${WED_TYPES.map(t => `<button class="chip${f.type===t?" tu":""}" data-act="wdtype" data-v="${esc(t)}">${esc(t)}</button>`).join("")}</div></div>
+    <div class="grid2"><label class="f">Ville<input type="text" id="wd-city" value="${esc(f.city||"")}" maxlength="60" placeholder="Lyon"></label><label class="f">Salle / lieu<input type="text" id="wd-place" value="${esc(f.place||"")}" maxlength="120" placeholder="Domaine…"></label></div>
+    <div class="grid2"><label class="f">Téléphone<input type="tel" id="wd-tel" value="${esc(f.tel||"")}" maxlength="30"></label><label class="f">Prix (€, facultatif)<input type="number" inputmode="decimal" id="wd-price" value="${esc(f.price||"")}"></label></div>
+    <label class="f">Notes<textarea id="wd-notes" rows="3" placeholder="Horaires, demandes, contact du témoin…">${esc(f.notes||"")}</textarea></label>
+    <button class="btn primary" data-act="wdsave" style="justify-content:center;padding:14px">Valider</button></section>`;
+}
+function wdGrab(){ const f = ui.wedForm; if (!f) return; const g = id => { const e = document.getElementById(id); return e ? e.value : undefined; };
+  [["maries","wd-maries"],["date","wd-date"],["time","wd-time"],["city","wd-city"],["place","wd-place"],["tel","wd-tel"],["price","wd-price"],["notes","wd-notes"]].forEach(([k, id]) => { const v = g(id); if (v !== undefined) f[k] = v; }); }
 /* ---------- Rendez-vous avec rappels ---------- */
 S.rdv = {};
 const RDV_OPTS = [[5,"5 min"],[15,"15 min"],[30,"30 min"],[60,"1 h"],[120,"2 h"],[1440,"1 jour"],[2880,"2 jours"],[4320,"3 jours"],[10080,"1 semaine"]];
@@ -2508,6 +2533,13 @@ function siteClick(a, b){
   switch(a){
     case "stab": ui.siteTab = b.dataset.v; ui.sfForm = ui.saForm = ui.sjForm = null; ui.sfDel = ui.saDel = ui.sjDel = ui.igDel = null; render(true); return true;
     case "hvrm": { if (ui.hvDel !== 1){ ui.hvDel = 1; toast("Appuyez encore une fois pour retirer la vidéo"); setTimeout(() => { ui.hvDel = 0; }, 4000); return true; } ui.hvDel = 0; A.delHeroVideo().then(() => { S.heroVid = null; toast("Vidéo retirée"); render(); }, siteErr); return true; }
+    case "wednew": ui.menu = false; ui.wedForm = null; pushHist(); ui.view = "wed"; render(true); return true;
+    case "wdtype": wdGrab(); ui.wedForm.type = b.dataset.v; render(); return true;
+    case "wdsave": { wdGrab(); const f = ui.wedForm; if (!f.maries || !f.maries.trim()){ toast("Indique le nom des mariés"); return true; } if (!f.date){ toast("Choisis la date"); return true; }
+      const id = uid(), m = f.maries.trim();
+      S.shoots[id] = {kind:"shoot", title:`${f.type} · ${m}`, client:m, category:"mariage", type:"Photo + vidéo", status:"Confirmé", date:f.date, time:f.time||"", city:(f.city||"").trim(), place:(f.place||"").trim(), contact:(f.tel||"").trim(), notes:(f.notes||"").trim(), price: f.price ? Number(f.price) : undefined, ratio:"16:9", palette:"golden", created:Date.now(), prep:{}, gear:[], plans:[], payments:[]};
+      if (S.shoots[id].price === undefined || isNaN(S.shoots[id].price)) delete S.shoots[id].price;
+      touch(id); ui.wedForm = null; ui.wedAnim = 0; ui.hist = []; ui.view = "home"; render(true); toast("Mariage ajouté"); return true; }
     case "rdvnew": ui.rdvForm = {id: uid(), r: {rappels:[60]}}; render(true); return true;
     case "rdvopen": pushHist(); ui.view = "rdv"; ui.rdvHi = b.dataset.id; render(true); setTimeout(() => { const e = document.getElementById("rv-" + b.dataset.id); if (e) e.scrollIntoView({block:"center"}); }, 60); return true;
     case "rvedit": ui.rdvForm = {id: b.dataset.id, r: JSON.parse(JSON.stringify(S.rdv[b.dataset.id]||{}))}; render(true); return true;
@@ -2923,7 +2955,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-stable2";
+const APP_VER = "2026-10-26-mariage";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
