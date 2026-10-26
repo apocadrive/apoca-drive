@@ -123,6 +123,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .btn.line:hover{background:#fff;color:var(--night);border-color:#fff}
 @media (max-width:560px){.hctas{flex-direction:column;width:100%;max-width:320px}.hctas .btn{justify-content:center}}
 .hscroll{position:absolute;z-index:2;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font:400 10px/1 var(--f-body);letter-spacing:.42em;text-transform:uppercase;color:rgba(255,255,255,.7);text-decoration:none;padding-left:.42em}
+.hscroll{transition:opacity .5s ease}.hscroll.gone{opacity:0;pointer-events:none}
 .hscroll span{width:1px;height:38px;background:linear-gradient(var(--gold-2),transparent);animation:drop 2.4s cubic-bezier(.6,0,.3,1) infinite}
 @keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}50.1%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 .reveal{animation:rise 1.6s cubic-bezier(.16,1,.3,1) both}
@@ -139,9 +140,13 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 
 /* à propos */
 .about{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(40px,7vw,110px);align-items:center}
-.ab-ph{margin:0 18px 34px 0;position:relative;max-width:620px}
-.ab-ph img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover;object-position:50% 36%;position:relative;z-index:1;background:var(--night)}
-.ab-ph::after{content:"";position:absolute;inset:18px -18px -18px 18px;border:1px solid var(--gold)}
+.ab-ph{margin:0 0 40px;position:relative;max-width:560px;width:100%;justify-self:center}
+.ab-ph .ab-main{position:relative;margin-left:auto;width:calc(100% - 10px);aspect-ratio:5/4;overflow:hidden;border-radius:28px 72px 28px 28px;box-shadow:0 2px 4px rgba(22,19,15,.05),0 28px 60px -24px rgba(22,19,15,.32);background:var(--night)}
+.ab-ph .ab-main img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 34%;transition:transform 1.4s cubic-bezier(.22,1,.36,1)}
+@media (hover:hover){.ab-ph:hover .ab-main img{transform:scale(1.04)}}
+.ab-mark{position:absolute;left:0;bottom:-30px;width:min(25%,120px);aspect-ratio:1;border-radius:20px;border:4px solid var(--paper,#fff);background:radial-gradient(120% 90% at 30% 20%,#2a251d 0%,#0E0D0B 70%);display:grid;place-items:center;box-shadow:0 2px 4px rgba(22,19,15,.05),0 24px 50px -20px rgba(22,19,15,.4);z-index:2}
+.ab-mark img{width:46%;height:auto}
+
 .ab-tx{display:flex;flex-direction:column;gap:24px;min-width:0}
 .serv{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:16px 34px}
 .serv li{font:400 12px/1 var(--f-body);letter-spacing:.26em;text-transform:uppercase;color:var(--ink);display:flex;flex-direction:column;gap:12px}
@@ -150,7 +155,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .stats div{display:flex;flex-direction:column;gap:8px}
 .stats b{font:400 50px/1 var(--f-display);color:var(--gold);font-variant-numeric:tabular-nums}
 .stats span{font:400 11px/1.4 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--mute)}
-@media (max-width:860px){.about{grid-template-columns:minmax(0,1fr)}.ab-ph{max-width:calc(100% - 18px)}.serv{grid-template-columns:1fr 1fr}}
+@media (max-width:860px){.about{grid-template-columns:minmax(0,1fr)}.ab-ph{max-width:100%}.serv{grid-template-columns:1fr 1fr}}
 /* à propos : citation et signature */
 .ab-q{margin:8px 0 0;padding-top:28px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:18px}
 .ab-q blockquote{margin:0;font:italic 400 clamp(24px,2.6vw,32px)/1.3 var(--f-display);color:var(--ink)}
@@ -585,12 +590,10 @@ button.wa{border:0;padding:0;cursor:pointer;font:inherit}
 .coll-h,#etapes .in>.eyebrow,#etapes .in>h2,#avis .in>.eyebrow,#avis .in>h2,#insta .in>.eyebrow,#insta .in>h2{text-align:center;justify-content:center;align-items:center;margin-left:auto;margin-right:auto}
 .coll-h{align-items:center}
 /* à propos : photo arrondie + badge */
-.ab-ph img{border-radius:18px}
-.ab-ph::after{border-radius:22px}
-.ab-badge{position:absolute;z-index:2;left:18px;bottom:-16px;padding:11px 18px;border-radius:999px;background:rgba(21,19,15,.9);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#EDE6D8;display:flex;flex-direction:row;align-items:center;gap:12px;white-space:nowrap;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-.ab-badge b{font:400 19px/1 var(--f-display);color:var(--gold-2)}
+.ab-badge{position:absolute;z-index:2;right:-8px;top:26px;width:122px;padding:16px 10px;border-radius:18px;background:rgba(21,19,15,.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);color:#EDE6D8;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;box-shadow:0 2px 4px rgba(22,19,15,.05),0 24px 50px -20px rgba(22,19,15,.45)}
+.ab-badge b{font:400 21px/1 var(--f-display);color:var(--gold-2)}
 .ab-badge span{font:400 9px/1.3 var(--f-body);letter-spacing:.24em;text-transform:uppercase}
-.ab-badge i{display:none}
+.ab-badge i{font:400 19px/1 "Allura",cursive;font-style:normal;color:var(--gold-2)}
 /* collections : cartes */
 #collections{background:var(--paper-2)}
 .coll{border-top:0;gap:18px}
@@ -716,7 +719,7 @@ body.drw-on .drw nav a{opacity:1;transform:none;transition-delay:calc(var(--i,0)
 </section>
 
 <section id="apropos" class="wrap soft"><div class="in about">
-  <figure class="ab-ph"><div class="ab-badge" aria-hidden="true"><b>Filmmaker</b><span>France · Monde</span><i>Apoca Drive</i></div><img id="ab-img" src="apropos.jpg" alt="Le filmmaker d'Apoca Drive en tournage, caméra sur stabilisateur" width="665" height="1300" loading="lazy"></figure>
+  <figure class="ab-ph"><div class="ab-main"><img id="ab-img" src="apropos.jpg" alt="Le filmmaker d'Apoca Drive en tournage, caméra sur stabilisateur" width="665" height="1300" loading="lazy"></div><div class="ab-badge" aria-hidden="true"><b>Filmmaker</b><span>France · Monde</span><i>Apoca Drive</i></div><div class="ab-mark" aria-hidden="true"><img src="logo-sym-g.png" alt="" width="217" height="240"></div></figure>
   <div class="ab-tx">
     <p class="eyebrow">À propos</p>
     <h2 id="ab-titre">Plus que des images, <em>des émotions.</em></h2>
@@ -1444,6 +1447,7 @@ document.addEventListener("click", e => { const a = e.target.closest('a[href="#r
 $("#bk-x").onclick = bkClose;
 $("#bk-back").onclick = () => history.back();
 addEventListener("keydown", e => { if (e.key === "Escape" && !bk.hidden) bkClose(); });
+{ const hs = document.querySelector(".hscroll"); if (hs){ const f = () => hs.classList.toggle("gone", scrollY > 30); addEventListener("scroll", f, {passive: true}); f(); } }
 /* Apparition douce des sections au défilement (une seule fois) */
 (() => { if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const els = []; document.querySelectorAll("section.soft > .in").forEach(inn => [...inn.children].forEach((c, i) => { if (c.getBoundingClientRect().top < innerHeight) return; c.classList.add("sr"); c.style.setProperty("--d", Math.min(i, 4) * 0.08 + "s"); els.push(c); }));
