@@ -618,9 +618,13 @@ button.wa{border:0;padding:0;cursor:pointer;font:inherit}
 /* films : étiquette lieu, grand numéro */
 .film{position:relative}
 .film .pill,.jcard .pill{position:absolute;z-index:2;left:24px;top:24px;padding:9px 14px;border-radius:999px;background:rgba(255,255,255,.92);color:var(--ink);font:500 10px/1 var(--f-body);font-style:normal;letter-spacing:.24em;text-transform:uppercase}
-.fnum{font:400 46px/1 var(--f-display);color:rgba(169,128,47,.28);margin-top:6px}
+.fnum{display:none}
 .film .cap{flex-direction:column;align-items:flex-start;gap:10px}
-.film .cap span{color:var(--gold)}
+.film .cap span{display:none}
+.film .cap{margin-top:8px}.film .cap b{font:400 clamp(38px,9vw,52px)/1.02 var(--f-display);letter-spacing:-.005em;color:var(--ink)}
+.film .cap b:empty{display:none}
+.film.isph .pill{display:none}
+.film .fstory{margin-top:-2px}
 /* avis : une citation à la fois, au centre */
 .avis{background:var(--paper-2);color:var(--ink)}
 .avis .eyebrow{color:var(--gold)}.avis .eyebrow::before{background:var(--gold)}
