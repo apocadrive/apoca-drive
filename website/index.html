@@ -31,6 +31,7 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Apoca Drive","alternateName":["Apocadrive","Apoca Drive Filmmaker"],"url":"https://apocadrive.web.app/"}</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<link rel="preload" as="image" href="accueil.jpg">
 </head>
 <body>
 <style>
@@ -1016,7 +1017,9 @@ const E = t => String(t == null ? "" : t).replace(/[&<>"']/g, c => ({"&":"&amp;"
 const has = (o, k) => o && Object.prototype.hasOwnProperty.call(o, k);
 const val = (o, k, d) => has(o, k) && o[k] != null ? String(o[k]).trim() : d;
 const SITE = {content:{}, heroPhoto:"", aboutPhoto:"", films:undefined, avis:undefined};
-try { if (localStorage.getItem("apoca_hv")) SITE.hvLoading = 1; SITE.heroPoster = localStorage.getItem("apoca_hvp") || ""; } catch (e) {}
+/* Vidéo d'accueil servie directement par le site (rapide). Une vidéo envoyée plus tard depuis l'appli la remplace. */
+const HERO_STATIC = {v: "accueil.mp4", poster: "accueil.jpg", ts: 1793079464015};
+SITE.heroVideo = HERO_STATIC.v; SITE.heroPoster = HERO_STATIC.poster;
 const digits = t => String(t||"").replace(/[^\d+]/g, "");
 const waNum = t => { let d = digits(t).replace(/^\+/, ""); if (d.startsWith("00")) d = d.slice(2); if (d.startsWith("0")) d = "33" + d.slice(1); return d; };
 const social = (u, base) => { u = String(u||"").trim(); if (!u) return ""; if (/^https?:\/\//.test(u)) return u; return base + u.replace(/^@/, ""); };
@@ -1627,10 +1630,11 @@ onSnapshot(doc(fs, "site/content"), (s) => q("content", s.exists() ? s.data() : 
 let hvStamp = null;
 /* Vidéo d'accueil gardée sur le téléphone : à la visite suivante, elle s'affiche tout de suite */
 const HVC = "apoca-hero-v1";
-(async () => { try { const st = localStorage.getItem("apoca_hv"); if (!st || !("caches" in window)) return;
+(async () => { try { const st = localStorage.getItem("apoca_hv"); if (!st || +st <= HERO_STATIC.ts) return; if (!st || !("caches" in window)) return;
   const r = await (await caches.open(HVC)).match("/__hero/" + st); if (r && hvStamp === null){ const b = await r.blob(); if (hvStamp === null){ hvStamp = st; q("heroVideo", URL.createObjectURL(b)); } } } catch (e) {} })();
 onSnapshot(doc(fs, "site/heroVideoMeta"), async (s) => {
   const m = s.exists() ? s.data() : null;
+  if (!m || !m.n || !(+m.updated > HERO_STATIC.ts)) return;
   if (!m || !m.n){ hvStamp = null; try { localStorage.removeItem("apoca_hv"); } catch (e) {} q("heroVideo", ""); return; }
   if (m.poster){ try { localStorage.setItem("apoca_hvp", m.poster); } catch (e) {} q("heroPoster", m.poster); }
   if (String(hvStamp) === String(m.updated)) return; hvStamp = String(m.updated); q("hvLoading", 1);
