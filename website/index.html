@@ -762,7 +762,7 @@ html{overflow-x:hidden}body{overflow-x:clip}
 
 <main id="top">
 <section class="hero wait" id="accueil" aria-label="Accueil">
-  <div class="hbg" aria-hidden="true"><canvas id="hcv"></canvas><img id="himg" alt="" hidden><video id="hvid" muted loop playsinline autoplay preload="auto" hidden></video><video id="hdemo1" class="hdemo" muted playsinline preload="auto" hidden></video><video id="hdemo2" class="hdemo" muted playsinline preload="auto" hidden></video></div>
+  <div class="hbg" aria-hidden="true"><canvas id="hcv"></canvas><img id="himg" alt="" hidden><video id="hvid" muted loop playsinline preload="auto" hidden></video><video id="hdemo1" class="hdemo" muted playsinline preload="auto" hidden></video><video id="hdemo2" class="hdemo" muted playsinline preload="auto" hidden></video></div>
   <div class="hveil"></div>
   <div class="hin wrap"><div class="in hcontent">
     <p class="heye reveal" id="h-eye">Vidéaste &amp; photographe de mariage · France</p>
@@ -1066,7 +1066,13 @@ function applyAll(){
   const demoOn = false;
   document.querySelectorAll(".hdemo").forEach(x => x.hidden = !demoOn);
   if (demoOn) demoStart(); else demoStop();
-  if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); vid.onplaying = () => { vid.classList.add("on"); setTimeout(() => { if (vid.classList.contains("on")) img.hidden = true; }, 2000); }; vid.src = v; vid.play && vid.play().catch(() => {}); } vid.hidden = false; if (vid.classList.contains("on")) img.hidden = true; else showPoster(); hcv.hidden = true; }
+  if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); let started = false;
+      vid.onplaying = () => { vid.classList.add("on"); setTimeout(() => { if (vid.classList.contains("on")) img.hidden = true; }, 2000); };
+      /* on attend que la vidéo soit assez chargée pour jouer sans à-coups (l'image d'attente reste affichée en attendant) */
+      const go = () => { if (started) return; started = true; vid.play && vid.play().catch(() => {}); };
+      const enough = () => { try { const b = vid.buffered; if (vid.readyState >= 4 || (b.length && b.end(b.length - 1) >= Math.min(4, (vid.duration || 4) - 0.1))) go(); } catch(e){} };
+      vid.oncanplaythrough = go; vid.onprogress = enough; vid.onloadeddata = enough; setTimeout(go, 6000);
+      vid.src = v; vid.load && vid.load(); } vid.hidden = false; if (vid.classList.contains("on")) img.hidden = true; else showPoster(); hcv.hidden = true; }
   else if (demoOn){ img.hidden = true; vid.hidden = true; hcv.hidden = true; }
   else if (SITE.heroPhoto){ img.dataset.p = ""; if (img.src !== SITE.heroPhoto){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.src = SITE.heroPhoto; } img.hidden = false; vid.hidden = true; hcv.hidden = true; }
   else { img.hidden = true; vid.hidden = true; hcv.hidden = false; hStart(); }
