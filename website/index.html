@@ -31,7 +31,7 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Apoca Drive","alternateName":["Apocadrive","Apoca Drive Filmmaker"],"url":"https://apocadrive.web.app/"}</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
-<link rel="preload" as="image" href="accueil.jpg">
+<link rel="preload" as="image" href="accueil.jpg?v=2">
 </head>
 <body>
 <style>
@@ -111,6 +111,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .hbg img{animation:kb 22s ease-out both}
 .hbg img[data-p="1"]{animation:none}
 .hbg #hvid,.hbg #himg{opacity:0;transition:opacity 1.8s ease}.hbg #hvid.on,.hbg #himg.on{opacity:1}
+.hbg #hvid{transition-duration:.35s}
 .hero.wait .reveal{animation:none;opacity:0}
 @keyframes kb{from{transform:scale(1.08)}to{transform:scale(1)}}
 .hveil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,.62) 0%,rgba(14,13,11,.12) 28%,rgba(14,13,11,.28) 55%,rgba(14,13,11,.86) 100%)}
@@ -1018,7 +1019,7 @@ const has = (o, k) => o && Object.prototype.hasOwnProperty.call(o, k);
 const val = (o, k, d) => has(o, k) && o[k] != null ? String(o[k]).trim() : d;
 const SITE = {content:{}, heroPhoto:"", aboutPhoto:"", films:undefined, avis:undefined};
 /* Vidéo d'accueil servie directement par le site (rapide). Une vidéo envoyée plus tard depuis l'appli la remplace. */
-const HERO_STATIC = {v: "accueil.mp4", poster: "accueil.jpg", ts: 1793079464015};
+const HERO_STATIC = {v: "accueil.mp4", poster: "accueil.jpg?v=2", ts: 1793079464015};
 SITE.heroVideo = HERO_STATIC.v; SITE.heroPoster = HERO_STATIC.poster;
 const digits = t => String(t||"").replace(/[^\d+]/g, "");
 const waNum = t => { let d = digits(t).replace(/^\+/, ""); if (d.startsWith("00")) d = d.slice(2); if (d.startsWith("0")) d = "33" + d.slice(1); return d; };
