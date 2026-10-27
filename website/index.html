@@ -498,6 +498,12 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .bk-pay .bk-inc{margin:0;font:500 10px/1 var(--f-body);letter-spacing:.3em;text-transform:uppercase;color:#F2C14E}
 .bk-payhint{margin:12px 0 0;font:400 14px/1.6 var(--f-body);color:rgba(255,255,255,.82);text-align:center}
 .bk-payhint b{font:600 14px/1.6 var(--f-body);color:#F2C14E}
+.bk-paybtn.pp{background:#0070BA;color:#fff;gap:10px;box-shadow:0 10px 26px rgba(0,112,186,.35);animation:none}
+.bk-paybtn.pp:hover,.bk-paybtn.pp:active{background:#005EA6}
+.bk-pay .bk-payhint b{font:600 14px/1.6 var(--f-body)!important;display:inline;color:#F2C14E}
+.bk-pay:has(.pp) .bk-payhint b{color:#8CC8FF}
+.bk-pay:has(.pp){border-left-color:#0070BA}
+.bk-pay:has(.pp) .bk-inc{color:#8CC8FF}
 .bk-paybtn{display:flex;justify-content:center;align-items:center;text-align:center;padding:17px 18px;background:#F2C14E;color:#16130F;text-decoration:none;font:600 15px/1 var(--f-body);letter-spacing:.06em;border-radius:999px;animation:bkPulse 2.4s ease-in-out infinite}
 .bk-wero{padding:14px 16px;border:1px dashed rgba(242,193,78,.6);font-size:14px;line-height:1.5;color:#fff}
 .bk-wero b,.sent .bk-wero b{display:inline;margin:0;color:#F2C14E;font:600 15px/1.5 var(--f-body)}
@@ -1573,7 +1579,7 @@ function payHTML(mail){
   if (!u && !wero) return "";
   const tot = parseInt(String(BK.cat.price||"").replace(/\s/g,""), 10) || 0, dep = Math.round(tot * 0.3);
   let href = u; if (u && /^https:\/\/buy\.stripe\.com\//.test(u) && mail) href += (u.includes("?") ? "&" : "?") + "prefilled_email=" + encodeURIComponent(mail);
-  return `<div class="bk-pay"><p class="bk-inc">Bloquez votre date tout de suite</p>${u ? `<a class="bk-paybtn" href="${ESC(href)}" target="_blank" rel="noopener">Payer l'acompte de ${dep} € ${/paypal\./i.test(u) ? "avec PayPal" : "par carte"}</a>` : ""}${u && /paypal\./i.test(u) ? `<p class="bk-payhint">Sur PayPal, touchez <b>« Payer »</b>, indiquez <b>${dep} €</b> et, en note, votre nom et votre date. Vous pouvez payer par carte, sans compte PayPal.</p>` : ""}${wero ? `<div class="bk-wero"><b>Ou par Wero</b> depuis l'appli de votre banque : envoyez <b>${dep} €</b> à <b class="sel">${ESC(wero)}</b>, en indiquant votre nom.</div>` : ""}<span>Acompte de 30 % pour bloquer la date. Le reste, ${tot - dep} €, se règle le jour du shooting.</span></div>`;
+  return `<div class="bk-pay"><p class="bk-inc">Bloquez votre date tout de suite</p>${u ? `<a class="bk-paybtn${/paypal\./i.test(u) ? " pp" : ""}" href="${ESC(href)}" target="_blank" rel="noopener">${/paypal\./i.test(u) ? `<svg width="20" height="24" viewBox="0 0 24 28" aria-hidden="true"><path fill="#fff" d="M20.1 2.2C18.8.8 16.5.2 13.5.2H5.1c-.6 0-1.1.4-1.2 1L.5 22.8c-.1.4.3.8.7.8h5.2l1.3-8.3-.1.3c.1-.6.6-1 1.2-1h2.5c4.9 0 8.7-2 9.8-7.7l.1-.5c.3-2.1 0-3.6-1.1-4.7"/><path fill="#cfe3ff" d="M21.2 6.9c-1.1 5.7-4.9 7.7-9.8 7.7H8.9c-.6 0-1.1.4-1.2 1l-1.3 8.1-.4 2.3c-.1.4.3.7.6.7h4.4c.5 0 1-.4 1.1-.9l.1-.3.8-5.3.1-.3c.1-.5.5-.9 1.1-.9h.7c4.3 0 7.6-1.7 8.6-6.8.4-2.1.2-3.9-.9-5.1-.3-.3-.6-.6-1.1-.9"/></svg>` : ""}Payer l'acompte de ${dep} € ${/paypal\./i.test(u) ? "avec PayPal" : "par carte"}</a>` : ""}${u && /paypal\./i.test(u) ? `<p class="bk-payhint">Sur PayPal, touchez <b>« Payer »</b>, indiquez <b>${dep} €</b> et, en note, votre nom et votre date. Vous pouvez payer par carte, sans compte PayPal.</p>` : ""}${wero ? `<div class="bk-wero"><b>Ou par Wero</b> depuis l'appli de votre banque : envoyez <b>${dep} €</b> à <b class="sel">${ESC(wero)}</b>, en indiquant votre nom.</div>` : ""}<span>Acompte de 30 % pour bloquer la date. Le reste, ${tot - dep} €, se règle le jour du shooting.</span></div>`;
 }
 /* form (aperçu : rien n'est envoyé) */
 function showErr(m){ const e = $("#err"); e.textContent = m; e.hidden = false; }
