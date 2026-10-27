@@ -2134,8 +2134,8 @@ function viewSite(){
       ${sfIn("hero.titreOr","Fin du titre (en doré)","filmés comme au cinéma.",80)}
       ${sfIn("hero.accroche","Phrase sous le titre","Mariages, clips et événements…",140)}</section>
       <section class="panel"><h3 style="margin:0">Vidéo d'accueil</h3>
-      <p class="small muted" style="margin:0">${S.heroVid ? `Votre vidéo passe en boucle sur l'accueil, à la place de la photo${S.heroVid.size ? ` (${(S.heroVid.size/1048576).toFixed(1).replace(".", ",")} Mo)` : ""}.` : "Un montage court (10 à 30 secondes), sans son : il passe en boucle en plein écran. Exportez-le en 1080p ou 720p, 40 Mo maximum."}${S.heroVid && S.heroVid.size > 12 * 1048576 ? `<br><b style="color:#ecc94b">Elle est lourde pour un téléphone : exporte-la avec le réglage « Apoca Accueil » dans DaVinci (5 Mo environ) et renvoie-la ici.</b>` : ""}</p>
-      ${ui.heroVidUp != null ? `<div class="row"><span class="spin"></span><span class="small">Envoi de la vidéo… ${Math.round(ui.heroVidUp*100)} %. Gardez l'appli ouverte.</span></div>`
+      <p class="small muted" style="margin:0">${S.heroVid ? `Votre vidéo passe en boucle sur l'accueil, à la place de la photo${S.heroVid.size ? ` (${(S.heroVid.size/1048576).toFixed(1).replace(".", ",")} Mo)` : ""}.` : "Un montage court (10 à 30 secondes) : il passe en boucle en plein écran, sans le son. Choisis ta vidéo telle quelle : l'appli l'allège toute seule avant de l'envoyer."}${S.heroVid && S.heroVid.size > 12 * 1048576 ? `<br><b style="color:#ecc94b">Elle est lourde pour un téléphone : renvoie-la avec « Changer la vidéo », l'appli l'allégera automatiquement.</b>` : ""}</p>
+      ${ui.heroVidUp != null ? `<div class="row"><span class="spin"></span><span class="small">${esc(ui.heroVidMsg || "Envoi de la vidéo")}… ${Math.round(ui.heroVidUp*100)} %. Gardez l'appli ouverte, écran allumé.</span></div>`
         : `<div class="row" style="flex-wrap:wrap;gap:8px"><label class="btn primary" style="cursor:pointer">${S.heroVid ? "Changer la vidéo" : "Envoyer ma vidéo"}<input type="file" accept="video/mp4,video/quicktime,video/*" data-hv="1" hidden></label>${S.heroVid ? `<button class="btn ghost" data-act="hvrm">Retirer la vidéo</button>` : ""}</div>`}
       ${S.heroVid ? "" : `<p class="small muted" style="margin:0">Sans vidéo, l'accueil affiche ta photo.</p>`}</section>`;
   } else if (t === "apropos"){
@@ -2307,15 +2307,44 @@ async function siteSetPhoto(w, file){
   catch(e){ toast(e && e.message === "trop lourde" ? "Cette photo est trop lourde, essayez-en une autre." : "La photo n'a pas pu être envoyée."); }
   ui.siteUp = null; render();
 }
+/* Allège une vidéo sur le téléphone avant l'envoi : réencodage en MP4 (H.264), 1080 px de large maximum, sans le son. */
+async function shrinkVideo(file, onProg){
+  const MR = window.MediaRecorder; if (!MR || !HTMLCanvasElement.prototype.captureStream) return file;
+  const mime = ["video/mp4;codecs=avc1.640028", "video/mp4;codecs=avc1.4d0028", "video/mp4;codecs=avc1", "video/mp4"].find(t => { try { return MR.isTypeSupported(t); } catch(e){ return false; } });
+  if (!mime) return file;
+  const url = URL.createObjectURL(file), v = document.createElement("video");
+  v.muted = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.preload = "auto"; v.src = url;
+  v.style.cssText = "position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none"; document.body.appendChild(v);
+  const cleanup = () => { try { v.pause(); } catch(e){} v.remove(); URL.revokeObjectURL(url); };
+  try {
+    await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = rej; setTimeout(() => rej(new Error("meta")), 15000); });
+    const sc = Math.min(1, 1080 / Math.max(1, Math.min(v.videoWidth, v.videoHeight)));
+    const W = Math.round(v.videoWidth * sc / 2) * 2, H = Math.round(v.videoHeight * sc / 2) * 2;
+    const c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+    const stream = c.captureStream(30), rec = new MR(stream, {mimeType: mime, videoBitsPerSecond: 3000000}), parts = [];
+    rec.ondataavailable = e => { if (e.data && e.data.size) parts.push(e.data); };
+    const done = new Promise(r => { rec.onstop = r; });
+    let on = true; const draw = () => { if (!on) return; g.drawImage(v, 0, 0, W, H); onProg && v.duration && onProg(Math.min(1, v.currentTime / v.duration));
+      if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(draw); else requestAnimationFrame(draw); };
+    g.drawImage(v, 0, 0, W, H); rec.start(1000); await v.play(); draw();
+    await new Promise(r => { v.onended = r; setTimeout(r, (v.duration + 20) * 1000); });
+    on = false; rec.stop(); await done; stream.getTracks().forEach(t => t.stop()); cleanup();
+    const out = new File(parts, (file.name || "video").replace(/\.[^.]+$/, "") + "-web.mp4", {type: "video/mp4"});
+    return out.size > 200000 && out.size < file.size * 0.85 ? out : file;
+  } catch(e){ cleanup(); return file; }
+}
 async function siteHeroVideo(file){
   if (!/^video\//.test(file.type || "video/")) return toast("Choisissez un fichier vidéo.");
-  if (file.size > 40 * 1048576) return toast(`Vidéo trop lourde (${Math.round(file.size/1048576)} Mo). Exportez-la plus courte ou en 720p : 40 Mo maximum.`);
-  ui.heroVidUp = 0; render();
-  if (file.size > 12 * 1048576) toast(`Vidéo lourde (${Math.round(file.size/1048576)} Mo) : sur téléphone elle mettra du temps. Idéal : moins de 8 Mo (réglage « Apoca Accueil » dans DaVinci).`);
+  if (file.size > 120 * 1048576) return toast(`Vidéo trop lourde (${Math.round(file.size/1048576)} Mo). Choisissez une vidéo plus courte (10 à 30 secondes).`);
   const poster = await videoPoster(file).catch(() => "");
+  if (file.size > 6 * 1048576){ ui.heroVidMsg = "Allègement de la vidéo"; ui.heroVidUp = 0; render();
+    const before = file.size; file = await shrinkVideo(file, p => { ui.heroVidUp = p; if (ui.view === "site") softRender(); });
+    if (file.size < before) toast(`Vidéo allégée : ${(before/1048576).toFixed(0)} Mo → ${(file.size/1048576).toFixed(1).replace(".", ",")} Mo`); }
+  if (file.size > 40 * 1048576){ ui.heroVidUp = null; ui.heroVidMsg = ""; render(); return toast(`Vidéo encore trop lourde (${Math.round(file.size/1048576)} Mo). Choisissez une vidéo plus courte.`); }
+  ui.heroVidMsg = "Envoi de la vidéo"; ui.heroVidUp = 0; render();
   try { await window.__apocaSiteAdmin.setHeroVideo(file, p => { ui.heroVidUp = p; if (ui.view === "site") softRender(); }, poster); toast("Vidéo en ligne · visible sur le site"); }
   catch(e){ toast("La vidéo n'a pas pu être envoyée. Vérifiez la connexion et réessayez."); }
-  ui.heroVidUp = null; render();
+  ui.heroVidUp = null; ui.heroVidMsg = ""; render();
 }
 async function siteJournalCover(id, file){
   ui.siteUp = "j" + id; render();
@@ -2956,7 +2985,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-10-26-mariage3";
+const APP_VER = "2026-10-27-video";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
