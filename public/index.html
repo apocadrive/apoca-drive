@@ -2116,7 +2116,7 @@ const sitePhoto = (w, label, help) => { const img = S.sitePh[w];
     ${ui.siteUp === w ? `<div class="row"><span class="spin"></span><span class="small">Envoi de la photo…</span></div>` : `<div class="row" style="flex-wrap:wrap;gap:8px"><label class="btn primary" style="cursor:pointer">${img ? "Changer la photo" : "Choisir une photo"}<input type="file" accept="image/*" data-sp="${w}" hidden></label>${img ? `<button class="btn ghost" data-act="sprm" data-w="${w}">Retirer la photo</button>` : ""}</div>`}</section>`; };
 const siteSorted = list => (list||[]).slice().sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9) || (b.created||0) - (a.created||0));
 /* Vidéos Vimeo du bas de l'accueil : liste de liens enregistrée dans site/content (vimeo.liens) */
-const vmParse = u => { u = String(u || "").trim(); const m = u.match(/vimeo\.com\/(?:[^?#\s]*?\/)?(\d{6,})(?:\/([0-9a-f]{6,}))?/i); if (!m) return null; const h = m[2] || ((u.match(/[?&]h=([0-9a-f]{6,})/i) || [])[1]) || ""; return {id: m[1], h}; };
+const vmParse = u => { u = String(u || "").trim(); const m = u.match(/vimeo\.com\/(?:.*?\/)?video\/(\d{6,})()/i) || u.match(/vimeo\.com\/(?:[^?#\s]*?\/)?(\d{6,})(?:\/([0-9a-f]{6,}))?/i); if (!m) return null; const h = m[2] || ((u.match(/[?&]h=([0-9a-f]{6,})/i) || [])[1]) || ""; return {id: m[1], h}; };
 const vmUrl = v => "https://vimeo.com/" + v.id + (v.h ? "/" + v.h : "");
 const vmList = () => String(sfGet("vimeo.liens") || "").split(/\s+/).map(vmParse).filter(Boolean);
 const VM_META = {};
