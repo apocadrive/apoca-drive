@@ -774,6 +774,13 @@ html{overflow-x:hidden}body{overflow-x:clip}
 .vdots i{width:6px;height:6px;border-radius:50%;background:rgba(244,238,226,.3);transition:background .4s,width .4s}
 .vdots i.on{background:var(--gold-e);width:22px;border-radius:3px}
 @media (max-width:720px){.vnav{display:none}.vcard .vplay{width:60px;height:60px;margin:-30px 0 0 -30px}}
+/* ===== Journal : les articles défilent à l'horizontale (glisser au doigt) ===== */
+#journal{overflow:hidden}
+#journal .jgrid{--edge:max(var(--gut),env(safe-area-inset-left,0px),calc((100vw - 1180px) / 2));display:flex;grid-template-columns:none;align-items:stretch;gap:clamp(14px,2vw,24px);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:var(--edge);margin-inline:calc(-1 * var(--edge));padding:4px var(--edge) 10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+#journal .jgrid::-webkit-scrollbar{display:none}
+#journal .jcard{flex:0 0 min(80vw,380px);scroll-snap-align:start}
+#journal .jcard div.jt{flex:1}
+#journal .jcard .jmore{margin-top:auto}
 </style>
 
 <header id="hd" class="wrap"><div class="in hd">
