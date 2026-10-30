@@ -2115,6 +2115,24 @@ const sitePhoto = (w, label, help) => { const img = S.sitePh[w];
     ${img ? `<img src="${img}" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:10px;display:block">` : ""}
     ${ui.siteUp === w ? `<div class="row"><span class="spin"></span><span class="small">Envoi de la photo…</span></div>` : `<div class="row" style="flex-wrap:wrap;gap:8px"><label class="btn primary" style="cursor:pointer">${img ? "Changer la photo" : "Choisir une photo"}<input type="file" accept="image/*" data-sp="${w}" hidden></label>${img ? `<button class="btn ghost" data-act="sprm" data-w="${w}">Retirer la photo</button>` : ""}</div>`}</section>`; };
 const siteSorted = list => (list||[]).slice().sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9) || (b.created||0) - (a.created||0));
+/* Vidéos Vimeo du bas de l'accueil : liste de liens enregistrée dans site/content (vimeo.liens) */
+const vmParse = u => { u = String(u || "").trim(); const m = u.match(/vimeo\.com\/(?:[^?#\s]*?\/)?(\d{6,})(?:\/([0-9a-f]{6,}))?/i); if (!m) return null; const h = m[2] || ((u.match(/[?&]h=([0-9a-f]{6,})/i) || [])[1]) || ""; return {id: m[1], h}; };
+const vmUrl = v => "https://vimeo.com/" + v.id + (v.h ? "/" + v.h : "");
+const vmList = () => String(sfGet("vimeo.liens") || "").split(/\s+/).map(vmParse).filter(Boolean);
+const VM_META = {};
+const vmMeta = v => { const key = v.id + v.h; if (VM_META[key]) return VM_META[key]; VM_META[key] = {}; fetch("https://vimeo.com/api/oembed.json?width=640&url=" + encodeURIComponent(vmUrl(v))).then(r => r.ok ? r.json() : null).then(j => { if (j){ VM_META[key] = {thumb: j.thumbnail_url || "", title: j.title || ""}; softRender(); } }).catch(() => {}); return VM_META[key]; };
+const vmSave = L => siteSave({vimeo: {liens: L.map(vmUrl).join("\n")}}).then(() => render());
+function vmEditor(){
+  const L = vmList();
+  return `<section class="panel"><h3 style="margin:0;display:flex;align-items:center;gap:8px"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><rect width="24" height="24" rx="6" fill="#1AB7EA"/><path d="M18.6 8.6c-.1 1.3-1 3.1-2.7 5.3-1.8 2.3-3.3 3.5-4.5 3.5-.8 0-1.4-.7-2-2.2l-1.1-4c-.4-1.4-.8-2.2-1.3-2.2-.1 0-.5.2-1.1.7l-.7-.9 2-1.8c.9-.8 1.6-1.2 2-1.2 1.1-.1 1.7.6 2 2.2.3 1.7.5 2.7.6 3.2.3 1.4.7 2.1 1.1 2.1.3 0 .8-.5 1.4-1.5.6-1 1-1.8 1-2.3.1-.9-.3-1.3-1-1.3-.4 0-.8.1-1.1.3.7-2.4 2.2-3.5 4.3-3.4 1.6 0 2.3 1 2.1 3.1z" fill="#fff"/></svg>Mes films Vimeo <span class="pill cnt">${L.length}</span></h3>
+    <p class="small muted" style="margin:0">Ils défilent en bas de l'accueil. Le bouton « Voir mes films » y emmène directement. Colle le lien de la vidéo sur Vimeo (une vidéo privée par lien marche aussi).</p>
+    <div class="row" style="gap:6px"><input type="url" id="vm-new" placeholder="https://vimeo.com/…" style="flex:1;min-width:0"><button class="btn primary" data-act="vmadd">Ajouter</button></div>
+    ${L.length ? `<div style="display:flex;flex-direction:column;gap:8px">${L.map((v, i) => { const m = vmMeta(v); return `<div style="position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#111 ${m.thumb ? `url('${esc(m.thumb)}') center/cover` : ""}">
+      <span style="position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:rgba(0,0,0,.55);display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+      ${m.title ? `<span style="position:absolute;left:8px;bottom:8px;right:8px;color:#fff;font-size:13px;text-shadow:0 1px 4px rgba(0,0,0,.8)">${esc(m.title)}</span>` : ""}
+      <div style="position:absolute;right:6px;top:6px;display:flex;gap:6px">${i ? `<button class="btn sm" data-act="vmup" data-i="${i}" style="padding:4px 9px">↑</button>` : ""}<button class="btn sm" data-act="vmdel" data-i="${i}" style="padding:4px 9px;color:var(--rec)">${ui.vmDel === i ? "Sûr ?" : "×"}</button></div></div>`; }).join("")}</div>` : `<p class="small muted" style="margin:0">Aucune vidéo pour l'instant : la rubrique reste cachée sur le site.</p>`}
+  </section>`;
+}
 const ytThumb = u => { const m = String(u||"").match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/); return m ? `https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg` : ""; };
 
 function viewSite(){
@@ -2138,6 +2156,7 @@ function viewSite(){
       ${ui.heroVidUp != null ? `<div class="row"><span class="spin"></span><span class="small">${esc(ui.heroVidMsg || "Envoi de la vidéo")}… ${Math.round(ui.heroVidUp*100)} %. Gardez l'appli ouverte, écran allumé.</span></div>`
         : `<div class="row" style="flex-wrap:wrap;gap:8px"><label class="btn primary" style="cursor:pointer">${S.heroVid ? "Changer la vidéo" : "Envoyer ma vidéo"}<input type="file" accept="video/mp4,video/quicktime,video/*" data-hv="1" hidden></label>${S.heroVid ? `<button class="btn ghost" data-act="hvrm">Retirer la vidéo</button>` : ""}</div>`}
       ${S.heroVid ? "" : `<p class="small muted" style="margin:0">Sans vidéo, l'accueil affiche ta photo.</p>`}</section>`;
+    h += vmEditor();
   } else if (t === "apropos"){
     h += sitePhoto("about", "Votre photo", "Une photo de vous en tournage, en hauteur de préférence. Sans photo choisie ici, la photo actuelle du site reste.");
     const st = Array.isArray((S.site.about||{}).stats) ? S.site.about.stats : [];
@@ -2587,6 +2606,9 @@ function siteClick(a, b){
     case "cqadd": { const bs = carteBtns(); const vi = bs.findIndex(x => x.k === "vcf"); bs.splice(vi < 0 ? bs.length : vi, 0, {k:"c" + uid(), custom:true, label:"Nouveau bouton", url:"https://", on:false}); cqSaveBtns(bs); toast("Bouton ajouté · écris le texte et le lien, puis coche-le"); return true; }
     case "galk": ui.galK = ui.galK === b.dataset.k ? null : b.dataset.k; galWatch(ui.galK); render(); return true;
     case "ytgo": { if (ui.galK !== "clip"){ ui.galK = "clip"; galWatch("clip"); } render(); setTimeout(() => { const e = document.getElementById("yt-new"); if (e) e.scrollIntoView({block: "center", behavior: "smooth"}); }, 250); return true; }
+    case "vmadd": { const inp = document.getElementById("vm-new"), v = vmParse(inp && inp.value); if (!v){ toast("Ce lien Vimeo n'est pas reconnu"); return true; } const L = vmList(); if (L.some(x => x.id === v.id)){ toast("Cette vidéo est déjà dans la liste"); return true; } L.unshift(v); if (inp) inp.value = ""; vmSave(L); return true; }
+    case "vmdel": { const i = +b.dataset.i; if (ui.vmDel !== i){ ui.vmDel = i; render(); return true; } ui.vmDel = null; const L = vmList(); L.splice(i, 1); vmSave(L); return true; }
+    case "vmup": { const i = +b.dataset.i, L = vmList(); [L[i-1], L[i]] = [L[i], L[i-1]]; vmSave(L); return true; }
     case "ytadd": { if (S.galInfo.clip === undefined){ toast("Un instant, chargement…"); return true; } const inp = document.getElementById("yt-new"), id = ytIdOf(inp && inp.value); if (!id){ toast("Ce lien YouTube n'est pas reconnu"); return true; } const L = ytList(S.galInfo.clip); if (L.includes(id)){ toast("Cette vidéo est déjà dans la liste"); return true; } L.unshift(id); ytSave(L).then(() => toast("Vidéo ajoutée"), siteErr); return true; }
     case "ytdel": { const i = +b.dataset.i; if (ui.ytDel !== i){ ui.ytDel = i; render(); return true; } ui.ytDel = null; const L = ytList(S.galInfo.clip); L.splice(i, 1); ytSave(L).then(() => toast("Vidéo retirée"), siteErr); return true; }
     case "ytup": { const i = +b.dataset.i, L = ytList(S.galInfo.clip); [L[i-1], L[i]] = [L[i], L[i-1]]; ytSave(L).then(() => {}, siteErr); return true; }
