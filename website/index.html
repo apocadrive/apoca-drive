@@ -781,6 +781,7 @@ html{overflow-x:hidden}body{overflow-x:clip}
 #journal .jcard{flex:0 0 min(80vw,380px);scroll-snap-align:start}
 #journal .jcard div.jt{flex:1}
 #journal .jcard .jmore{margin-top:auto}
+#jnav{margin-top:28px}#jnav button:disabled{opacity:.35;cursor:default}
 </style>
 
 <header id="hd" class="wrap"><div class="in hd">
@@ -944,6 +945,7 @@ html{overflow-x:hidden}body{overflow-x:clip}
   <p class="eyebrow">Le journal</p>
   <h2 style="margin-top:18px">Coulisses <em>&amp; conseils.</em></h2>
   <div class="jgrid" id="jgrid"></div>
+  <div class="av-nav" id="jnav" hidden><button type="button" id="j-p" aria-label="Article précédent">‹</button><div class="av-dots" id="jdots"></div><button type="button" id="j-n" aria-label="Article suivant">›</button></div>
 </div></section>
 
 <div class="jr" id="jr" role="dialog" aria-modal="true" aria-labelledby="jr-t" hidden><div class="jr-in">
@@ -1140,6 +1142,17 @@ function vmSync(){ const T = $("#vtrack"), i = vmIndex(), end = T.scrollLeft + T
     const end = T.scrollLeft + T.clientWidth >= T.scrollWidth - 4; vmGo(end ? 0 : vmIndex() + 1); idle = Date.now() - 1500;
   }, 1000);
 })();
+/* ---------- Journal : flèches et points sous la bande horizontale ---------- */
+function jSync(){ const T = $("#jgrid"), cs = Array.from(T.querySelectorAll(".jcard")), N = $("#jnav"); if (!N) return;
+  N.hidden = cs.length < 2; const D = $("#jdots"); if (D.children.length !== cs.length) D.innerHTML = cs.map(() => "<i></i>").join("");
+  if (!cs.length) return; const end = T.scrollLeft + T.clientWidth >= T.scrollWidth - 4; let i = 0, d = 1e9;
+  cs.forEach((c, k) => { const dd = Math.abs(c.offsetLeft - cs[0].offsetLeft - T.scrollLeft); if (dd < d){ d = dd; i = k; } }); if (end) i = cs.length - 1;
+  Array.from(D.children).forEach((x, k) => x.classList.toggle("on", k === i)); $("#j-p").disabled = T.scrollLeft < 4; $("#j-n").disabled = end; return i; }
+(() => { const T = $("#jgrid"); if (!T) return; let r = 0;
+  const go = st => { const cs = Array.from(T.querySelectorAll(".jcard")); if (!cs.length) return; const i = Math.max(0, Math.min(cs.length - 1, jSync() + st)); T.scrollTo({left: cs[i].offsetLeft - cs[0].offsetLeft, behavior: "smooth"}); };
+  $("#j-p").addEventListener("click", () => go(-1)); $("#j-n").addEventListener("click", () => go(1));
+  T.addEventListener("scroll", () => { cancelAnimationFrame(r); r = requestAnimationFrame(jSync); }, {passive: true}); window.addEventListener("resize", jSync);
+  new MutationObserver(() => requestAnimationFrame(jSync)).observe(T, {childList: true}); })();
 function applyAll(){
   const c = SITE.content || {}, h = c.hero || {}, a = c.about || {}, k = c.contact || {}, hide = c.hide || {};
   /* accueil */
