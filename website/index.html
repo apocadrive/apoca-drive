@@ -786,11 +786,11 @@ html{overflow-x:hidden}body{overflow-x:clip}
 #moments{background:radial-gradient(100% 100% at 50% 0%,var(--sg-hi) 0%,transparent 70%),var(--sg);color:var(--ink);padding-top:clamp(64px,9vw,110px);padding-bottom:clamp(64px,9vw,110px);overflow:hidden}
 #moments h2{margin-top:18px;font-size:clamp(38px,6vw,64px)}
 #moments h2 em{color:var(--gold)}
-.mtrack{display:flex;gap:clamp(12px,1.6vw,20px);overflow-x:auto;margin-top:clamp(32px,4vw,48px);margin-inline:calc(50% - 50vw);padding:6px 0 30px;margin-bottom:-24px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;cursor:grab}
-.mtrack::-webkit-scrollbar{display:none}
-.mtrack button{flex:0 0 auto;width:clamp(220px,62vw,380px);aspect-ratio:4/3;border-radius:18px;overflow:hidden;border:1px solid rgba(32,39,35,.08);padding:0;background:#E9E4D8;cursor:zoom-in;box-shadow:0 10px 26px rgba(30,45,34,.10)}
-.mtrack img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 1.2s cubic-bezier(.16,1,.3,1);-webkit-user-drag:none;user-select:none}
-.mtrack button:hover img{transform:scale(1.04)}
+.mtrack{overflow:hidden;margin-top:clamp(28px,4vw,44px);margin-inline:calc(50% - 50vw);padding:4px 0 18px;margin-bottom:-14px;pointer-events:none;user-select:none;-webkit-user-select:none}
+.mrow{display:flex;gap:clamp(10px,1.4vw,16px);width:max-content;animation:mroll var(--mdur,40s) linear infinite;will-change:transform}
+@keyframes mroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--mset,50%)),0,0)}}
+.mrow figure{margin:0;flex:0 0 auto;width:clamp(150px,22vw,250px);aspect-ratio:10/7;border-radius:12px;overflow:hidden;border:1px solid rgba(32,39,35,.10);background:#E9E4D8;box-shadow:0 6px 16px rgba(30,45,34,.10)}
+.mrow img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}
 </style>
 
 <header id="hd" class="wrap"><div class="in hd">
@@ -1168,8 +1168,8 @@ function jSync(){ const T = $("#jgrid"), cs = Array.from(T.querySelectorAll(".jc
   $("#j-p").addEventListener("click", () => go(-1)); $("#j-n").addEventListener("click", () => go(1));
   T.addEventListener("scroll", () => { cancelAnimationFrame(r); r = requestAnimationFrame(jSync); }, {passive: true}); window.addEventListener("resize", jSync);
   new MutationObserver(() => requestAnimationFrame(jSync)).observe(T, {childList: true}); })();
-/* ---------- Moments : photos qui défilent toutes seules à l'horizontale ---------- */
-let MO_KEY = "", MO_SET = 0, MO_POS = 0, MO_HOLD = 0;
+/* ---------- Moments : petites photos qui défilent toutes seules, en boucle (on ne peut pas les bouger) ---------- */
+let MO_KEY = "";
 function renderMoments(t, off){
   const S2 = $("#moments"), T = $("#mtrack"); if (!S2) return;
   const c = document.querySelector("section.close"); if (c && S2.nextElementSibling !== c) c.before(S2);
@@ -1179,38 +1179,16 @@ function renderMoments(t, off){
   const L = Array.isArray(SITE.moments) ? SITE.moments.filter(x => x.img && !x.hidden).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0)) : [];
   S2.hidden = off || !L.length; if (S2.hidden) return;
   const key = L.map(x => x.id).join(",") + "|" + Math.round(innerWidth / 200); if (key === MO_KEY) return; MO_KEY = key;
-  /* une « série » assez longue pour remplir l'écran, répétée 3 fois : la boucle ne se voit pas */
-  const cw = Math.min(380, Math.max(220, innerWidth * .62)) + 20, need = Math.ceil((innerWidth + cw) / cw);
+  /* une série au moins aussi large que l'écran, posée 2 fois : quand la 1re est passée, on revient au début sans que ça se voie */
+  const cw = Math.min(250, Math.max(150, innerWidth * .22)) + 14, need = Math.ceil(innerWidth / cw) + 1;
   let set = []; while (set.length < Math.max(need, L.length)) set = set.concat(L);
-  const one = set.map(x => `<button type="button" aria-label="Voir la photo en grand"><img src="${E(x.img)}" alt="" loading="eager" draggable="false"></button>`).join("");
-  T.innerHTML = one + one + one;
-  requestAnimationFrame(() => { const k = T.children[set.length]; MO_SET = k ? k.offsetLeft - T.children[0].offsetLeft : 0; MO_POS = MO_SET; T.scrollLeft = MO_POS; });
+  const one = set.map(x => `<figure><img src="${E(x.img)}" alt="" draggable="false"></figure>`).join("");
+  T.innerHTML = `<div class="mrow">${one}${one}</div>`;
+  const R = T.firstChild;
+  requestAnimationFrame(() => { const k = R.children[set.length], w = k ? k.offsetLeft - R.children[0].offsetLeft : R.scrollWidth / 2;
+    R.style.setProperty("--mset", w + "px"); R.style.setProperty("--mdur", Math.max(12, w / 38) + "s"); });
 }
-(() => {
-  const T = $("#mtrack"); if (!T) return;
-  const still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let seen = false, last = 0, mine = false;
-  const hold = ms => { MO_HOLD = Date.now() + (ms || 2500); };
-  const wrap = () => { if (!MO_SET) return; if (T.scrollLeft < MO_SET * .5){ T.scrollLeft += MO_SET; } else if (T.scrollLeft > MO_SET * 1.5){ T.scrollLeft -= MO_SET; } MO_POS = T.scrollLeft; };
-  ["pointerdown", "touchstart", "wheel"].forEach(ev => T.addEventListener(ev, () => hold(), {passive: true}));
-  T.addEventListener("touchend", () => hold(2000), {passive: true});
-  T.addEventListener("mouseenter", () => hold(1e9)); T.addEventListener("mouseleave", () => hold(800));
-  T.addEventListener("scroll", () => { if (mine){ mine = false; return; } if (Date.now() < MO_HOLD) wrap(); }, {passive: true});
-  /* glisser à la souris sur ordinateur */
-  let dx = null, sl = 0, moved = false;
-  T.addEventListener("mousedown", e => { dx = e.clientX; sl = T.scrollLeft; moved = false; e.preventDefault(); });
-  addEventListener("mousemove", e => { if (dx === null) return; const d = e.clientX - dx; if (Math.abs(d) > 4) moved = true; T.scrollLeft = sl - d; });
-  addEventListener("mouseup", () => { if (dx !== null){ dx = null; wrap(); } });
-  T.addEventListener("click", e => { if (moved){ e.preventDefault(); moved = false; return; } const im = e.target.closest("button") && e.target.closest("button").querySelector("img"); if (!im || typeof lb === "undefined") return;
-    lb.classList.add("one"); lb.querySelector("img").src = im.src; lb.hidden = false; });
-  if ("IntersectionObserver" in window) new IntersectionObserver(es => es.forEach(e => { seen = e.isIntersecting; }), {rootMargin: "100px"}).observe(T); else seen = true;
-  addEventListener("resize", () => { MO_KEY = ""; renderMoments(((SITE.content || {}).moments) || {}, !!(((SITE.content || {}).hide) || {}).moments); });
-  const tick = now => { const dt = Math.min(64, now - (last || now)); last = now;
-    if (!still && seen && !document.hidden && MO_SET && Date.now() >= MO_HOLD && !$("#moments").hidden){
-      MO_POS += dt * .035; if (MO_POS > MO_SET * 1.5) MO_POS -= MO_SET; mine = true; T.scrollLeft = MO_POS; }
-    requestAnimationFrame(tick); };
-  requestAnimationFrame(tick);
-})();
+addEventListener("resize", () => { const c = SITE.content || {}; MO_KEY = ""; renderMoments(c.moments || {}, !!(c.hide || {}).moments); });
 function applyAll(){
   const c = SITE.content || {}, h = c.hero || {}, a = c.about || {}, k = c.contact || {}, hide = c.hide || {};
   /* accueil */
