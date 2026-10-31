@@ -783,13 +783,13 @@ html{overflow-x:hidden}body{overflow-x:clip}
 #journal .jcard .jmore{margin-top:auto}
 #jnav{margin-top:28px}#jnav button:disabled{opacity:.35;cursor:default}
 /* ===== Moments : bande de photos qui défile toute seule (et au doigt) ===== */
-#moments{background:radial-gradient(100% 100% at 50% 0%,var(--sg-hi) 0%,transparent 70%),var(--sg);color:var(--ink);padding-top:clamp(64px,9vw,110px);padding-bottom:clamp(64px,9vw,110px);overflow:hidden}
+#moments{background:radial-gradient(90% 120% at 0% 0%,var(--ol-hi) 0%,transparent 55%),radial-gradient(90% 120% at 100% 100%,var(--ol-lo) 0%,transparent 55%),var(--ol);color:var(--ivory);border-bottom:1px solid rgba(200,161,99,.22);padding-top:clamp(64px,9vw,110px);padding-bottom:clamp(64px,9vw,110px);overflow:hidden}
 #moments h2{margin-top:18px;font-size:clamp(38px,6vw,64px)}
-#moments h2 em{color:var(--gold)}
+#moments h2{color:#F4EEE2}#moments h2 em{color:var(--gold-e)}#moments .eyebrow{color:var(--gold-e)}
 .mtrack{overflow:hidden;margin-top:clamp(28px,4vw,44px);margin-inline:calc(50% - 50vw);padding:4px 0 18px;margin-bottom:-14px;pointer-events:none;user-select:none;-webkit-user-select:none}
 .mrow{display:flex;gap:clamp(10px,1.4vw,16px);width:max-content;animation:mroll var(--mdur,40s) linear infinite;will-change:transform}
 @keyframes mroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--mset,50%)),0,0)}}
-.mrow figure{margin:0;flex:0 0 auto;width:clamp(150px,22vw,250px);aspect-ratio:10/7;border-radius:12px;overflow:hidden;border:1px solid rgba(32,39,35,.10);background:#E9E4D8;box-shadow:0 6px 16px rgba(30,45,34,.10)}
+.mrow figure{margin:0;flex:0 0 auto;width:clamp(150px,22vw,250px);aspect-ratio:10/7;border-radius:12px;overflow:hidden;border:1px solid rgba(244,238,226,.14);background:#1A1814;box-shadow:0 10px 24px rgba(0,0,0,.28)}
 .mrow img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}
 </style>
 
@@ -1178,11 +1178,11 @@ function renderMoments(t, off){
   $("#mo-titre").innerHTML = `${E(a)} <em>${E(b)}</em>`;
   const L = Array.isArray(SITE.moments) ? SITE.moments.filter(x => x.img && !x.hidden).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0)) : [];
   S2.hidden = off || !L.length; if (S2.hidden) return;
-  const key = L.map(x => x.id).join(",") + "|" + Math.round(innerWidth / 200); if (key === MO_KEY) return; MO_KEY = key;
+  const key = L.map(x => x.id + (x.pos || "")).join(",") + "|" + Math.round(innerWidth / 200); if (key === MO_KEY) return; MO_KEY = key;
   /* une série au moins aussi large que l'écran, posée 2 fois : quand la 1re est passée, on revient au début sans que ça se voie */
   const cw = Math.min(250, Math.max(150, innerWidth * .22)) + 14, need = Math.ceil(innerWidth / cw) + 1;
   let set = []; while (set.length < Math.max(need, L.length)) set = set.concat(L);
-  const one = set.map(x => `<figure><img src="${E(x.img)}" alt="" draggable="false"></figure>`).join("");
+  const one = set.map(x => `<figure><img src="${E(x.img)}" alt="" draggable="false" style="object-position:${/^[\d.]+% [\d.]+%$/.test(x.pos || "") ? x.pos : "50% 30%"}"></figure>`).join("");
   T.innerHTML = `<div class="mrow">${one}${one}</div>`;
   const R = T.firstChild;
   requestAnimationFrame(() => { const k = R.children[set.length], w = k ? k.offsetLeft - R.children[0].offsetLeft : R.scrollWidth / 2;
