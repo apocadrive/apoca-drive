@@ -216,7 +216,8 @@ window.__apocaSiteAdmin = {
       onSnapshot(collection(fs, "films"), (q) => cb("films", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("films", [])),
       onSnapshot(collection(fs, "avis"), (q) => cb("avis", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("avis", [])),
       onSnapshot(collection(fs, "journal"), (q) => cb("journal", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("journal", [])),
-      onSnapshot(collection(fs, "insta"), (q) => cb("insta", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("insta", []))
+      onSnapshot(collection(fs, "insta"), (q) => cb("insta", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("insta", [])),
+      onSnapshot(collection(fs, "moments"), (q) => cb("moments", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("moments", []))
     ];
     return () => u.forEach((f) => f());
   },
@@ -260,6 +261,8 @@ window.__apocaSiteAdmin = {
   delJournal(id) { return deleteDoc(doc(fs, `journal/${id}`)); },
   saveInsta(id, d) { return setDoc(doc(fs, `insta/${id}`), JSON.parse(JSON.stringify(d)), { merge: true }); },
   delInsta(id) { return deleteDoc(doc(fs, `insta/${id}`)); },
+  saveMoment(id, d) { return setDoc(doc(fs, `moments/${id}`), JSON.parse(JSON.stringify(d)), { merge: true }); },
+  delMoment(id) { return deleteDoc(doc(fs, `moments/${id}`)); },
   listenStats(cb) { return onSnapshot(collection(fs, "stats"), (q) => { const m = {}; q.docs.forEach((d) => { m[d.id] = d.data(); }); cb(m); }, () => cb({})); },
   listenResa(cb) { return onSnapshot(collection(fs, "resaPhotos"), (q) => { const m = {}; q.docs.forEach((d) => { if (d.data().img) m[d.id] = d.data().img; }); cb(m); }, () => cb({})); },
   setResa(k, img) { const r = doc(fs, `resaPhotos/${k}`); return img ? setDoc(r, { img, updated: Date.now() }) : deleteDoc(r); }
