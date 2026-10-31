@@ -2086,11 +2086,12 @@ async function destAddPhotos(files){
 }
 /* ---------- Mon site : tout ce qui s'affiche sur apocadrive.web.app ---------- */
 const SITE_DEF = {
-  hero:{eyebrow:"France · partout dans le monde", titre:"Vos plus beaux jours,", titreOr:"filmés comme au cinéma.", accroche:"Mariages, clips et événements, en photo et en vidéo.", video:""},
+  hero:{eyebrow:"France · partout dans le monde", titre:"Vos plus beaux jours,", titreOr:"filmés comme au cinéma.", accroche:"Mariages, clips et événements, en photo et en vidéo.", video:"", badges:"Livré en 2 à 4 semaines\nPartout en France\nAcompte 30 % en ligne\nShooting dès 150 €"},
+  conditions:{texte:"Acompte : 30 % du prix, payé en ligne, pour bloquer votre date. Le reste se règle comme prévu dans votre devis.\nChangement de date : possible, selon mes disponibilités. Votre acompte est reporté sur la nouvelle date.\nAnnulation : l'acompte n'est pas remboursé, car la date vous était réservée.\nDate indisponible : si je ne suis pas libre à votre date, l'acompte vous est remboursé en entier.\nLivraison : vos films et photos sont livrés en 2 à 4 semaines, dans votre espace privé."},
   about:{prenom:"", titre:"Plus que des images,", titreOr:"des émotions.", p1:"Photographe et vidéaste, fondateur d'Apoca Drive. Basé en France, je filme partout dans le monde.", p2:"Pour moi, un film réussi fait revivre ce qu'on a ressenti : un regard, un rire, une émotion qu'on n'avait pas vue sur le moment. Je filme avec discrétion, pour que vous viviez votre journée sans penser à la caméra.", services:"Événements, Mariages, Corporate, Clips & projets"},
-  contact:{tel:"+33 6 07 05 53 84", email:"", instagram:"apocadrive", tiktok:"apocadrive", youtube:"apocadrive", phrase:"Parlons de votre projet"}
+  contact:{tel:"+33 6 07 05 53 84", email:"", instagram:"apocadrive", tiktok:"apocadrive", youtube:"apocadrive", phrase:"Parlons de votre projet", zones:"Partout en France · À l'étranger sur demande", google:"", googleNote:"", googleNb:""}
 };
-const SITE_SECS = [["apropos","À propos"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["journal","Journal"],["insta","Instagram"],["moments","Moments (photos qui défilent)"]];
+const SITE_SECS = [["apropos","À propos"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["conditions","Conditions de réservation"],["journal","Journal"],["insta","Instagram"],["moments","Moments (photos qui défilent)"]];
 const FILM_CATS = [["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Corporate"]];
 const RESA_ITEMS = [["mariage","Mariage",""],["mariage-civil","Mariage civil","Mariage"],["mariage-religieux","Mariage religieux","Mariage"],["mariage-civil-religieux","Mariage civil & religieux","Mariage"],["mariage-coutumier","Mariage coutumier","Mariage"],["fiancailles","Fiançailles","Mariage"],["clip","Clip musique",""],["anniversaire","Anniversaire",""],["podcast","Podcast",""],["shooting","Shooting photo & vidéo",""],["outfit","Outfit",""]];
 S.resa = null;
@@ -2150,7 +2151,8 @@ function viewSite(){
       ${sfIn("hero.eyebrow","Petite ligne dorée en haut","France · partout dans le monde",60)}
       ${sfIn("hero.titre","Titre (en blanc)","Vos plus beaux jours,",80)}
       ${sfIn("hero.titreOr","Fin du titre (en doré)","filmés comme au cinéma.",80)}
-      ${sfIn("hero.accroche","Phrase sous le titre","Mariages, clips et événements…",140)}</section>
+      ${sfIn("hero.accroche","Phrase sous le titre","Mariages, clips et événements…",140)}
+      ${sfTa("hero.badges","Badges sous les boutons (un par ligne, 4 conseillés)","Livré en 2 à 4 semaines")}</section>
       <section class="panel"><h3 style="margin:0">Vidéo d'accueil</h3>
       <p class="small muted" style="margin:0">${S.heroVid ? `Votre vidéo passe en boucle sur l'accueil, à la place de la photo${S.heroVid.size ? ` (${(S.heroVid.size/1048576).toFixed(1).replace(".", ",")} Mo)` : ""}.` : "Un montage court (10 à 30 secondes) : il passe en boucle en plein écran, sans le son. Choisis ta vidéo telle quelle : l'appli l'allège toute seule avant de l'envoyer."}${S.heroVid && S.heroVid.size > 12 * 1048576 ? `<br><b style="color:#ecc94b">Elle est lourde pour un téléphone : renvoie-la avec « Changer la vidéo », l'appli l'allégera automatiquement.</b>` : ""}</p>
       ${ui.heroVidUp != null ? `<div class="row"><span class="spin"></span><span class="small">${esc(ui.heroVidMsg || "Envoi de la vidéo")}… ${Math.round(ui.heroVidUp*100)} %. Gardez l'appli ouverte, écran allumé.</span></div>`
@@ -2282,6 +2284,8 @@ function viewSite(){
         <img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;aspect-ratio:10/7;object-fit:cover;object-position:${esc(moPos(x))};border-radius:8px;display:block">
         <button class="btn sm" data-act="mocrop" data-id="${x.id}">Cadrer</button><button class="btn ghost sm" data-act="model" data-id="${x.id}" style="color:var(--rec)">${ui.moDel===x.id?"Confirmer":"Retirer"}</button></div>`).join("") + `</div>`;
   } else if (t === "reserver"){
+    h += `<section class="panel"><h3 style="margin:0">Conditions de réservation</h3><p class="small muted" style="margin:0">Affichées sur l'accueil. Une condition par ligne, sous la forme « Titre : explication ». Laissez vide pour cacher le bloc.</p>
+      ${sfTa("conditions.texte","Conditions","Acompte : 30 % du prix…")}</section>`;
     const pl = String(sfGet("paiement.shooting")||"").trim();
     h += `<section class="panel"><h3 style="margin:0">Acompte en ligne (shootings : 30 % = 45 €)</h3>
       <p class="small muted" style="margin:0">Collez ici votre lien de paiement. Après sa demande de shooting, le client voit un gros bouton jaune « Payer l'acompte de 45 € (30 %) ». Le reste (105 €) se règle le jour du shooting. Laissez vide pour ne pas proposer le paiement.</p>
@@ -2312,7 +2316,11 @@ function viewSite(){
       <section class="panel"><h3 style="margin:0">Réseaux sociaux</h3><p class="small muted" style="margin:0">Le nom du compte suffit. Laissez vide pour retirer l'icône.</p>
       ${sfIn("contact.instagram","Instagram","apocadrive",120)}
       ${sfIn("contact.tiktok","TikTok","apocadrive",120)}
-      ${sfIn("contact.youtube","YouTube","apocadrive",120)}</section>`;
+      ${sfIn("contact.youtube","YouTube","apocadrive",120)}
+      ${sfIn("contact.zones","Zones où tu te déplaces (bas du site)","Partout en France · À l'étranger sur demande",120)}
+      ${sfIn("contact.google","Lien de ta fiche Google (avis)","https://g.page/r/…",300)}
+      ${sfIn("contact.googleNote","Ta note Google","5,0",8)}
+      ${sfIn("contact.googleNb","Nombre d'avis Google","12",8)}</section>`;
   } else if (t === "visites"){
     const st = S.stats || {};
     const dk = n => new Date(Date.now() - n * 864e5).toLocaleDateString("sv-SE", {timeZone: "Europe/Paris"});
