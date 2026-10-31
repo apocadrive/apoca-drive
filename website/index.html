@@ -783,9 +783,9 @@ html{overflow-x:hidden}body{overflow-x:clip}
 #journal .jcard .jmore{margin-top:auto}
 #jnav{margin-top:28px}#jnav button:disabled{opacity:.35;cursor:default}
 /* ===== Moments : bande de photos qui défile toute seule (et au doigt) ===== */
-#moments{background:radial-gradient(90% 120% at 0% 0%,#CDAD70 0%,transparent 55%),radial-gradient(90% 120% at 100% 100%,#B5934F 0%,transparent 55%),#C2A061;color:var(--ol);border-bottom:1px solid rgba(39,56,43,.18);padding-top:clamp(64px,9vw,110px);padding-bottom:clamp(64px,9vw,110px);overflow:hidden}
+#moments{background:radial-gradient(100% 100% at 50% 0%,var(--sg-hi) 0%,transparent 70%),var(--sg);color:var(--ink);border-bottom:1px solid rgba(39,56,43,.1);padding-top:clamp(64px,9vw,110px);padding-bottom:clamp(64px,9vw,110px);overflow:hidden}
 #moments h2{margin-top:18px;font-size:clamp(38px,6vw,64px)}
-#moments h2{color:var(--ol)}#moments h2 em{color:#FBF6EC}#moments .eyebrow{color:var(--ol)}#moments .eyebrow::before{background:var(--ol)}
+#moments h2{color:var(--ol)}#moments h2 em{color:var(--gold)}#moments .eyebrow{color:var(--gold)}#moments .eyebrow::before{background:var(--gold)}
 .mtrack{overflow:hidden;margin-top:clamp(28px,4vw,44px);margin-inline:calc(50% - 50vw);padding:4px 0 18px;margin-bottom:-14px;pointer-events:none;user-select:none;-webkit-user-select:none}
 .mrow{display:flex;gap:clamp(10px,1.4vw,16px);width:max-content;animation:mroll var(--mdur,40s) linear infinite;will-change:transform}
 @keyframes mroll{from{transform:translate3d(0,0,0)}to{transform:translate3d(calc(-1 * var(--mset,50%)),0,0)}}
