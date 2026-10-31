@@ -185,6 +185,7 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 @media (max-width:860px){.jgrid{grid-template-columns:1fr}}
 .jcard{display:flex;flex-direction:column;gap:14px;text-align:left;background:none;border:0;padding:0;cursor:pointer;color:var(--ink);font:inherit}
 .jcard .frame{aspect-ratio:3/2;width:100%}
+.jcard .frame img[src*="journal-chantal"]{object-position:center 22%}
 .jcard .frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .jcard span{font:400 10px/1 var(--f-body);letter-spacing:.26em;text-transform:uppercase;color:var(--gold)}
 .jcard b{font:400 26px/1.15 var(--f-display)}
@@ -1116,6 +1117,8 @@ const social = (u, base) => { u = String(u||"").trim(); if (!u) return ""; if (/
 const CAT = {mariage:"Mariage", clip:"Clip", event:"Événement", corporate:"Corporate"};
 const ytId = u => { const m = String(u||"").match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/); return m ? m[1] : ""; };
 let JOURNAL = [], AVN = 0;
+/* articles du journal fixés dans le code (ils s'ajoutent à ceux de l'application) */
+const JOURNAL_FIXE = [{ id: "une-chantal-gaudence", titre: "Ils se sont dit oui : Chantal & Gaudence", cat: "Mariage", cover: "/journal-chantal-gaudence.jpg", lien: "/journal", created: Date.UTC(2026, 9, 31, 12), texte: "Édition spéciale du Journal des Mariés : le mariage civil et religieux de Chantal et Gaudence, samedi 31 octobre 2026 à Paris." }];
 function filmDecor(){ document.querySelectorAll("#gfilms .film").forEach((el, i) => { if (el.querySelector(".fnum")) return; const fr = el.querySelector(".frame"), cap = el.querySelector(".cap"); const l = el.dataset.lieu;
   if (l && fr){ const p = document.createElement("em"); p.className = "pill"; p.textContent = l; fr.appendChild(p); }
   if (cap){ const n = document.createElement("span"); n.className = "fnum"; n.textContent = String(i + 1).padStart(2, "0"); cap.parentNode.insertBefore(n, cap); } }); }
@@ -1124,7 +1127,7 @@ function avSync(){ const st = $("#avstrip"), nav = $("#avnav"); if (!st || !nav)
 document.addEventListener("click", e => { const st = $("#avstrip"); if (!st) return; if (e.target.closest("#av-n")) st.scrollBy({left: st.clientWidth, behavior: "smooth"}); if (e.target.closest("#av-p")) st.scrollBy({left: -st.clientWidth, behavior: "smooth"}); });
 setTimeout(() => { const st = $("#avstrip"); if (st) st.addEventListener("scroll", () => { clearTimeout(st._t); st._t = setTimeout(avSync, 80); }, {passive: true}); }, 0);
 const jDate = t => t ? new Date(t).toLocaleDateString("fr-FR", {day:"numeric", month:"long", year:"numeric"}) : "";
-document.addEventListener("click", e => { const b = e.target.closest("[data-j]"); if (!b) return; const j = JOURNAL[+b.dataset.j]; if (!j) return;
+document.addEventListener("click", e => { const b = e.target.closest("[data-j]"); if (!b) return; const j = JOURNAL[+b.dataset.j]; if (!j) return; if (j.lien){ location.href = j.lien; return; }
   const r = $("#jr"); $("#jr-cat").textContent = j.cat || "Journal"; $("#jr-t").textContent = j.titre; $("#jr-d").textContent = jDate(j.created); $("#jr-txt").textContent = j.texte || "";
   const im = $("#jr-img"); if (j.cover){ im.src = j.cover; im.hidden = false; } else im.hidden = true;
   r.hidden = false; r.scrollTop = 0; document.body.style.overflow = "hidden"; });
@@ -1324,7 +1327,7 @@ function applyAll(){
   setTimeout(avSync, 0);
   /* journal */
   if (Array.isArray(SITE.journal)){
-    const jl = SITE.journal.filter(j => !j.hidden && j.titre).sort((x, y) => (y.created||0) - (x.created||0));
+    const jl = JOURNAL_FIXE.concat(SITE.journal).filter(j => !j.hidden && j.titre).sort((x, y) => (y.created||0) - (x.created||0));
     JOURNAL = jl;
     $("#jgrid").innerHTML = jl.map((j, i) => { const ex = String(j.texte||"").replace(/\s+/g, " ").trim(); return `<button type="button" class="jcard" data-j="${i}"><div class="frame">${j.cover ? `<img src="${E(j.cover)}" alt="" loading="lazy">` : ""}${j.cat ? `<em class="pill">${E(j.cat)}</em>` : ""}</div><div class="jt"><small>${E(jDate(j.created))}</small><b>${E(j.titre)}</b>${ex ? `<p>${E(ex.length > 150 ? ex.slice(0, 147) + "…" : ex)}</p>` : ""}<span class="jmore">Lire l'article ↗</span></div></button>`; }).join("");
     $("#journal").hidden = !jl.length || !!hide.journal;
