@@ -213,6 +213,8 @@ window.__apocaSiteAdmin = {
       onSnapshot(doc(fs, "site/heroPhoto"), (s) => cb("heroPhoto", s.exists() ? (s.data().img || "") : ""), () => cb("heroPhoto", "")),
       onSnapshot(doc(fs, "site/heroVideoMeta"), (s) => cb("heroVideoMeta", s.exists() ? s.data() : null), () => cb("heroVideoMeta", null)),
       onSnapshot(doc(fs, "site/aboutPhoto"), (s) => cb("aboutPhoto", s.exists() ? (s.data().img || "") : ""), () => cb("aboutPhoto", "")),
+      onSnapshot(doc(fs, "site/coulisse1Photo"), (s) => cb("coulisse1Photo", s.exists() ? (s.data().img || "") : ""), () => cb("coulisse1Photo", "")),
+      onSnapshot(doc(fs, "site/coulisse2Photo"), (s) => cb("coulisse2Photo", s.exists() ? (s.data().img || "") : ""), () => cb("coulisse2Photo", "")),
       onSnapshot(collection(fs, "films"), (q) => cb("films", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("films", [])),
       onSnapshot(collection(fs, "avis"), (q) => cb("avis", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("avis", [])),
       onSnapshot(collection(fs, "journal"), (q) => cb("journal", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("journal", [])),

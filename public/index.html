@@ -2109,12 +2109,13 @@ async function destAddPhotos(files){
 }
 /* ---------- Mon site : tout ce qui s'affiche sur apocadrive.web.app ---------- */
 const SITE_DEF = {
+  pourquoi:{eyebrow:"Dans les coulisses", titre:"Pourquoi", titreOr:"Apoca Drive ?", points:"Un regard de cinéma : chaque film est pensé comme un court-métrage, avec une lumière, des mouvements et un son soignés.\nLivré en 2 à 4 semaines : votre film arrive vite, prêt à partager avec vos proches.\nPartout en France : basé en France, je me déplace partout, et à l'étranger sur demande.\nSouple sur les dates : un changement de date est possible, selon mes disponibilités."},
   hero:{eyebrow:"France · partout dans le monde", titre:"Vos plus beaux jours,", titreOr:"filmés comme au cinéma.", accroche:"Mariages, clips et événements, en photo et en vidéo.", video:"", badges:"Livré en 2 à 4 semaines\nPartout en France\nAcompte 30 % en ligne\nShooting dès 150 €"},
   conditions:{texte:"Acompte : 30 % du prix, payé en ligne, pour bloquer votre date. Le reste se règle comme prévu dans votre devis.\nChangement de date : possible, selon mes disponibilités. Votre acompte est reporté sur la nouvelle date.\nAnnulation : l'acompte n'est pas remboursé, car la date vous était réservée.\nDate indisponible : si je ne suis pas libre à votre date, l'acompte vous est remboursé en entier.\nLivraison : vos films et photos sont livrés en 2 à 4 semaines, dans votre espace privé."},
   about:{prenom:"", titre:"Plus que des images,", titreOr:"des émotions.", p1:"Photographe et vidéaste, fondateur d'Apoca Drive. Basé en France, je filme partout dans le monde.", p2:"Pour moi, un film réussi fait revivre ce qu'on a ressenti : un regard, un rire, une émotion qu'on n'avait pas vue sur le moment. Je filme avec discrétion, pour que vous viviez votre journée sans penser à la caméra.", services:"Événements, Mariages, Corporate, Clips & projets"},
   contact:{tel:"+33 6 07 05 53 84", email:"", instagram:"apocadrive", tiktok:"apocadrive", youtube:"apocadrive", phrase:"Parlons de votre projet", zones:"Partout en France · À l'étranger sur demande", google:"", googleNote:"", googleNb:""}
 };
-const SITE_SECS = [["apropos","À propos"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["conditions","Conditions de réservation"],["journal","Journal"],["insta","Instagram"],["moments","Moments (photos qui défilent)"]];
+const SITE_SECS = [["apropos","À propos"],["pourquoi","Pourquoi Apoca Drive (coulisses)"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["conditions","Conditions de réservation"],["journal","Journal"],["insta","Instagram"],["moments","Moments (photos qui défilent)"]];
 const FILM_CATS = [["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Corporate"]];
 const RESA_ITEMS = [["mariage","Mariage",""],["mariage-civil","Mariage civil","Mariage"],["mariage-religieux","Mariage religieux","Mariage"],["mariage-civil-religieux","Mariage civil & religieux","Mariage"],["mariage-coutumier","Mariage coutumier","Mariage"],["fiancailles","Fiançailles","Mariage"],["clip","Clip musique",""],["anniversaire","Anniversaire",""],["podcast","Podcast",""],["shooting","Shooting photo & vidéo",""],["outfit","Outfit",""]];
 S.resa = null;
@@ -2124,7 +2125,7 @@ const STAR_OPTS = [["5","★★★★★  5"],["4","★★★★  4"],["3","★�
 const starTxt = n => { n = Math.max(0, Math.min(5, +n||0)); return n ? "★".repeat(n) + "☆".repeat(5-n) : ""; };
 let siteUnsub = null;
 function siteStart(){ if (siteUnsub || !window.__apocaSiteAdmin) return; siteUnsub = window.__apocaSiteAdmin.listen((k, v) => {
-  if (k === "content") S.site = v; else if (k === "heroPhoto") S.sitePh.hero = v; else if (k === "aboutPhoto") S.sitePh.about = v; else if (k === "heroVideoMeta"){ S.heroVid = v; if (v && v.n && !v.poster && !S.hvPosterTry && window.__apocaSiteAdmin.heroPoster){ S.hvPosterTry = 1; window.__apocaSiteAdmin.heroPoster(videoPoster).catch(() => {}); } } else if (k === "films") S.siteFilms = v; else if (k === "avis") S.siteAvis = v; else if (k === "journal") S.siteJournal = v; else if (k === "insta") S.siteInsta = v; else if (k === "moments") S.siteMoments = v;
+  if (k === "content") S.site = v; else if (k === "heroPhoto") S.sitePh.hero = v; else if (k === "aboutPhoto") S.sitePh.about = v; else if (k === "coulisse1Photo") S.sitePh.coulisse1 = v; else if (k === "coulisse2Photo") S.sitePh.coulisse2 = v; else if (k === "heroVideoMeta"){ S.heroVid = v; if (v && v.n && !v.poster && !S.hvPosterTry && window.__apocaSiteAdmin.heroPoster){ S.hvPosterTry = 1; window.__apocaSiteAdmin.heroPoster(videoPoster).catch(() => {}); } } else if (k === "films") S.siteFilms = v; else if (k === "avis") S.siteAvis = v; else if (k === "journal") S.siteJournal = v; else if (k === "insta") S.siteInsta = v; else if (k === "moments") S.siteMoments = v;
   if (ui.view === "site") softRender(); });
   if (window.__apocaSiteAdmin.listenStats) window.__apocaSiteAdmin.listenStats(m => { S.stats = m; if (ui.view === "site") softRender(); });
   if (window.__apocaSiteAdmin.listenResa) window.__apocaSiteAdmin.listenResa(m => { S.resa = m; if (ui.view === "site") softRender(); });
@@ -2164,7 +2165,7 @@ function viewSite(){
   if (!window.__apocaSiteAdmin) return `<h2>Mon site</h2><div class="empty">Disponible dans l'appli en ligne uniquement.</div>`;
   const t = ui.siteTab || "accueil";
   const np = (S.sitePend||[]).length;
-  const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
+  const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["pourquoi","Coulisses"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
   let h = `<h2>Mon site</h2><p class="small muted" style="margin:0">Ce que vous changez ici s'affiche tout de suite sur <b>apocadrive.web.app</b>.</p>
     <div class="chips">${tabs.map(([k, l]) => `<button class="chip${t===k?" tu":""}" data-act="stab" data-v="${k}">${l}</button>`).join("")}</div>`;
   if (S.site === null) return h + `<div class="empty"><span class="spin"></span>Chargement…</div>`;
@@ -2306,6 +2307,15 @@ function viewSite(){
     h += `<p class="small muted" style="margin:0">${list.length} photo${list.length > 1 ? "s" : ""}</p><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">` + list.map(x => `<div style="display:flex;flex-direction:column;gap:6px;min-width:0">
         <img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;aspect-ratio:10/7;object-fit:cover;object-position:${esc(moPos(x))};border-radius:8px;display:block">
         <button class="btn sm" data-act="mocrop" data-id="${x.id}">Cadrer</button><button class="btn ghost sm" data-act="model" data-id="${x.id}" style="color:var(--rec)">${ui.moDel===x.id?"Confirmer":"Retirer"}</button></div>`).join("") + `</div>`;
+  } else if (t === "pourquoi"){
+    h += `<section class="panel"><h3 style="margin:0">Pourquoi Apoca Drive ?</h3><p class="small muted" style="margin:0">Une section sur fond noir avec vos photos des coulisses (vous en train de filmer) : une grande photo en arche et une photo ronde qui la chevauche. Elle apparaît sur le site dès que la première photo est choisie.</p></section>`;
+    h += sitePhoto("coulisse1", "Grande photo (en arche)", "Une photo en hauteur de vous ou de l'équipe en train de travailler.");
+    h += sitePhoto("coulisse2", "Petite photo (ronde)", "Une deuxième photo de tournage. Elle se place en rond, en bas à gauche.");
+    h += `<section class="panel"><h3 style="margin:0">Textes</h3>
+      ${sfIn("pourquoi.eyebrow","Petite ligne dorée","Dans les coulisses",40)}
+      ${sfIn("pourquoi.titre","Titre (en blanc)","Pourquoi",60)}
+      ${sfIn("pourquoi.titreOr","Fin du titre (en doré)","Apoca Drive ?",60)}
+      ${sfTa("pourquoi.points","Points à ouvrir (un par ligne, sous la forme « Titre : explication »)","Un regard de cinéma : …")}</section>`;
   } else if (t === "realis"){
     h += `<section class="panel"><h3 style="margin:0">Photos et vidéos de chaque prestation</h3><p class="small muted" style="margin:0">Choisissez une prestation, puis ajoutez vos photos et vidéos. Elles s'affichent sur sa page du site. Touchez <b>☆ Haut</b> sur une photo pour qu'elle devienne la grande photo en haut de la page.</p></section>`;
     h += RESA_ITEMS.map(([k, l, parent]) => { const n = S.gal && S.gal[k] ? S.gal[k].length : 0;
@@ -3096,7 +3106,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-film-allege";
+const APP_VER = "2026-11-02-coulisses";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);

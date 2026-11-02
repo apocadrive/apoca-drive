@@ -340,6 +340,23 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 
 /* steps */
 .steps{background:var(--paper-2)}
+.pq{background:var(--night);color:#F4EFE6}
+.pq .in{max-width:620px;margin:0 auto}
+.pq .eyebrow{color:var(--gold-2,#D9BE86)}.pq .eyebrow::before{background:var(--gold-2,#D9BE86)}
+.pq h2{margin-top:16px;color:#F4EFE6;font-size:clamp(44px,11vw,72px)}.pq h2 em{color:var(--gold-2,#D9BE86)}
+.pq-art{position:relative;margin:clamp(40px,8vw,64px) 0 0;aspect-ratio:1/1.15}
+.pq-blk{position:absolute;left:24%;top:6%;width:62%;height:86%;background:#E6DCCD}
+.pq-arch{position:absolute;right:0;top:0;width:62%;height:84%;object-fit:cover;border-radius:999px 999px 0 0;display:block}
+.pq-circ{position:absolute;left:0;bottom:2%;width:56%;aspect-ratio:1;object-fit:cover;border-radius:50%;display:block}
+.pq-circ[hidden]{display:none}
+.pq-l{margin-top:clamp(28px,6vw,44px)}
+.pq-l details{border-top:1px solid rgba(244,239,230,.55)}
+.pq-l details:last-child{border-bottom:1px solid rgba(244,239,230,.55)}
+.pq-l summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 0;font:400 clamp(26px,6.5vw,32px)/1.15 var(--f-display);color:#F4EFE6}
+.pq-l summary::-webkit-details-marker{display:none}
+.pq-l summary::after{content:"";flex:none;width:18px;height:18px;background:linear-gradient(currentColor,currentColor) center/18px 1.5px no-repeat,linear-gradient(currentColor,currentColor) center/1.5px 18px no-repeat;transition:transform .4s}
+.pq-l details[open] summary::after{background:linear-gradient(currentColor,currentColor) center/18px 1.5px no-repeat}
+.pq-l p{margin:0 0 24px;font:300 17px/1.65 var(--f-body);color:rgba(244,239,230,.82)}
 .steps ol{list-style:none;margin:56px 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px}
 .steps li{display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--gold);padding-top:20px}
 .steps li span{font:400 15px/1 var(--f-display);font-style:italic;color:var(--gold)}
@@ -884,6 +901,13 @@ html{overflow-x:hidden}body{overflow-x:clip}
   </ol>
 </div></section>
 
+<section id="pourquoi" class="pq wrap off" aria-label="Pourquoi Apoca Drive"><div class="in">
+  <p class="eyebrow" id="pq-eye">Dans les coulisses</p>
+  <h2 id="pq-h">Pourquoi <em>Apoca Drive ?</em></h2>
+  <div class="pq-art" aria-hidden="true"><span class="pq-blk"></span><img class="pq-arch" id="pq-1" alt="" loading="lazy"><img class="pq-circ" id="pq-2" alt="" loading="lazy"></div>
+  <div class="pq-l" id="pq-l"></div>
+</div></section>
+
 <section id="conditions" class="wrap" data-sec="conditions"><div class="in">
   <p class="eyebrow">Réservation</p>
   <h2>Les conditions, <em>en toute clarté.</em></h2>
@@ -1285,6 +1309,18 @@ function applyAll(){
   $("#ab-stats").innerHTML = st.map(x => `<div><b>${E(x.n)}</b><span>${E(x.l)}</span></div>`).join(""); $("#ab-stats").hidden = !st.length;
   { const cit = val(a, "citation", ""), sig = val(a, "signature", "") || prenom; $("#ab-cit").textContent = cit; $("#ab-sig").textContent = sig; $("#ab-sig").hidden = !sig; $("#ab-q").hidden = !cit; }
   if (SITE.aboutPhoto) $("#ab-img").src = SITE.aboutPhoto;
+  /* pourquoi Apoca Drive (photos des coulisses) */
+  { const p = c.pourquoi || {}, p1 = SITE.coulisse1Photo || "", p2 = SITE.coulisse2Photo || "";
+    $("#pq-eye").textContent = val(p, "eyebrow", "Dans les coulisses");
+    $("#pq-h").innerHTML = `${E(val(p, "titre", "Pourquoi"))} <em>${E(val(p, "titreOr", "Apoca Drive ?"))}</em>`;
+    const pts = val(p, "points", "Un regard de cinéma : chaque film est pensé comme un court-métrage, avec une lumière, des mouvements et un son soignés.\nLivré en 2 à 4 semaines : votre film arrive vite, prêt à partager avec vos proches.\nPartout en France : basé en France, je me déplace partout, et à l'étranger sur demande.\nSouple sur les dates : un changement de date est possible, selon mes disponibilités.").split(/\n/).map(x => x.trim()).filter(Boolean);
+    const up = t => t.charAt(0).toUpperCase() + t.slice(1);
+    const L = $("#pq-l"), open = [...L.querySelectorAll("details")].map(d => d.open);
+    L.innerHTML = pts.map((x, i) => { const m = x.match(/^([^:]{2,60}) ?: ?(.+)$/); return `<details${open[i] || (!open.length && i === 0) ? " open" : ""}><summary>${E(up(m ? m[1] : x))}</summary>${m ? `<p>${E(up(m[2]))}</p>` : ""}</details>`; }).join("");
+    if (p1 && $("#pq-1").getAttribute("src") !== p1) $("#pq-1").src = p1;
+    if (p2 && $("#pq-2").getAttribute("src") !== p2) $("#pq-2").src = p2;
+    $("#pq-2").hidden = !p2;
+    vis("#pourquoi", !!p1 && !hide.pourquoi); }
   /* contact */
   const tel = val(k, "tel", "+33 6 07 05 53 84"), wn = waNum(tel), msg = encodeURIComponent("Bonjour Apoca Drive, je souhaite des informations pour mon projet.");
   const waU = wn ? `https://wa.me/${wn}?text=${msg}` : "";
@@ -1888,6 +1924,8 @@ onSnapshot(doc(fs, "site/heroVideoMeta"), async (s) => {
 }, () => {});
 onSnapshot(doc(fs, "site/heroPhoto"), (s) => q("heroPhoto", s.exists() ? (s.data().img || "") : ""), () => {});
 onSnapshot(doc(fs, "site/aboutPhoto"), (s) => q("aboutPhoto", s.exists() ? (s.data().img || "") : ""), () => {});
+onSnapshot(doc(fs, "site/coulisse1Photo"), (s) => q("coulisse1Photo", s.exists() ? (s.data().img || "") : ""), () => {});
+onSnapshot(doc(fs, "site/coulisse2Photo"), (s) => q("coulisse2Photo", s.exists() ? (s.data().img || "") : ""), () => {});
 onSnapshot(collection(fs, "films"), (x) => q("films", x.docs.map((d) => ({ id: d.id, ...d.data() }))), () => q("films", null));
 onSnapshot(collection(fs, "resaPhotos"), (x) => { const m = {}; x.docs.forEach((d) => { if (d.data().img) m[d.id] = d.data().img; }); if (window.__apocaResa) window.__apocaResa(m); else window.__apocaResaQueued = m; }, () => {});
 onSnapshot(collection(fs, "journal"), (x) => q("journal", x.docs.map((d) => ({ id: d.id, ...d.data() }))), () => q("journal", null));
