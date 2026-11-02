@@ -70,7 +70,7 @@ body.jour .sym{width:26px}
 body.jour .name{font-size:13px}
 body.jour .couple{font-size:30px}
 body.jour h1{font-size:18px;margin:0 0 auto}
-body.jour #list,body.jour .foot{display:none}
+body.jour .foot{display:none}
 body.jour .row{grid-template-columns:repeat(var(--n,6),minmax(0,1fr));gap:8px;margin-bottom:2px}
 body.jour .row .b{min-height:0;aspect-ratio:1;max-width:54px;justify-self:center;width:100%;padding:0;border-radius:50%;gap:0}
 body.jour .row .b span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -139,9 +139,9 @@ function renderButtons(list){
   LAST = list;
   var main = [], soc = [], last = [], site = [];
   list.forEach(function(x){ if (!x || x.on === false || !x.label || !okUrl(String(x.url || ""))) return;
-    if (JOUR){ if (ICONS[x.k] || SOC[x.k]) soc.push(x); else if (x.k === "site") site.push(x); else last.push(x); return; }
+    if (JOUR){ if (ICONS[x.k] || SOC[x.k]) soc.push(x); else if (x.k === "site") main.push(x); else last.push(x); return; }
     if (SOC[x.k]) soc.push(x); else if (x.k === "vcf") last.push(x); else main.push(x); });
-  if (JOUR){ soc.sort(function(a, b){ return "wa tel resa ig tt yt".indexOf(a.k) - "wa tel resa ig tt yt".indexOf(b.k); }); last = last.concat(site); }
+  if (JOUR){ soc.sort(function(a, b){ return "wa tel resa ig tt yt".indexOf(a.k) - "wa tel resa ig tt yt".indexOf(b.k); }); }
   document.getElementById("list").innerHTML = main.map(btn).join("");
   var row = document.getElementById("row"); row.innerHTML = soc.map(btn).join(""); row.hidden = !soc.length; row.style.setProperty("--n", Math.max(1, soc.length));
   document.getElementById("list2").innerHTML = last.map(btn).join("");
