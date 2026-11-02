@@ -1352,7 +1352,7 @@ function applyAll(){
       document.querySelectorAll("#gfilms video.fv").forEach(v => io ? io.observe(v) : (v.src = v.dataset.src));
       any = true;
     }
-    vis("#films", any); vis('a[href="#films"]:not(#h-films)', any); $("#h-films").href = any ? "#films" : "#reserver"; filmDecor();
+    vis("#films", any); vis('a[href="#films"]:not(#h-films)', any); $("#h-films").href = any ? "/films" : "#reserver"; filmDecor();
   } else vis("#films", false);
   /* moments : bande de photos */
   renderMoments(c.moments || {}, !!hide.moments);
@@ -1361,7 +1361,7 @@ function applyAll(){
   document.querySelectorAll('a[href="#films"]:not(#h-films)').forEach(x => x.dataset.fl = "1");
   { const filmsOn = !$("#films").classList.contains("off"), vOn = VIM.length > 0;
     document.querySelectorAll("a[data-fl]").forEach(x => { x.href = filmsOn || !vOn ? "#films" : "#videos"; x.classList.toggle("off", !filmsOn && !vOn); });
-    if (vOn) $("#h-films").href = "#videos"; }
+    if (vOn) $("#h-films").href = "/films"; }
   /* avis */
   if (Array.isArray(SITE.avis)){
     const av = SITE.avis.filter(x => !x.hidden && x.texte).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0));

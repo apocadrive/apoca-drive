@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mes films · Apoca Drive, vidéaste en France</title>
+<meta name="description" content="Les films d'Apoca Drive : mariages, clips et événements filmés comme au cinéma, en format paysage et vertical.">
+<link rel="canonical" href="https://apocadrive.web.app/films">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Apoca Drive"><meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Mes films · Apoca Drive"><meta property="og:description" content="Mariages, clips et événements filmés comme au cinéma.">
+<meta property="og:url" content="https://apocadrive.web.app/films"><meta property="og:image" content="https://apocadrive.web.app/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0E0D0B">
+<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/prestation.css?v=1">
+<style>
+body{background:var(--night);color:#F4EFE6}
+.fh{padding-top:calc(76px + env(safe-area-inset-top,0px) + clamp(40px,7vw,80px));padding-bottom:clamp(28px,4vw,44px)}
+.fh .crumbs{margin:0 0 22px;font:400 12px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:rgba(244,239,230,.6)}
+.fh .crumbs a{text-decoration:none}
+.fh .eyebrow{color:var(--gold-2)}
+.fh h1{margin-top:18px;font-size:clamp(46px,8vw,96px);color:#F4EFE6}.fh h1 em{color:var(--gold-2)}
+.fh p.lead{margin:18px 0 0;max-width:46ch;color:rgba(244,239,230,.75)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px}
+.chips button{font:400 12px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;padding:13px 18px;border:1px solid rgba(217,190,134,.35);background:none;color:#F4EFE6;border-radius:999px;cursor:pointer;min-height:44px}
+.chips button[aria-pressed="true"]{background:var(--gold-2);border-color:var(--gold-2);color:var(--night)}
+.fgw{padding-bottom:clamp(60px,9vw,110px)}
+.fg{--c:2;display:grid;grid-template-columns:repeat(var(--c),minmax(0,1fr));grid-auto-rows:var(--u,40px);grid-auto-flow:dense;gap:10px}
+@media (min-width:900px){.fg{--c:4;gap:14px}}
+.t{position:relative;overflow:hidden;background:#1a1714;border:0;padding:0;margin:0;cursor:pointer;color:#F4EFE6;text-align:left;grid-column:span 2;grid-row:span 4}
+.t.v{grid-column:span 1;grid-row:span 6}
+.t.feat{grid-column:1/-1;grid-row:span 4}
+@media (min-width:900px){.t.feat{grid-row:span 8}}
+.t img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.16,1,.3,1),opacity .6s;opacity:0}
+.t img.on{opacity:1}
+.t:hover img{transform:scale(1.04)}
+.t::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,0) 45%,rgba(14,13,11,.82))}
+.t .pl{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;border:1px solid var(--gold-2);background:rgba(14,13,11,.35);display:grid;place-items:center;z-index:1;transition:transform .5s,background .5s}
+.t.feat .pl{width:76px;height:76px;margin:-38px 0 0 -38px}
+.t:hover .pl{transform:scale(1.08);background:rgba(14,13,11,.6)}
+.t .pl::before{content:"";border-style:solid;border-width:8px 0 8px 13px;border-color:transparent transparent transparent var(--gold-2);margin-left:4px}
+.t .cap{position:absolute;left:14px;right:14px;bottom:12px;z-index:1;display:flex;flex-direction:column;gap:4px}
+.t .cap b{font:400 clamp(19px,2.2vw,24px)/1.1 var(--f-display);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.t.feat .cap{left:clamp(16px,3vw,32px);bottom:clamp(14px,3vw,30px)}.t.feat .cap b{font-size:clamp(28px,4vw,48px)}
+.t .cap span{font:500 10px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:var(--gold-2)}
+.t[hidden]{display:none}
+.fe{padding:60px 0;text-align:center;color:rgba(244,239,230,.7)}
+.fc{background:#1E2D22;text-align:center;padding-top:clamp(64px,9vw,110px);padding-bottom:clamp(64px,9vw,110px)}
+.fc h2{color:#F4EFE6}.fc h2 em{color:var(--gold-2)}
+.fc .btn{margin-top:28px}
+.pv{position:fixed;inset:0;z-index:120;background:rgba(8,7,6,.96);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:calc(60px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px));opacity:0;transition:opacity .35s}
+.pv.on{opacity:1}
+.pv .fr{position:relative;width:min(100%,var(--mw));aspect-ratio:var(--ar,16/9);background:#000}
+.pv iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.pv .ti{margin:0;font:400 clamp(22px,3vw,30px)/1.15 var(--f-display);color:#F4EFE6;text-align:center;max-width:900px}
+.pv .x{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(217,190,134,.45);background:none;color:#F4EFE6;font:300 26px/1 var(--f-body);cursor:pointer}
+.pv .nv{display:flex;gap:10px}
+.pv .nv button{width:48px;height:48px;border-radius:50%;border:1px solid rgba(217,190,134,.45);background:none;color:var(--gold-2);cursor:pointer;display:grid;place-items:center}
+</style>
+</head>
+<body>
+<header class="hd wrap"><div class="in">
+  <a class="logo" href="/" aria-label="Apoca Drive, accueil"><img class="sym" src="/logo-sym-k.png" alt="" width="217" height="240"><span class="lw"><img src="/logo-name-k.png" alt="Apoca Drive" width="510" height="64"><small>Filmmaker · France</small></span></a>
+  <nav aria-label="Navigation"><a class="lk" href="/films">Films</a><a class="lk" href="/#collections">Collections</a><a class="btn" href="/#reserver" data-book>Réserver</a></nav>
+</div></header>
+<main>
+<section class="fh wrap"><div class="in">
+  <p class="crumbs"><a href="/">Accueil</a> · Films</p>
+  <p class="eyebrow">Mes films</p>
+  <h1>Regardez, <em>ressentez.</em></h1>
+  <p class="lead">Mariages, clips et événements, filmés comme au cinéma. Touchez un film pour le regarder en grand.</p>
+  <div class="chips" id="chips" role="group" aria-label="Filtrer les films" hidden></div>
+</div></section>
+<section class="fgw wrap"><div class="in">
+  <div class="fg" id="fg" aria-live="polite"></div>
+  <p class="fe" id="fe" hidden>Les films arrivent très bientôt ici.</p>
+</div></section>
+<section class="fc wrap"><div class="in">
+  <p class="eyebrow" style="justify-content:center;color:var(--gold-2)">Votre projet</p>
+  <h2 style="margin-top:16px">Votre histoire, <em>la prochaine ?</em></h2>
+  <a class="btn gold" href="/#reserver">Réserver ma date</a>
+</div></section>
+</main>
+<footer class="wrap"><div class="in">
+  <div class="ft">
+    <div><h4>Apoca Drive</h4><p>Vidéaste et photographe basé en France : mariages civils, religieux et coutumiers, clips, outfits et shootings. Partout en France, et à l'étranger sur demande.</p></div>
+    <nav aria-label="Prestations"><h4>Prestations</h4><a href="/mariage">Vidéaste &amp; photographe de mariage</a><a href="/mariage-coutumier">Mariage coutumier</a><a href="/clip">Clips musicaux</a><a href="/outfit">Outfit</a><a href="/shooting">Shooting photo et vidéo</a></nav>
+    <div><h4>Contact</h4><a href="https://wa.me/33607055384?text=Bonjour%20Apoca%20Drive%2C%20je%20souhaite%20des%20informations%20pour%20mon%20projet." target="_blank" rel="noopener">+33 6 07 05 53 84</a><a href="mailto:contact@apocadrive.com">contact@apocadrive.com</a><a href="https://www.instagram.com/apocadrive/" target="_blank" rel="noopener">Instagram @apocadrive</a><a href="/#conditions">Conditions de réservation</a><a href="/#faq">Questions fréquentes</a></div>
+  </div>
+  <div class="legal"><span>© 2026 Apoca Drive</span><span>Vidéaste &amp; photographe · France</span></div>
+</div></footer>
+<a class="wa" href="https://wa.me/33607055384?text=Bonjour%20Apoca%20Drive%2C%20je%20souhaite%20des%20informations%20pour%20mon%20projet." target="_blank" rel="noopener" aria-label="Écrire sur WhatsApp"><svg width="30" height="30" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 3C9 3 3.3 8.6 3.3 15.6c0 2.4.7 4.7 1.9 6.7L3 29l6.9-2.1c1.9 1 4 1.6 6.1 1.6 7 0 12.7-5.7 12.7-12.7S23 3 16 3zm0 23.2c-2 0-3.9-.5-5.5-1.5l-.4-.2-4.1 1.2 1.2-4-.3-.4c-1.1-1.7-1.6-3.6-1.6-5.6C5.3 9.8 10.1 5.1 16 5.1s10.6 4.7 10.6 10.6S21.9 26.2 16 26.2zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1c-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.5c.2.2 2.4 3.6 5.7 5 .8.3 1.4.5 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.3.2-1.5-.1-.1-.3-.2-.6-.3z"/></svg></a>
+<div class="pv" id="pv" role="dialog" aria-label="Lecture du film" hidden>
+  <button type="button" class="x" aria-label="Fermer">×</button>
+  <div class="fr" id="pv-fr"></div>
+  <p class="ti" id="pv-ti"></p>
+  <div class="nv"><button type="button" data-d="-1" aria-label="Film précédent"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button><button type="button" data-d="1" aria-label="Film suivant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></div>
+</div>
+<script>
+(function(){
+var API = "https://firestore.googleapis.com/v1/projects/apoca-drive/databases/(default)/documents/", KEY = "key=AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc";
+var CATS = {mariage:"Mariage", clip:"Clip", event:"Événement", corporate:"Corporate"};
+var $ = function(s){ return document.querySelector(s); };
+function E(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function fv(v){ if (!v) return null; if ("mapValue" in v){ var o = {}, f = v.mapValue.fields || {}; for (var k in f) o[k] = fv(f[k]); return o; } if ("arrayValue" in v) return (v.arrayValue.values || []).map(fv); if ("integerValue" in v) return +v.integerValue; if ("doubleValue" in v) return v.doubleValue; if ("booleanValue" in v) return v.booleanValue; if ("stringValue" in v) return v.stringValue; return null; }
+function doc(d){ var o = {}, f = (d && d.fields) || {}; for (var k in f) o[k] = fv(f[k]); return o; }
+function vm(u){ u = String(u || "").trim(); var m = u.match(/vimeo\.com\/(?:.*?\/)?video\/(\d{6,})()/i) || u.match(/vimeo\.com\/(?:[^?#\s]*?\/)?(\d{6,})(?:\/([0-9a-f]{6,}))?/i); if (!m) return null; return {p:"vm", id:m[1], h:m[2] || ((u.match(/[?&]h=([0-9a-f]{6,})/i) || [])[1]) || ""}; }
+function yt(u){ u = String(u || ""); var m = u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m ? {p:"yt", id:m[1], v:/shorts\//.test(u)} : null; }
+var F = [], cur = -1, filt = "all";
+function key(x){ return x.p + x.id; }
+function add(x, extra){ if (!x || F.some(function(f){ return key(f) === key(x); })) return; for (var k in extra) x[k] = extra[k]; F.push(x); }
+function sizeGrid(){ var g = $("#fg"); if (!g) return; var cs = getComputedStyle(g), n = +cs.getPropertyValue("--c") || 2, gap = parseFloat(cs.columnGap) || 10, c = (g.clientWidth - gap * (n - 1)) / n;
+  g.style.setProperty("--u", Math.max(10, ((2 * c + gap) * 9 / 16 - 3 * gap) / 4) + "px"); }
+function render(){
+  var g = $("#fg");
+  g.innerHTML = F.map(function(x, i){ return '<button type="button" class="t' + (x.v ? " v" : "") + '" data-i="' + i + '" aria-label="Regarder ' + E(x.t || "le film") + '"><img alt="" loading="' + (i < 4 ? "eager" : "lazy") + '"><span class="pl" aria-hidden="true"></span><span class="cap"><span>' + E(x.cat || "Film") + (x.lieu ? " · " + E(x.lieu) : "") + '</span><b>' + E(x.t || "") + '</b></span></button>'; }).join("");
+  $("#fe").hidden = F.length > 0;
+  F.forEach(function(x, i){ if (x.th) thumb(i); });
+  feat(); filterNow(); chips();
+}
+function feat(){ var first = null; document.querySelectorAll("#fg .t").forEach(function(t){ t.classList.remove("feat"); if (!first && !t.hidden && !F[+t.dataset.i].v) first = t; }); if (first) first.classList.add("feat"); }
+function thumb(i){ var t = document.querySelector('#fg .t[data-i="' + i + '"]'), x = F[i]; if (!t || !x.th) return; var im = t.querySelector("img"); im.onload = function(){ im.classList.add("on"); };
+  im.onerror = function(){ if (x.th2 && im.src !== x.th2) im.src = x.th2; }; im.src = x.th; }
+function meta(i){ var x = F[i];
+  var u = x.p === "vm" ? "https://vimeo.com/api/oembed.json?width=1280&url=" + encodeURIComponent("https://vimeo.com/" + x.id + (x.h ? "/" + x.h : "")) : "https://www.youtube.com/oembed?format=json&url=" + encodeURIComponent((x.v ? "https://www.youtube.com/shorts/" : "https://www.youtube.com/watch?v=") + x.id);
+  if (x.p === "yt"){ x.th = "https://i.ytimg.com/vi/" + x.id + (x.v ? "/oar2.jpg" : "/maxresdefault.jpg"); x.th2 = "https://i.ytimg.com/vi/" + x.id + "/hqdefault.jpg"; thumb(i); }
+  fetch(u).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if (!j) return;
+    if (!x.t && j.title) x.t = j.title;
+    if (j.width && j.height){ x.ar = j.width / j.height; if (x.p === "vm" || !x.v) x.v = j.height > j.width; }
+    if (x.p === "vm" && j.thumbnail_url){ x.th = j.thumbnail_url.replace(/_\d+x\d+(\.\w+)?$/, (x.v ? "_720x1280" : "_1280x720") + "$1").replace(/-d_\d+x\d+/, x.v ? "-d_720x1280" : "-d_1280x720"); x.th2 = j.thumbnail_url; }
+    var t = document.querySelector('#fg .t[data-i="' + i + '"]'); if (!t) return;
+    t.classList.toggle("v", !!x.v); t.querySelector(".cap b").textContent = x.t || ""; t.setAttribute("aria-label", "Regarder " + (x.t || "le film")); thumb(i); feat(); chips();
+  }).catch(function(){});
+}
+function chips(){ var c = $("#chips"), cats = {}; F.forEach(function(x){ if (x.ck) cats[x.ck] = 1; });
+  var list = [["all","Tous"]]; Object.keys(CATS).forEach(function(k){ if (cats[k]) list.push([k, CATS[k]]); });
+  if (F.some(function(x){ return x.v; }) && F.some(function(x){ return !x.v; })){ list.push(["h","Paysage"]); list.push(["v","Vertical"]); }
+  c.hidden = list.length < 3;
+  c.innerHTML = list.map(function(k){ return '<button type="button" data-f="' + k[0] + '" aria-pressed="' + (filt === k[0]) + '">' + k[1] + "</button>"; }).join(""); }
+function filterNow(){ document.querySelectorAll("#fg .t").forEach(function(t){ var x = F[+t.dataset.i]; t.hidden = !(filt === "all" || (filt === "v" && x.v) || (filt === "h" && !x.v) || x.ck === filt); }); feat(); }
+$("#chips").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; filt = b.dataset.f; filterNow(); chips(); });
+/* lecteur en grand */
+var pv = $("#pv");
+function vis(){ return F.map(function(x, i){ return i; }).filter(function(i){ var t = document.querySelector('#fg .t[data-i="' + i + '"]'); return t && !t.hidden; }); }
+function open(i){ cur = i; var x = F[i], ar = x.ar || (x.v ? 9 / 16 : 16 / 9), fr = $("#pv-fr");
+  fr.style.setProperty("--ar", ar); fr.style.setProperty("--mw", "min(1200px, calc((100vh - 230px) * " + ar + "))");
+  var src = x.p === "vm" ? "https://player.vimeo.com/video/" + x.id + "?autoplay=1&title=0&byline=0&portrait=0&dnt=1&color=C8A163" + (x.h ? "&h=" + x.h : "") : "https://www.youtube-nocookie.com/embed/" + x.id + "?autoplay=1&rel=0&playsinline=1&modestbranding=1";
+  fr.innerHTML = '<iframe src="' + src + '" title="' + E(x.t || "Film Apoca Drive") + '" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe>';
+  $("#pv-ti").textContent = x.t || ""; pv.hidden = false; document.body.style.overflow = "hidden"; requestAnimationFrame(function(){ pv.classList.add("on"); }); }
+function close(){ pv.classList.remove("on"); document.body.style.overflow = ""; setTimeout(function(){ pv.hidden = true; $("#pv-fr").innerHTML = ""; }, 350); }
+function step(d){ var L = vis(), k = L.indexOf(cur); if (!L.length) return; open(L[(k + d + L.length) % L.length]); }
+$("#fg").addEventListener("click", function(e){ var t = e.target.closest(".t"); if (t) open(+t.dataset.i); });
+pv.addEventListener("click", function(e){ if (e.target.closest(".x") || e.target === pv) return close(); var b = e.target.closest("[data-d]"); if (b) step(+b.dataset.d); });
+addEventListener("keydown", function(e){ if (pv.hidden) return; if (e.key === "Escape") close(); else if (e.key === "ArrowRight") step(1); else if (e.key === "ArrowLeft") step(-1); });
+addEventListener("resize", sizeGrid);
+/* les films : liens Vimeo de « Mes films » + films de « Films à la une » */
+sizeGrid();
+Promise.all([
+  fetch(API + "site/content?" + KEY + "&mask.fieldPaths=vimeo").then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; }),
+  fetch(API + "films?" + KEY + "&pageSize=200").then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; })
+]).then(function(res){
+  var vim = doc(res[0]).vimeo || {};
+  var films = (res[1].documents || []).map(doc).filter(function(f){ return !f.hidden && f.kind !== "photo" && f.url; })
+    .sort(function(a, b){ return (a.order != null ? a.order : 1e9) - (b.order != null ? b.order : 1e9) || (b.created || 0) - (a.created || 0); });
+  String(vim.liens || "").split(/\s+/).forEach(function(u){ add(vm(u), {}); });
+  films.forEach(function(f){ add(vm(f.url) || yt(f.url), {t: f.titre || "", ck: f.cat || "", cat: CATS[f.cat] || "Film", lieu: f.lieu || ""}); });
+  render(); F.forEach(function(x, i){ meta(i); });
+}).catch(function(){ render(); });
+})();
+</script>
+</body>
+</html>
