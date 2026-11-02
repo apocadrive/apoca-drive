@@ -1181,7 +1181,7 @@ const vmParse = u => { u = String(u || "").trim(); const m = u.match(/vimeo\.com
 let VIM = [], VIM_KEY = "";
 function renderVimeo(v){
   const L = String(v.liens || "").split(/\s+/).map(vmParse).filter(Boolean), key = L.map(x => x.id + x.h).join(",");
-  VIM = L; $("#videos").hidden = !L.length;
+  VIM = L; $("#videos").hidden = true; // les films sont maintenant sur la page /films
   if (key === VIM_KEY) return; VIM_KEY = key;
   const T = $("#vtrack");
   T.innerHTML = L.map((x, i) => `<figure class="vcard" data-i="${i}"><button type="button" class="vf" aria-label="Lire le film"><span class="vplay"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></button><figcaption></figcaption></figure>`).join("");
@@ -1352,7 +1352,7 @@ function applyAll(){
       document.querySelectorAll("#gfilms video.fv").forEach(v => io ? io.observe(v) : (v.src = v.dataset.src));
       any = true;
     }
-    vis("#films", any); vis('a[href="#films"]:not(#h-films)', any); $("#h-films").href = any ? "/films" : "#reserver"; filmDecor();
+    vis("#films", any); vis('a[href="#films"]:not(#h-films)', any); $("#h-films").href = "/films"; filmDecor();
   } else vis("#films", false);
   /* moments : bande de photos */
   renderMoments(c.moments || {}, !!hide.moments);

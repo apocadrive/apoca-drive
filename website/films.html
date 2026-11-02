@@ -71,11 +71,12 @@ body{background:var(--night);color:#F4EFE6}
   <p class="eyebrow">Mes films</p>
   <h1>Regardez, <em>ressentez.</em></h1>
   <p class="lead">Mariages, clips et événements, filmés comme au cinéma. Touchez un film pour le regarder en grand.</p>
-  <div class="chips" id="chips" role="group" aria-label="Filtrer les films" hidden></div>
+  <div class="chips" id="chips" role="group" aria-label="Filtrer les films"></div>
 </div></section>
 <section class="fgw wrap"><div class="in">
   <div class="fg" id="fg" aria-live="polite"></div>
   <p class="fe" id="fe" hidden>Les films arrivent très bientôt ici.</p>
+  <p class="fe" id="fe2" hidden>Rien dans cette catégorie pour l'instant. Revenez bientôt !</p>
 </div></section>
 <section class="fc wrap"><div class="in">
   <p class="eyebrow" style="justify-content:center;color:var(--gold-2)">Votre projet</p>
@@ -101,7 +102,7 @@ body{background:var(--night);color:#F4EFE6}
 <script>
 (function(){
 var API = "https://firestore.googleapis.com/v1/projects/apoca-drive/databases/(default)/documents/", KEY = "key=AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc";
-var CATS = {mariage:"Mariage", clip:"Clip", event:"Événement", corporate:"Corporate"};
+var CATS = {mariage:"Mariage", clip:"Clip", event:"Événement", corporate:"Commercial"};
 var $ = function(s){ return document.querySelector(s); };
 function E(t){ return String(t == null ? "" : t).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
 function fv(v){ if (!v) return null; if ("mapValue" in v){ var o = {}, f = v.mapValue.fields || {}; for (var k in f) o[k] = fv(f[k]); return o; } if ("arrayValue" in v) return (v.arrayValue.values || []).map(fv); if ("integerValue" in v) return +v.integerValue; if ("doubleValue" in v) return v.doubleValue; if ("booleanValue" in v) return v.booleanValue; if ("stringValue" in v) return v.stringValue; return null; }
@@ -110,12 +111,13 @@ function vm(u){ u = String(u || "").trim(); var m = u.match(/vimeo\.com\/(?:.*?\
 function yt(u){ u = String(u || ""); var m = u.match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m ? {p:"yt", id:m[1], v:/shorts\//.test(u)} : null; }
 var F = [], cur = -1, filt = "all";
 function key(x){ return x.p + x.id; }
+var PL = '<span class="pl" aria-hidden="true"></span>';
 function add(x, extra){ if (!x || F.some(function(f){ return key(f) === key(x); })) return; for (var k in extra) x[k] = extra[k]; F.push(x); }
 function sizeGrid(){ var g = $("#fg"); if (!g) return; var cs = getComputedStyle(g), n = +cs.getPropertyValue("--c") || 2, gap = parseFloat(cs.columnGap) || 10, c = (g.clientWidth - gap * (n - 1)) / n;
   g.style.setProperty("--u", Math.max(10, ((2 * c + gap) * 9 / 16 - 3 * gap) / 4) + "px"); }
 function render(){
   var g = $("#fg");
-  g.innerHTML = F.map(function(x, i){ return '<button type="button" class="t' + (x.v ? " v" : "") + '" data-i="' + i + '" aria-label="Regarder ' + E(x.t || "le film") + '"><img alt="" loading="' + (i < 4 ? "eager" : "lazy") + '"><span class="pl" aria-hidden="true"></span><span class="cap"><span>' + E(x.cat || "Film") + (x.lieu ? " · " + E(x.lieu) : "") + '</span><b>' + E(x.t || "") + '</b></span></button>'; }).join("");
+  g.innerHTML = F.map(function(x, i){ return '<button type="button" class="t' + (x.v ? " v" : "") + '" data-i="' + i + '" aria-label="Regarder ' + E(x.t || "le film") + '"><img alt="" loading="' + (i < 4 ? "eager" : "lazy") + '">' + (x.photo ? "" : PL) + '<span class="cap"><span>' + E(x.photo ? (x.cat && x.cat !== "Film" ? x.cat + " · Photo" : "Photo") : (x.cat || "Film")) + (x.lieu ? " · " + E(x.lieu) : "") + '</span><b>' + E(x.t || "") + '</b></span></button>'; }).join("");
   $("#fe").hidden = F.length > 0;
   F.forEach(function(x, i){ if (x.th) thumb(i); });
   feat(); filterNow(); chips();
@@ -134,18 +136,21 @@ function meta(i){ var x = F[i];
     t.classList.toggle("v", !!x.v); t.querySelector(".cap b").textContent = x.t || ""; t.setAttribute("aria-label", "Regarder " + (x.t || "le film")); thumb(i); feat(); chips();
   }).catch(function(){});
 }
-function chips(){ var c = $("#chips"), cats = {}; F.forEach(function(x){ if (x.ck) cats[x.ck] = 1; });
-  var list = [["all","Tous"]]; Object.keys(CATS).forEach(function(k){ if (cats[k]) list.push([k, CATS[k]]); });
-  if (F.some(function(x){ return x.v; }) && F.some(function(x){ return !x.v; })){ list.push(["h","Paysage"]); list.push(["v","Vertical"]); }
-  c.hidden = list.length < 3;
+function phMeta(i){ var x = F[i], im = new Image(); im.onload = function(){ x.ar = im.naturalWidth / im.naturalHeight; x.v = im.naturalHeight > im.naturalWidth;
+  var t = document.querySelector('#fg .t[data-i="' + i + '"]'); if (t){ t.classList.toggle("v", x.v); feat(); } }; im.src = x.th; }
+function chips(){ var c = $("#chips");
+  var list = [["all","Tous"],["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Commercial"],["photo","Photo"],["h","Paysage"],["v","Vertical"]];
   c.innerHTML = list.map(function(k){ return '<button type="button" data-f="' + k[0] + '" aria-pressed="' + (filt === k[0]) + '">' + k[1] + "</button>"; }).join(""); }
-function filterNow(){ document.querySelectorAll("#fg .t").forEach(function(t){ var x = F[+t.dataset.i]; t.hidden = !(filt === "all" || (filt === "v" && x.v) || (filt === "h" && !x.v) || x.ck === filt); }); feat(); }
+function filterNow(){ var n = 0; document.querySelectorAll("#fg .t").forEach(function(t){ var x = F[+t.dataset.i]; t.hidden = !(filt === "all" || (filt === "v" && x.v) || (filt === "h" && !x.v) || (filt === "photo" && x.photo) || x.ck === filt); if (!t.hidden) n++; });
+  $("#fe2").hidden = !(F.length && !n); feat(); }
 $("#chips").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; filt = b.dataset.f; filterNow(); chips(); });
 /* lecteur en grand */
 var pv = $("#pv");
 function vis(){ return F.map(function(x, i){ return i; }).filter(function(i){ var t = document.querySelector('#fg .t[data-i="' + i + '"]'); return t && !t.hidden; }); }
 function open(i){ cur = i; var x = F[i], ar = x.ar || (x.v ? 9 / 16 : 16 / 9), fr = $("#pv-fr");
   fr.style.setProperty("--ar", ar); fr.style.setProperty("--mw", "min(1200px, calc((100vh - 230px) * " + ar + "))");
+  if (x.photo){ fr.innerHTML = '<img src="' + E(x.th) + '" alt="' + E(x.t || "Photo Apoca Drive") + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain">';
+    $("#pv-ti").textContent = x.t || ""; pv.hidden = false; document.body.style.overflow = "hidden"; requestAnimationFrame(function(){ pv.classList.add("on"); }); return; }
   var src = x.p === "vm" ? "https://player.vimeo.com/video/" + x.id + "?autoplay=1&title=0&byline=0&portrait=0&dnt=1&color=C8A163" + (x.h ? "&h=" + x.h : "") : "https://www.youtube-nocookie.com/embed/" + x.id + "?autoplay=1&rel=0&playsinline=1&modestbranding=1";
   fr.innerHTML = '<iframe src="' + src + '" title="' + E(x.t || "Film Apoca Drive") + '" allow="autoplay; fullscreen; picture-in-picture; encrypted-media" allowfullscreen></iframe>';
   $("#pv-ti").textContent = x.t || ""; pv.hidden = false; document.body.style.overflow = "hidden"; requestAnimationFrame(function(){ pv.classList.add("on"); }); }
@@ -162,11 +167,14 @@ Promise.all([
   fetch(API + "films?" + KEY + "&pageSize=200").then(function(r){ return r.ok ? r.json() : {}; }).catch(function(){ return {}; })
 ]).then(function(res){
   var vim = doc(res[0]).vimeo || {};
-  var films = (res[1].documents || []).map(doc).filter(function(f){ return !f.hidden && f.kind !== "photo" && f.url; })
+  var all = (res[1].documents || []).map(function(d){ var o = doc(d); o._id = String(d.name || "").split("/").pop(); return o; });
+  var films = all.filter(function(f){ return !f.hidden && f.kind !== "photo" && f.url; })
     .sort(function(a, b){ return (a.order != null ? a.order : 1e9) - (b.order != null ? b.order : 1e9) || (b.created || 0) - (a.created || 0); });
   String(vim.liens || "").split(/\s+/).forEach(function(u){ add(vm(u), {}); });
   films.forEach(function(f){ add(vm(f.url) || yt(f.url), {t: f.titre || "", ck: f.cat || "", cat: CATS[f.cat] || "Film", lieu: f.lieu || ""}); });
-  render(); F.forEach(function(x, i){ meta(i); });
+  all.filter(function(f){ return !f.hidden && f.kind === "photo" && f.cover; }).sort(function(a, b){ return (a.order != null ? a.order : 1e9) - (b.order != null ? b.order : 1e9) || (b.created || 0) - (a.created || 0); })
+    .forEach(function(f){ add({p:"ph", id:f._id, photo:true, th:f.cover}, {t: f.titre || "", ck: f.cat || "", cat: CATS[f.cat] || "", lieu: f.lieu || ""}); });
+  render(); F.forEach(function(x, i){ if (x.photo) phMeta(i); else meta(i); });
 }).catch(function(){ render(); });
 })();
 </script>

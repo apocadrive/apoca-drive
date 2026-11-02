@@ -2118,7 +2118,7 @@ const SITE_DEF = {
   contact:{tel:"+33 6 07 05 53 84", email:"", instagram:"apocadrive", tiktok:"apocadrive", youtube:"apocadrive", phrase:"Parlons de votre projet", zones:"Partout en France · À l'étranger sur demande", google:"", googleNote:"", googleNb:""}
 };
 const SITE_SECS = [["apropos","À propos"],["pourquoi","Pourquoi Apoca Drive (coulisses)"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["conditions","Conditions de réservation"],["journal","Journal"],["insta","Instagram"],["moments","Moments (photos qui défilent)"]];
-const FILM_CATS = [["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Corporate"]];
+const FILM_CATS = [["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Commercial"]];
 const RESA_ITEMS = [["mariage","Mariage",""],["mariage-civil","Mariage civil","Mariage"],["mariage-religieux","Mariage religieux","Mariage"],["mariage-civil-religieux","Mariage civil & religieux","Mariage"],["mariage-coutumier","Mariage coutumier","Mariage"],["fiancailles","Fiançailles","Mariage"],["clip","Clip musique",""],["anniversaire","Anniversaire",""],["podcast","Podcast",""],["shooting","Shooting photo & vidéo",""],["outfit","Outfit",""]];
 S.resa = null;
 S.siteJournal = null; S.siteInsta = null; S.siteMoments = null;
@@ -3271,7 +3271,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-grilles-cadrage";
+const APP_VER = "2026-11-02-commercial";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
