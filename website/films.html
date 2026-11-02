@@ -58,6 +58,32 @@ body{background:var(--night);color:#F4EFE6}
 .pv .x{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;width:48px;height:48px;border-radius:50%;border:1px solid rgba(217,190,134,.45);background:none;color:#F4EFE6;font:300 26px/1 var(--f-body);cursor:pointer}
 .pv .nv{display:flex;gap:10px}
 .pv .nv button{width:48px;height:48px;border-radius:50%;border:1px solid rgba(217,190,134,.45);background:none;color:var(--gold-2);cursor:pointer;display:grid;place-items:center}
+.ytp{position:fixed;inset:0;z-index:118;background:#1E2D22;color:#F4EFE6;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;opacity:0;transition:opacity .35s ease}
+.ytp.on{opacity:1}
+.ytp-top{position:sticky;top:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(12px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 12px max(20px,env(safe-area-inset-left,0px));background:#1E2D22}
+.ytp-top h3{margin:0;font:400 28px/1.1 var(--f-display);color:#F4EFE6}.ytp-top h3 em{color:#D9BE86}
+.ytp-x{width:44px;height:44px;border:1px solid rgba(217,190,134,.4);border-radius:50%;background:none;color:#F4EFE6;font:300 24px/1 var(--f-body);cursor:pointer;flex:none}
+.ytp-in{max-width:860px;margin:0 auto}
+.ytp-st{background:#0E0D0B;padding:18px 0 18px}
+.ytp-pl{position:relative;aspect-ratio:16/9;background:#16130f center/cover no-repeat;border:0;padding:0;width:100%;display:block;cursor:pointer}
+.ytp-pl::after{content:"";position:absolute;inset:0;background:rgba(14,13,11,.25)}
+.ytp-pl i{position:absolute;left:50%;top:50%;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;border:1px solid #D9BE86;background:rgba(14,13,11,.4);z-index:1;display:grid;place-items:center;transition:transform .4s,background .4s}
+.ytp-pl:hover i{transform:scale(1.06);background:rgba(14,13,11,.6)}
+.ytp-pl i::before{content:"";border-style:solid;border-width:10px 0 10px 16px;border-color:transparent transparent transparent #D9BE86;margin-left:4px}
+.ytp-pl iframe{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2}
+.ytp-now{display:flex;align-items:center;gap:10px;margin:16px 20px 6px;font:500 10px/1 var(--f-body);letter-spacing:.3em;text-transform:uppercase;color:#D9BE86}
+.ytp-now::before{content:"";width:7px;height:7px;border-radius:50%;background:#D9BE86}
+.ytp-t{margin:0 20px;font:400 30px/1.05 var(--f-display);color:#F4EFE6;min-height:1.05em}
+.ytp-by{margin:6px 20px 0;font-size:13px;color:rgba(244,239,230,.7)}
+.ytp-ey{margin:24px 20px 12px;font:500 10px/1 var(--f-body);letter-spacing:.3em;text-transform:uppercase;color:rgba(244,239,230,.65)}
+.ytp-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 12px;padding:0 20px}
+@media (min-width:700px){.ytp-g{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.ytp-g button{display:flex;flex-direction:column;gap:8px;border:0;padding:0;background:none;text-align:left;color:#F4EFE6;cursor:pointer;min-width:0}
+.ytp-g span{display:block;width:100%;aspect-ratio:16/9;background:#16130f center/cover no-repeat;border:1px solid transparent;transition:border-color .3s}
+.ytp-g button.on span{border-color:#D9BE86}
+.ytp-g b{font:400 17px/1.15 var(--f-display);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ytp-ch{display:flex;align-items:center;justify-content:center;gap:10px;margin:28px 20px calc(28px + env(safe-area-inset-bottom,0px));min-height:50px;border:1px solid rgba(217,190,134,.5);border-radius:999px;color:#D9BE86;text-decoration:none;font:500 11px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase}
+.ytp-e{margin:40px 20px;color:rgba(244,239,230,.7);text-align:center}
 </style>
 </head>
 <body>
@@ -176,6 +202,52 @@ Promise.all([
     .forEach(function(f){ add({p:"ph", id:f._id, photo:true, th:f.cover}, {t: f.titre || "", ck: f.cat || "", cat: CATS[f.cat] || "", lieu: f.lieu || ""}); });
   render(); F.forEach(function(x, i){ if (x.photo) phMeta(i); else meta(i); });
 }).catch(function(){ render(); });
+})();
+</script>
+<script>
+(function(){
+const $ = s => document.querySelector(s);
+const YT_CH = "https://www.youtube.com/@apocadrive";
+const ytVid = u => { const m = String(u || "").match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m ? m[1] : (/^[\w-]{11}$/.test(String(u).trim()) ? String(u).trim() : ""); };
+const ytp = document.createElement("div"); ytp.className = "ytp"; ytp.hidden = true; ytp.setAttribute("role", "dialog"); ytp.setAttribute("aria-label", "Mes clips sur YouTube");
+ytp.innerHTML = `<div class="ytp-top"><h3>Mes clips <em>en salle.</em></h3><button type="button" class="ytp-x" aria-label="Fermer">×</button></div><div class="ytp-in"></div>`;
+document.body.appendChild(ytp);
+const YT_T = {};
+const ytThumb = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+let ytIds = [], ytCur = "";
+function ytShow(id, play){
+  ytCur = id; const pl = ytp.querySelector(".ytp-pl"); if (!pl) return;
+  pl.style.backgroundImage = `url('https://i.ytimg.com/vi/${id}/maxresdefault.jpg'), url('${ytThumb(id)}')`;
+  pl.innerHTML = play ? `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="Clip" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>` : `<i aria-hidden="true"></i>`;
+  pl.setAttribute("aria-label", "Lire " + (YT_T[id] || "le clip"));
+  ytp.querySelector(".ytp-t").textContent = YT_T[id] || "";
+  ytp.querySelectorAll(".ytp-g button").forEach(b => b.classList.toggle("on", b.dataset.yt === id));
+}
+function ytOpen(){
+  ytIds = String(window.__ytList || "").split(/[\s,]+/).map(ytVid).filter(Boolean);
+  const W = ytp.querySelector(".ytp-in");
+  W.innerHTML = ytIds.length ? `<div class="ytp-st"><button type="button" class="ytp-pl"></button><p class="ytp-now">En lecture</p><p class="ytp-t"></p><p class="ytp-by">Réalisé par Apoca Drive</p></div>
+    ${ytIds.length > 1 ? `<p class="ytp-ey">À voir aussi</p><div class="ytp-g">${ytIds.map(id => `<button type="button" data-yt="${id}"><span style="background-image:url('${ytThumb(id)}')"></span><b></b></button>`).join("")}</div>` : ""}
+    <a class="ytp-ch" href="${YT_CH}" target="_blank" rel="noopener">Toute la chaîne YouTube</a>` : `<p class="ytp-e">Les clips arrivent bientôt ici.</p>`;
+  if (ytIds.length) ytShow(ytIds[0], false);
+  ytIds.forEach(id => (YT_T[id] ? Promise.resolve({title: YT_T[id]}) : fetch(`https://www.youtube.com/oembed?url=${encodeURIComponent("https://www.youtube.com/watch?v=" + id)}&format=json`).then(r => r.ok ? r.json() : null)).then(j => {
+    if (!j || !j.title) return; YT_T[id] = j.title;
+    const b = W.querySelector(`.ytp-g [data-yt="${id}"] b`); if (b) b.textContent = j.title;
+    if (id === ytCur) W.querySelector(".ytp-t").textContent = j.title; }).catch(() => {}));
+  ytp.hidden = false; ytp.scrollTop = 0; requestAnimationFrame(() => ytp.classList.add("on"));
+}
+function ytClose(){ ytp.classList.remove("on"); setTimeout(() => { ytp.hidden = true; ytp.querySelector(".ytp-in").innerHTML = ""; }, 350); }
+ytp.addEventListener("click", e => {
+  if (e.target.closest(".ytp-x")) return ytClose();
+  if (e.target.closest(".ytp-pl") && !ytp.querySelector(".ytp-pl iframe")) return ytShow(ytCur, true);
+  const g = e.target.closest(".ytp-g button"); if (g){ ytShow(g.dataset.yt, true); ytp.scrollTo({top: 0, behavior: "smooth"}); }
+});
+addEventListener("keydown", e => { if (e.key === "Escape" && !ytp.hidden) ytClose(); });
+/* « Clip » ouvre directement la salle de projection des clips YouTube */
+window.__ytList = "";
+fetch("https://firestore.googleapis.com/v1/projects/apoca-drive/databases/(default)/documents/galerieInfo/clip?key=AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc&mask.fieldPaths=youtube")
+  .then(r => r.ok ? r.json() : {}).then(d => { window.__ytList = (((d || {}).fields || {}).youtube || {}).stringValue || ""; }).catch(() => {});
+document.getElementById("chips").addEventListener("click", e => { const b = e.target.closest('[data-f="clip"]'); if (!b) return; e.stopImmediatePropagation(); ytOpen(); }, true);
 })();
 </script>
 </body>
