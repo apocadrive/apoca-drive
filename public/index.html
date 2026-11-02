@@ -2165,7 +2165,7 @@ const ytThumb = u => { const m = String(u||"").match(/(?:youtu\.be\/|v=|shorts\/
 /* ---------- Grilles photos : une mise en page nouvelle à chaque fois ---------- */
 const GRID_FMT = {portrait:[1080, 1350, "Instagram"], carre:[1080, 1080, "Carré"], story:[1080, 1920, "Story"]};
 const GRID_BG = [["#0E0D0B","#F4EFE6"],["#FCFAF5","#16130F"],["#E6DCCD","#16130F"],["#1E2D22","#F4EFE6"],["#F4EFE6","#16130F"],["#16130F","#D9BE86"]];
-S.grid = S.grid || {fmt:"portrait", lay:null, ph:[]};
+S.grid = S.grid || {fmt:"portrait", lay:null, ph:[], tf:[]};
 const rnd = (a, b) => a + Math.random() * (b - a), pick = a => a[Math.floor(Math.random() * a.length)];
 function gridSplit(r, n, out){
   if (n <= 1){ out.push(r); return; }
@@ -2196,8 +2196,12 @@ function gridNew(){
       text = {y:H - m - foot * .35, a:"APOCADRIVE", b: pick(["Dans les coulisses","Le grand jour","Moments","Filmmaker · France","Behind the scenes"])}; }
   }
   S.grid.lay = {W, H, bg, fg, cells, deco, text};
-  S.grid.ph = S.grid.ph.slice(0, cells.length);
+  S.grid.ph = S.grid.ph.slice(0, cells.length); S.grid.tf = []; ui.gridSel = null;
 }
+function gridTf(i){ return S.grid.tf[i] || (S.grid.tf[i] = {ox:0, oy:0, z:1}); }
+function gridClamp(i){ const c = S.grid.lay.cells[i], im = S.grid.ph[i], t = gridTf(i); if (!c || !im) return;
+  t.z = Math.min(4, Math.max(1, t.z)); const k = Math.max(c.w / im.naturalWidth, c.h / im.naturalHeight) * t.z, mx = Math.max(0, (im.naturalWidth * k - c.w) / 2), my = Math.max(0, (im.naturalHeight * k - c.h) / 2);
+  t.ox = Math.min(mx, Math.max(-mx, t.ox)); t.oy = Math.min(my, Math.max(-my, t.oy)); }
 function gridPath(g, c){
   g.beginPath();
   if (c.shape === "circle"){ const r = Math.min(c.w, c.h) / 2; g.arc(c.x + c.w / 2, c.y + c.h / 2, r, 0, Math.PI * 2); }
@@ -2212,10 +2216,11 @@ function gridDraw(g, sc, empty){
   L.cells.forEach((c, i) => {
     const im = S.grid.ph[i];
     g.save(); gridPath(g, c); g.clip();
-    if (im && im.naturalWidth){ const k = Math.max(c.w / im.naturalWidth, c.h / im.naturalHeight), w = im.naturalWidth * k, h = im.naturalHeight * k; g.drawImage(im, c.x + (c.w - w) / 2, c.y + (c.h - h) / 2, w, h); }
+    if (im && im.naturalWidth){ const t = gridTf(i), k = Math.max(c.w / im.naturalWidth, c.h / im.naturalHeight) * t.z, w = im.naturalWidth * k, h = im.naturalHeight * k; g.drawImage(im, c.x + (c.w - w) / 2 + t.ox, c.y + (c.h - h) / 2 + t.oy, w, h); }
     else if (empty){ g.fillStyle = L.fg === "#16130F" ? "rgba(22,19,15,.12)" : "rgba(244,239,230,.14)"; g.fill();
       g.fillStyle = L.fg; g.globalAlpha = .7; g.font = `300 ${Math.round(Math.min(c.w, c.h) * .22)}px Georgia, serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("+", c.x + c.w / 2, c.y + c.h / 2); g.globalAlpha = 1; }
     g.restore();
+    if (empty && ui.gridSel === i){ g.save(); gridPath(g, c); g.lineWidth = L.W * .008; g.strokeStyle = "#D9BE86"; g.stroke(); g.restore(); }
   });
   if (L.text){ g.fillStyle = L.fg; g.textAlign = "center"; g.textBaseline = "alphabetic";
     g.font = `500 ${Math.round(L.W * .03)}px Georgia, serif`; if ("letterSpacing" in g) g.letterSpacing = `${Math.round(L.W * .012)}px`; g.fillText(L.text.a, L.W / 2, L.text.y);
@@ -2231,9 +2236,10 @@ function viewGrid(){
   setTimeout(gridPaint, 0);
   return `<h2>Grilles photos</h2><p class="small muted" style="margin:0">Une mise en page différente à chaque fois. Touchez une case pour y mettre une photo, puis enregistrez-la pour Instagram ou publiez-la sur votre site.</p>
   <div class="chips">${Object.entries(GRID_FMT).map(([k, f]) => `<button class="chip${S.grid.fmt === k ? " tu" : ""}" data-act="gridfmt" data-v="${k}">${f[2]}</button>`).join("")}</div>
-  <canvas id="grid-cv" style="width:100%;display:block;border-radius:6px;cursor:pointer;touch-action:manipulation" aria-label="Grille : touchez une case pour choisir sa photo"></canvas>
+  <canvas id="grid-cv" style="width:100%;display:block;border-radius:6px;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none" aria-label="Grille : touchez une case pour choisir sa photo"></canvas>
   <input type="file" accept="image/*" id="grid-file" hidden>
-  <p class="small muted" style="margin:0">${have} photo${have > 1 ? "s" : ""} sur ${n}. Touchez une case remplie pour changer sa photo.</p>
+  <p class="small muted" style="margin:0">${have} photo${have > 1 ? "s" : ""} sur ${n}. Glissez une photo avec le doigt pour la déplacer, pincez avec deux doigts pour zoomer.</p>
+  ${ui.gridSel != null && S.grid.ph[ui.gridSel] ? `<div class="row" style="flex-wrap:wrap;gap:8px"><button class="btn sm" data-act="gridchg">Changer cette photo</button><button class="btn sm ghost" data-act="gridctr">Recentrer</button><button class="btn sm ghost" data-act="gridzin">Zoom +</button><button class="btn sm ghost" data-act="gridzout">Zoom −</button></div>` : ""}
   <div class="row" style="flex-wrap:wrap;gap:8px">
     <button class="btn" data-act="gridnew">↻ Nouvelle grille</button>
     <button class="btn" data-act="gridmix"${have > 1 ? "" : " disabled"}>Mélanger les photos</button>
@@ -2247,7 +2253,10 @@ function gridBlob(){ const L = S.grid.lay, c = document.createElement("canvas");
   return new Promise(r => c.toBlob(r, "image/jpeg", .92)); }
 async function gridAct(a){
   if (a === "gridnew"){ gridNew(); render(); return; }
-  if (a === "gridmix"){ const p = S.grid.ph.slice(); for (let i = p.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; } S.grid.ph = p; gridPaint(); return; }
+  if (a === "gridmix"){ const p = S.grid.ph.slice(); for (let i = p.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [p[i], p[j]] = [p[j], p[i]]; } S.grid.ph = p; S.grid.tf = []; ui.gridSel = null; render(); return; }
+  if (a === "gridchg"){ ui.gridCell = ui.gridSel; const f = $("#grid-file"); if (f){ f.value = ""; f.click(); } return; }
+  if (a === "gridctr"){ S.grid.tf[ui.gridSel] = {ox:0, oy:0, z:1}; gridPaint(); return; }
+  if (a === "gridzin" || a === "gridzout"){ const t = gridTf(ui.gridSel); t.z *= a === "gridzin" ? 1.2 : 1 / 1.2; gridClamp(ui.gridSel); gridPaint(); return; }
   const blob = await gridBlob(); if (!blob) return toast("La grille n'a pas pu être créée.");
   const file = new File([blob], `apocadrive-grille-${Date.now()}.jpg`, {type: "image/jpeg"});
   if (a === "gridsave"){
@@ -2260,14 +2269,28 @@ async function gridAct(a){
     catch(e){ toast("La grille n'a pas pu être publiée. Vérifiez votre connexion."); }
     ui.gridBusy = null; render(); }
 }
-document.addEventListener("click", e => { const cv = e.target.closest && e.target.closest("#grid-cv"); if (!cv || !S.grid.lay) return;
-  const r = cv.getBoundingClientRect(), L = S.grid.lay, x = (e.clientX - r.left) * L.W / r.width, y = (e.clientY - r.top) * L.H / r.height;
-  let i = L.cells.findIndex(c => x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h && !(c.shape === "circle" && Math.hypot(x - c.x - c.w / 2, y - c.y - c.h / 2) > c.w / 2));
-  // le rond passe au-dessus de l'arche
-  const top = L.cells.map((c, k) => k).filter(k => { const c = L.cells[k]; return x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h; }); if (top.length > 1) i = top[top.length - 1];
-  if (i < 0) return; ui.gridCell = i; const f = $("#grid-file"); if (f){ f.value = ""; f.click(); } });
+function gridHit(cv, cx, cy){ const r = cv.getBoundingClientRect(), L = S.grid.lay, x = (cx - r.left) * L.W / r.width, y = (cy - r.top) * L.H / r.height;
+  let hit = -1; L.cells.forEach((c, k) => { if (x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h && !(c.shape === "circle" && Math.hypot(x - c.x - c.w / 2, y - c.y - c.h / 2) > c.w / 2)) hit = k; });
+  return hit; }
+const GP = {pts: new Map(), i: -1, moved: false, d0: 0, z0: 1};
+document.addEventListener("pointerdown", e => { const cv = e.target.closest && e.target.closest("#grid-cv"); if (!cv || !S.grid.lay) return;
+  GP.pts.set(e.pointerId, {x: e.clientX, y: e.clientY}); try { cv.setPointerCapture(e.pointerId); } catch(err){}
+  if (GP.pts.size === 1){ GP.i = gridHit(cv, e.clientX, e.clientY); GP.moved = false; }
+  else if (GP.pts.size === 2 && GP.i >= 0 && S.grid.ph[GP.i]){ const [p, q] = [...GP.pts.values()]; GP.d0 = Math.hypot(p.x - q.x, p.y - q.y); GP.z0 = gridTf(GP.i).z; GP.moved = true; } });
+document.addEventListener("pointermove", e => { if (!GP.pts.has(e.pointerId) || GP.i < 0 || !S.grid.ph[GP.i]) return; const cv = $("#grid-cv"); if (!cv) return;
+  const prev = GP.pts.get(e.pointerId), r = cv.getBoundingClientRect(), s2 = S.grid.lay.W / r.width; GP.pts.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  if (GP.pts.size >= 2){ const [p, q] = [...GP.pts.values()]; const d = Math.hypot(p.x - q.x, p.y - q.y); if (GP.d0) gridTf(GP.i).z = GP.z0 * d / GP.d0; }
+  else { const dx = e.clientX - prev.x, dy = e.clientY - prev.y; if (!GP.moved && Math.hypot(dx, dy) < 4) { GP.pts.set(e.pointerId, prev); return; } GP.moved = true; const t = gridTf(GP.i); t.ox += dx * s2; t.oy += dy * s2; }
+  if (ui.gridSel !== GP.i){ ui.gridSel = GP.i; }
+  gridClamp(GP.i); gridPaint(); e.preventDefault(); }, {passive: false});
+const gridUp = e => { if (!GP.pts.has(e.pointerId)) return; GP.pts.delete(e.pointerId); if (GP.pts.size) return;
+  const i = GP.i; GP.i = -1; if (i < 0) return;
+  if (GP.moved){ if (ui.gridSel !== i){ ui.gridSel = i; render(); } else render(); return; }
+  if (!S.grid.ph[i]){ ui.gridCell = i; const f = $("#grid-file"); if (f){ f.value = ""; f.click(); } return; }
+  ui.gridSel = ui.gridSel === i ? null : i; render(); };
+document.addEventListener("pointerup", gridUp); document.addEventListener("pointercancel", gridUp);
 document.addEventListener("change", e => { if (e.target.id !== "grid-file") return; const f = e.target.files && e.target.files[0]; if (!f || ui.gridCell == null) return;
-  const im = new Image(); im.onload = () => { S.grid.ph[ui.gridCell] = im; render(); }; im.src = URL.createObjectURL(f); });
+  const im = new Image(); im.onload = () => { S.grid.ph[ui.gridCell] = im; S.grid.tf[ui.gridCell] = {ox:0, oy:0, z:1}; ui.gridSel = ui.gridCell; render(); }; im.src = URL.createObjectURL(f); });
 addEventListener("resize", () => { if (ui.view === "grid") gridPaint(); });
 /* ---------- Lien de paiement PayPal à envoyer au client ---------- */
 const payUser = () => { const m = String(sfGet("paiement.shooting") || "").match(/paypal\.me\/([A-Za-z0-9._-]+)/i); return m ? m[1] : "ApocaDrive"; };
@@ -2830,7 +2853,7 @@ function siteClick(a, b){
       f.r.created = f.r.created || Date.now(); f.r.done = false; rdvSave(f.id, f.r); ui.rdvForm = null; render(true); toast("Rendez-vous enregistré"); return true; }
     case "rvdone": { const r = S.rdv[b.dataset.id]; if (r){ r.done = true; rdvSave(b.dataset.id, r); render(); } return true; }
     case "rvdel": { const id = b.dataset.id; if (ui.rvDel !== id){ ui.rvDel = id; render(); return true; } ui.rvDel = null; delete S.rdv[id]; if (S.db) S.db.doc("rdv/" + id).delete().catch(() => {}); render(); toast("Supprimé"); return true; }
-    case "gridnew": case "gridmix": case "gridsave": case "gridsite": gridAct(a); return true;
+    case "gridnew": case "gridmix": case "gridsave": case "gridsite": case "gridchg": case "gridctr": case "gridzin": case "gridzout": gridAct(a); return true;
     case "gridfmt": S.grid.fmt = b.dataset.v; gridNew(); render(); return true;
     case "payq": ui.payAmt = b.dataset.v; { const i = $("#pay-amt"); if (i) i.value = b.dataset.v; } payRefresh(); return true;
     case "paycopy": { const v = payLinkOf(); if (!v) return; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié · collez-le dans votre message"), () => toast("Copie impossible : appuyez longtemps sur le lien pour le copier")); return true; }
@@ -3248,7 +3271,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-grilles";
+const APP_VER = "2026-11-02-grilles-cadrage";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
