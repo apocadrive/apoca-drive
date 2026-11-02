@@ -62,6 +62,7 @@ h1{margin:0 0 34px;font:500 26px/1.12 var(--display);text-wrap:balance}h1 em{col
 @media (prefers-reduced-motion:reduce){.b{transition:none}.b.press{transform:none}.rip{display:none}}
 .foot{font-size:11px;letter-spacing:.14em;color:rgba(244,239,230,.6);margin:0}
 #hapl{position:fixed;left:-9999px;top:0;opacity:0}
+body.wait main,body.wait .sound{visibility:hidden}
 /* film du jour : la vidéo d'abord, les boutons compacts en bas */
 body.jour .veil{background:linear-gradient(180deg,rgba(14,13,11,.6) 0%,rgba(14,13,11,0) 20%,rgba(14,13,11,0) 60%,rgba(14,13,11,.8) 100%)}
 body.jour .stage{align-items:stretch}
@@ -77,7 +78,7 @@ body.jour .row .b span{position:absolute;width:1px;height:1px;overflow:hidden;cl
 body.jour .row .b svg{width:21px;height:21px}
 </style>
 </head>
-<body>
+<body class="wait">
 <video class="film" id="film" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
 <div class="veil" aria-hidden="true"></div>
 <button type="button" class="sound" id="sound" hidden>🔊 Activer le son</button>
@@ -178,6 +179,17 @@ window.__carte = {
     s.onclick = function(){ film.muted = !film.muted; s.textContent = film.muted ? "🔊 Activer le son" : "🔇 Couper le son"; film.play().catch(function(){}); };
   }
 };
+
+/* ---------- film du jour : on le sait tout de suite, avant d'afficher quoi que ce soit ---------- */
+function ready(){ document.body.classList.remove("wait"); }
+setTimeout(ready, 2500);
+function fv(v){ if (!v) return null; if ("mapValue" in v){ var o = {}, f = v.mapValue.fields || {}; for (var k in f) o[k] = fv(f[k]); return o; } if ("integerValue" in v) return +v.integerValue; if ("booleanValue" in v) return v.booleanValue; if ("stringValue" in v) return v.stringValue; if ("doubleValue" in v) return v.doubleValue; return null; }
+try {
+  fetch("https://firestore.googleapis.com/v1/projects/apoca-drive/databases/(default)/documents/site/carte?key=AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc&mask.fieldPaths=jour", {cache:"no-store"})
+    .then(function(r){ return r.ok ? r.json() : {}; })
+    .then(function(d){ var j = fv(d && d.fields && d.fields.jour); if (j && j.on && j.vid && j.vid.n){ window.__carte.jour(j); window.__carte.none(); } ready(); })
+    .catch(ready);
+} catch(e){ ready(); }
 
 /* ---------- toucher : onde, rebond, petite vibration ---------- */
 function buzz(){ try { if (navigator.vibrate){ navigator.vibrate(12); return; } } catch(e){} try { document.getElementById("hapl").click(); } catch(e){} }
