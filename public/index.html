@@ -2536,7 +2536,7 @@ function cqSaveBtns(bs){ return carteSave({buttons: bs.map(x => ({k:x.k, label:x
 async function cqVideo(file){
   if (file.size > 60 * 1024 * 1024){ toast("Vidéo trop lourde (plus de 60 Mo). Exporte-la en 1080p, 30 s maximum."); return; }
   ui.carteUp = "Envoi de la vidéo… 0 %"; render();
-  try { await window.__apocaCarte.setJourVideo(file, f => { ui.carteUp = `Envoi de la vidéo… ${Math.round(f*100)} %`; render(); }); toast("Vidéo du jour en ligne"); }
+  try { const poster = await videoPoster(file).catch(() => ""); await window.__apocaCarte.setJourVideo(file, f => { ui.carteUp = `Envoi de la vidéo… ${Math.round(f*100)} %`; render(); }); if (poster && poster.length < 400000) await window.__apocaCarte.save({jour: {poster}}).catch(() => {}); toast("Vidéo du jour en ligne"); }
   catch(e){ toast("La vidéo n'a pas pu être envoyée. Vérifie ta connexion."); }
   ui.carteUp = null; render();
 }
@@ -3079,7 +3079,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-onglet-realisations";
+const APP_VER = "2026-11-02-carte-apercu";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);

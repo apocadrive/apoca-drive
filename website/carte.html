@@ -65,6 +65,7 @@ h1{margin:0 0 34px;font:500 26px/1.12 var(--display);text-wrap:balance}h1 em{col
 body.wait main,body.wait .sound{visibility:hidden}
 /* film du jour : la vidéo d'abord, les boutons compacts en bas */
 body.jour .veil{background:linear-gradient(180deg,rgba(14,13,11,.6) 0%,rgba(14,13,11,0) 20%,rgba(14,13,11,0) 60%,rgba(14,13,11,.8) 100%)}
+body.jour .film{animation:none}
 body.jour .stage{align-items:stretch}
 body.jour main{min-height:100%;gap:8px}
 body.jour .sym{width:26px}
@@ -184,12 +185,27 @@ window.__carte = {
 function ready(){ document.body.classList.remove("wait"); }
 setTimeout(ready, 2500);
 function fv(v){ if (!v) return null; if ("mapValue" in v){ var o = {}, f = v.mapValue.fields || {}; for (var k in f) o[k] = fv(f[k]); return o; } if ("integerValue" in v) return +v.integerValue; if ("booleanValue" in v) return v.booleanValue; if ("stringValue" in v) return v.stringValue; if ("doubleValue" in v) return v.doubleValue; return null; }
-try {
-  fetch("https://firestore.googleapis.com/v1/projects/apoca-drive/databases/(default)/documents/site/carte?key=AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc&mask.fieldPaths=jour", {cache:"no-store"})
-    .then(function(r){ return r.ok ? r.json() : {}; })
-    .then(function(d){ var j = fv(d && d.fields && d.fields.jour); if (j && j.on && j.vid && j.vid.n){ window.__carte.jour(j); window.__carte.none(); } ready(); })
-    .catch(ready);
-} catch(e){ ready(); }
+var API = "https://firestore.googleapis.com/v1/projects/apoca-drive/databases/(default)/documents/", KEY = "?key=AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc";
+function b64(s){ var bin = atob(s), a = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return a; }
+window.__jourP = new Promise(function(done){
+  try {
+    fetch(API + "site/carte" + KEY + "&mask.fieldPaths=jour", {cache:"no-store"})
+      .then(function(r){ return r.ok ? r.json() : {}; })
+      .then(function(d){
+        var j = fv(d && d.fields && d.fields.jour);
+        if (!(j && j.on && j.vid && j.vid.n)){ ready(); done("none"); return; }
+        var C = window.__carte; C.jour(j); C.none();
+        if (j.poster){ film.poster = j.poster; film.style.backgroundImage = 'url("' + String(j.poster).replace(/"/g, "") + '")'; }
+        ready();
+        // tous les morceaux de la vidéo en même temps
+        var ids = []; for (var i = 0; i < j.vid.n; i++) ids.push(i);
+        return Promise.all(ids.map(function(i){ return fetch(API + "carteJour/" + j.vid.v + "_" + i + KEY).then(function(r){ if (!r.ok) throw 0; return r.json(); }).then(function(x){ return b64(x.fields.b.bytesValue); }); }))
+          .then(function(parts){ C.video(URL.createObjectURL(new Blob(parts, {type: j.vid.type || "video/mp4"}))); done("ok"); })
+          .catch(function(){ C.unjour(); done("fail"); });
+      })
+      .catch(function(){ ready(); done("none"); });
+  } catch(e){ ready(); done("none"); }
+});
 
 /* ---------- toucher : onde, rebond, petite vibration ---------- */
 function buzz(){ try { if (navigator.vibrate){ navigator.vibrate(12); return; } } catch(e){} try { document.getElementById("hapl").click(); } catch(e){} }
@@ -225,8 +241,10 @@ const chunks = async (col, field, val, n, type) => {
   let cfg = {};
   try { const s = await getDoc(doc(fs, "site/carte")); cfg = s.exists() ? s.data() : {}; } catch (e) {}
   if (cfg.buttons) C.buttons(cfg.buttons);
+  const jr = await (window.__jourP || Promise.resolve("none"));
+  if (jr === "ok") return;
   const j = cfg.jour || {};
-  if (j.on && j.vid && j.vid.n) {
+  if (jr === "none" && j.on && j.vid && j.vid.n) {
     C.jour(j); C.none(); // la mise en page du film du jour s'affiche tout de suite, la vidéo arrive ensuite
     const u = await chunks("carteJour", "v", j.vid.v, j.vid.n, j.vid.type).catch(() => "");
     if (u) { C.video(u); return; }
