@@ -1688,7 +1688,9 @@ const ytThumb = id => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 let ytIds = [], ytCur = "";
 function ytShow(id, play){
   ytCur = id; const pl = ytp.querySelector(".ytp-pl"); if (!pl) return;
-  pl.style.backgroundImage = `url('https://i.ytimg.com/vi/${id}/maxresdefault.jpg'), url('${ytThumb(id)}')`;
+  pl.style.backgroundImage = `url('${ytThumb(id)}')`;
+  // image haute qualité seulement si YouTube en a une (sinon il renvoie un logo gris)
+  { const hi = new Image(); hi.onload = () => { if (hi.naturalWidth > 200 && ytCur === id) pl.style.backgroundImage = `url('${hi.src}')`; }; hi.src = `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`; }
   pl.innerHTML = play ? `<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1&playsinline=1" title="Clip" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>` : `<i aria-hidden="true"></i>`;
   pl.setAttribute("aria-label", "Lire " + (YT_T[id] || "le clip"));
   ytp.querySelector(".ytp-t").textContent = YT_T[id] || "";
