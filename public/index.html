@@ -2170,8 +2170,7 @@ function viewPay(){
   const L = payLinkOf();
   return `<h2>Lien PayPal</h2><p class="small muted" style="margin:0">Tapez un montant : le lien PayPal est prêt. Le client clique, PayPal s'ouvre avec le montant déjà rempli, il paie (PayPal ou carte) et l'argent arrive sur votre PayPal.</p>
   <section class="panel">
-    <label class="f">Montant à payer (€)<input type="text" inputmode="decimal" id="pay-amt" data-pay="amt" value="${esc(ui.payAmt || "")}" placeholder="Ex. 45" maxlength="10" style="font-size:22px"></label>
-    <div class="chips">${[45, 100, 150, 300, 500].map(n => `<button class="chip${payAmt() === n ? " tu" : ""}" data-act="payq" data-v="${n}">${n} €</button>`).join("")}</div>
+    <label class="f">Montant à payer (€), celui que vous voulez<input type="text" inputmode="decimal" id="pay-amt" data-pay="amt" value="${esc(ui.payAmt || "")}" placeholder="Tapez le montant" maxlength="10" style="font-size:22px"></label>
     <label class="f">Pour quoi ? (facultatif, écrit dans le message)<input type="text" data-pay="for" value="${esc(ui.payFor || "")}" placeholder="Ex. l'acompte de votre mariage" maxlength="80"></label>
   </section>
   <section class="panel" id="pay-out"${L ? "" : " hidden"}>
@@ -3139,7 +3138,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-lien-paypal";
+const APP_VER = "2026-11-02-lien-paypal-2";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
