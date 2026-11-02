@@ -911,19 +911,32 @@ function newShoot(date){
   S.shoots[id] = {kind:"shoot", title:"Nouveau tournage", client:"", category:"autre", type:"Vidéo", status:"À confirmer", date:date||todayStr(), time:"09:00", city:"", place:"", contact:"", notes:"", ratio:"16:9", palette:"docu", created:Date.now(), prep:{}, gear:[], plans:[]};
   touch(id); openShoot(id, "infos");
 }
-function pushHist(){ ui.hist.push({view:ui.view, id:ui.id, tab:ui.tab, qid:ui.qid}); if (ui.hist.length > 40) ui.hist.shift(); }
+const navSnap = () => ({view:ui.view, id:ui.id, tab:ui.tab, qid:ui.qid, destId:ui.destId||null, siteTab:ui.siteTab||null, galK:ui.galK||null});
+const sameNav = (a, b) => ["view","id","tab","qid","destId","siteTab","galK"].every(k => (a[k]||null) === (b[k]||null));
+function pushHist(){ const h = navSnap(); const last = ui.hist[ui.hist.length-1]; if (last && sameNav(last, h)) return; ui.hist.push(h); if (ui.hist.length > 40) ui.hist.shift();
+  // une étape de plus pour le geste « retour » du téléphone
+  try { if (history.state && history.state.m) history.replaceState({ap: ui.hist.length}, ""); else history.pushState({ap: ui.hist.length}, ""); } catch(e){} }
 function goBack(){
   while (ui.hist.length){
     const h = ui.hist.pop();
     if (h.view === "shoot" && !S.shoots[h.id]) continue;
-    if (h.view === ui.view && h.id === ui.id && h.tab === ui.tab && h.qid === ui.qid) continue;
+    if (sameNav(h, navSnap())) continue;
     if (h.view === "quote" && !S.quotes[h.qid]) continue;
-    ui.view = h.view; ui.id = h.id; ui.tab = h.tab || "infos"; ui.qid = h.qid; ui.qprev = false; ui.qdel = false; ui.confirmDel = false; ui.homeEdit = false; render(true); return;
+    ui.view = h.view; ui.id = h.id; ui.tab = h.tab || "infos"; ui.qid = h.qid; ui.destId = h.destId; ui.siteTab = h.siteTab; ui.galK = h.galK; ui.dDel = false; ui.qprev = false; ui.qdel = false; ui.confirmDel = false; ui.homeEdit = false; render(true); return;
   }
   ui.view = ui.view === "agenda" ? "home" : "agenda"; ui.id = null; render(true);
 }
 const DOTS = `<button class="dots" data-act="menu" aria-label="Plus d'options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="4.5" r="2.5"/><circle cx="12" cy="12" r="2.5"/><circle cx="12" cy="19.5" r="2.5"/></svg></button>`;
 const BACK = `<button class="back" data-act="back" aria-label="Retour"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>`;
+// menu ou fenêtre ouverte : une étape « retour » qui la referme
+function overlayMark(){ try { if (!(history.state && history.state.m)) history.pushState({m:1, ap: ui.hist.length}, ""); } catch(e){} }
+function overlaySync(){ try { if (!ui.menu && !ui.plus && history.state && history.state.m) history.replaceState({ap: ui.hist.length}, ""); } catch(e){} }
+function appBack(){ if (ui.hist.length && history.state && history.state.ap){ history.back(); } else goBack(); }
+addEventListener("popstate", () => {
+  // une fenêtre est ouverte : on la ferme simplement, sans quitter la page
+  if (ui.menu || ui.plus || ui.lightbox){ ui.menu = false; ui.plus = null; ui.lightbox = null; render(); return; }
+  if (ui.hist.length) goBack(); else if (ui.view !== "home"){ ui.view = "home"; ui.id = null; ui.destId = null; render(true); }
+});
 function openShoot(id, tab){ pushHist(); ui.view = "shoot"; ui.id = id; ui.tab = tab || "infos"; ui.confirmDel = false; ui.sbSel = null; ui.sbForm = null; ui.ai = null; ui.aiErr = ""; render(true); }
 const cur = () => S.shoots[ui.id];
 function gearStats(s){ const g = s.gear||[]; return {n:g.length, packed:g.filter(x=>x.packed).length, back:g.filter(x=>x.back).length}; }
@@ -969,6 +982,7 @@ const ICON = {
   tool:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>`
 };
 function render(scrollTop){
+  overlaySync();
   const app = $("#app");
   const y = window.scrollY;
   if (ui.view === "home"){ lastKey = "home"; app.innerHTML = viewHome() + menuHTML(); window.scrollTo(0,0); return; }
@@ -2631,7 +2645,7 @@ function siteChange(el){
 function siteClick(a, b){
   const A = window.__apocaSiteAdmin;
   switch(a){
-    case "stab": ui.siteTab = b.dataset.v; ui.sfForm = ui.saForm = ui.sjForm = null; ui.sfDel = ui.saDel = ui.sjDel = ui.igDel = null; render(true); return true;
+    case "stab": if ((ui.siteTab||"accueil") !== b.dataset.v) pushHist(); ui.siteTab = b.dataset.v; ui.sfForm = ui.saForm = ui.sjForm = null; ui.sfDel = ui.saDel = ui.sjDel = ui.igDel = null; render(true); return true;
     case "hvrm": { if (ui.hvDel !== 1){ ui.hvDel = 1; toast("Appuyez encore une fois pour retirer la vidéo"); setTimeout(() => { ui.hvDel = 0; }, 4000); return true; } ui.hvDel = 0; A.delHeroVideo().then(() => { S.heroVid = null; toast("Vidéo retirée"); render(); }, siteErr); return true; }
     case "wednew": ui.menu = false; ui.plus = null; ui.wedForm = null; pushHist(); ui.view = "wed"; render(true); return true;
     case "wdtype": wdGrab(); ui.wedForm.type = b.dataset.v; render(); return true;
@@ -2655,7 +2669,7 @@ function siteClick(a, b){
     case "cqup": { const bs = carteBtns(), i = +b.dataset.i; if (i > 0){ [bs[i-1], bs[i]] = [bs[i], bs[i-1]]; cqSaveBtns(bs); } return true; }
     case "cqdel": { const bs = carteBtns(); bs.splice(+b.dataset.i, 1); cqSaveBtns(bs); return true; }
     case "cqadd": { const bs = carteBtns(); const vi = bs.findIndex(x => x.k === "vcf"); bs.splice(vi < 0 ? bs.length : vi, 0, {k:"c" + uid(), custom:true, label:"Nouveau bouton", url:"https://", on:false}); cqSaveBtns(bs); toast("Bouton ajouté · écris le texte et le lien, puis coche-le"); return true; }
-    case "galk": ui.galK = ui.galK === b.dataset.k ? null : b.dataset.k; galWatch(ui.galK); render(); return true;
+    case "galk": if (ui.galK !== b.dataset.k) pushHist(); ui.galK = ui.galK === b.dataset.k ? null : b.dataset.k; galWatch(ui.galK); render(); return true;
     case "ytgo": { if (ui.galK !== "clip"){ ui.galK = "clip"; galWatch("clip"); } render(); setTimeout(() => { const e = document.getElementById("yt-new"); if (e) e.scrollIntoView({block: "center", behavior: "smooth"}); }, 250); return true; }
     case "vmadd": { const inp = document.getElementById("vm-new"), v = vmParse(inp && inp.value); if (!v){ toast("Ce lien Vimeo n'est pas reconnu"); return true; } const L = vmList(); if (L.some(x => x.id === v.id)){ toast("Cette vidéo est déjà dans la liste"); return true; } L.unshift(v); if (inp) inp.value = ""; vmSave(L); return true; }
     case "vmdel": { const i = +b.dataset.i; if (ui.vmDel !== i){ ui.vmDel = i; render(); return true; } ui.vmDel = null; const L = vmList(); L.splice(i, 1); vmSave(L); return true; }
@@ -2749,7 +2763,7 @@ document.addEventListener("click", async e => {
   if (siteClick(a, b)) return;
   switch(a){
     case "nav": if (b.dataset.v === ui.view) break; pushHist(); ui.view = b.dataset.v; ui.homeEdit = false; ui.plus = null; render(true); break;
-    case "back": goBack(); break;
+    case "back": appBack(); break;
     case "open": openShoot(b.dataset.id); break;
     case "sdopen": openShoot(b.dataset.id, "days"); break;
     case "new": newShoot(); break;
@@ -2787,8 +2801,8 @@ document.addEventListener("click", async e => {
     case "kdel": S.kit.items = S.kit.items.filter(k=>k.id!==b.dataset.kid); touchKit(); render(); break;
     case "kstarter": STARTER.forEach(([n,c])=>addKit(n,c)); touchKit(); render(); toast("Liste type ajoutée : renommez ou supprimez à votre guise"); break;
     case "fps": ui.tool.fps = +b.dataset.v; render(); break;
-    case "menu": ui.menu = true; render(); break;
-    case "plus": ui.plus = "main"; render(); break;
+    case "menu": ui.menu = true; overlayMark(); render(); break;
+    case "plus": ui.plus = "main"; overlayMark(); render(); break;
     case "pclose": ui.plus = null; render(); break;
     case "pstep2": ui.plus = "pay"; render(); break;
     case "pnew": ui.plus = null; newShoot(); break;
@@ -2800,7 +2814,7 @@ document.addEventListener("click", async e => {
       S.dest = S.dest || []; const vc = villeCoord(ville); const d = {ville, pays, paysNom:c[1], lat:vc ? vc[0] : c[2], lon:vc ? vc[1] : c[3], an:$("#dn-an").value.trim(), created:Date.now(), count:0, videos:[]}; S.dest.push({id, ...d});
       destSave(id, d); ui.destForm = null; pushHist(); ui.destId = id; render(true); toast(`${ville} ajoutée · ajoutez maintenant vos photos`); break; }
     case "dopen": pushHist(); ui.destId = b.dataset.id; ui.dDel = false; render(true); break;
-    case "dback": ui.destId = null; ui.dDel = false; render(true); break;
+    case "dback": appBack(); break;
     case "dcover": { const d = (S.dest||[]).find(x => x.id === ui.destId); const x = (S.destPhotos[ui.destId]||[]).find(p => p.id === b.dataset.pid); if (!d || !x) break; toast("Couverture en cours…"); photoData(dataURLToBlob(x.img), 720).then(cov => destSave(d.id, {cover:cov, coverId:x.id})).then(() => toast("Couverture changée")); break; }
     case "dpdel": { const pid = b.dataset.pid; if (ui.dpDel !== pid){ ui.dpDel = pid; render(); break; } ui.dpDel = null; const d = (S.dest||[]).find(x => x.id === ui.destId); if (!d) break;
       window.__apocaDest.delPhoto(d.id, pid).then(() => { const left = (S.destPhotos[d.id]||[]).filter(p => p.id !== pid); const patch = {count: left.length + (d.videos||[]).length}; if (d.coverId === pid){ patch.coverId = ""; patch.cover = ""; } destSave(d.id, patch); if (d.coverId === pid && left[0]) photoData(dataURLToBlob(left[0].img), 720).then(cov => destSave(d.id, {cover:cov, coverId:left[0].id})); }); toast("Photo supprimée"); break; }
@@ -3061,7 +3075,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-photos-webp";
+const APP_VER = "2026-11-02-retour-etapes";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
