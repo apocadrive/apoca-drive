@@ -62,6 +62,19 @@ h1{margin:0 0 34px;font:500 26px/1.12 var(--display);text-wrap:balance}h1 em{col
 @media (prefers-reduced-motion:reduce){.b{transition:none}.b.press{transform:none}.rip{display:none}}
 .foot{font-size:11px;letter-spacing:.14em;color:rgba(244,239,230,.6);margin:0}
 #hapl{position:fixed;left:-9999px;top:0;opacity:0}
+/* film du jour : la vidéo d'abord, les boutons compacts en bas */
+body.jour .veil{background:linear-gradient(180deg,rgba(14,13,11,.6) 0%,rgba(14,13,11,0) 20%,rgba(14,13,11,0) 60%,rgba(14,13,11,.8) 100%)}
+body.jour .stage{align-items:stretch}
+body.jour main{min-height:100%;gap:8px}
+body.jour .sym{width:26px}
+body.jour .name{font-size:13px}
+body.jour .couple{font-size:30px}
+body.jour h1{font-size:18px;margin:0 0 auto}
+body.jour #list,body.jour .foot{display:none}
+body.jour .row{grid-template-columns:repeat(var(--n,6),minmax(0,1fr));gap:8px;margin-bottom:2px}
+body.jour .row .b{min-height:0;aspect-ratio:1;max-width:54px;justify-self:center;width:100%;padding:0;border-radius:50%;gap:0}
+body.jour .row .b span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+body.jour .row .b svg{width:21px;height:21px}
 </style>
 </head>
 <body>
@@ -119,11 +132,16 @@ function btn(x){
   var cls = "b" + (x.k === "site" ? " main" : x.k === "wa" ? " wa" : SOC[x.k] ? " " + x.k : "");
   var ext = /^https:\/\//.test(x.url) && x.k !== "site" && x.k !== "resa";
   var icon = IC[x.k] || (x.custom ? IC.link : "");
-  return '<a class="' + cls + '" href="' + E(x.url) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + (x.k === "vcf" ? " download" : "") + ">" + icon + E(x.label) + "</a>";
+  return '<a class="' + cls + '" href="' + E(x.url) + '"' + (ext ? ' target="_blank" rel="noopener"' : "") + (x.k === "vcf" ? " download" : "") + ' aria-label="' + E(x.label) + '">' + icon + "<span>" + E(x.label) + "</span></a>";
 }
+var LAST = DEF, JOUR = false, ICONS = {wa:1, tel:1, resa:1};
 function renderButtons(list){
-  var main = [], soc = [], last = [];
-  list.forEach(function(x){ if (!x || x.on === false || !x.label || !okUrl(String(x.url || ""))) return; if (SOC[x.k]) soc.push(x); else if (x.k === "vcf") last.push(x); else main.push(x); });
+  LAST = list;
+  var main = [], soc = [], last = [], site = [];
+  list.forEach(function(x){ if (!x || x.on === false || !x.label || !okUrl(String(x.url || ""))) return;
+    if (JOUR){ if (ICONS[x.k] || SOC[x.k]) soc.push(x); else if (x.k === "site") site.push(x); else last.push(x); return; }
+    if (SOC[x.k]) soc.push(x); else if (x.k === "vcf") last.push(x); else main.push(x); });
+  if (JOUR){ soc.sort(function(a, b){ return "wa tel resa ig tt yt".indexOf(a.k) - "wa tel resa ig tt yt".indexOf(b.k); }); last = last.concat(site); }
   document.getElementById("list").innerHTML = main.map(btn).join("");
   var row = document.getElementById("row"); row.innerHTML = soc.map(btn).join(""); row.hidden = !soc.length; row.style.setProperty("--n", Math.max(1, soc.length));
   document.getElementById("list2").innerHTML = last.map(btn).join("");
@@ -151,6 +169,7 @@ window.__carte = {
   demo: demo, video: setVideo, photo: setPhoto, none: function(){ noDemo = true; },
   jour: function(j){
     if (!j) return;
+    JOUR = true; document.body.classList.add("jour"); renderButtons(LAST);
     document.getElementById("head").innerHTML = '<p class="live"><i></i>Le film du jour</p>' + (j.titre ? '<p class="couple">' + E(j.titre).replace(/ (&amp;|et) /, ' <em>$1</em> ') + "</p>" : "") + (j.date ? '<p class="cdate">' + E(j.date) + "</p>" : "");
     document.getElementById("h1").innerHTML = j.phrase ? E(j.phrase) : 'Vos plus beaux jours, <em>filmés comme au cinéma.</em>';
     var s = document.getElementById("sound"); s.hidden = false;
