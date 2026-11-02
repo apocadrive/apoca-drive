@@ -997,7 +997,7 @@ function render(scrollTop){
     if (ui.view === "shoot") ui.view = "agenda";
     const t = new Date();
     header = `<div class="top"><div class="wrap">${BACK}<button class="brandbtn brand" data-act="nav" data-v="home" aria-label="Écran d'accueil">Apoca<b>drive</b></button><span class="sub">${esc(DOW[t.getDay()].toUpperCase())} ${pad(t.getDate())}.${pad(t.getMonth()+1)}.${t.getFullYear()}<br>${S.mode==="db"?"SYNCHRO ON":"HORS LIGNE"}</span>${DOTS}</div><div class="stripes"></div></div>`;
-    body = ui.view === "wed" ? viewWed() : ui.view === "rdv" ? viewRdv() : ui.view === "send" ? viewSend() : ui.view === "site" ? viewSite() : ui.view === "dest" ? viewDest() : ui.view === "requests" ? viewRequests() : ui.view === "notif" ? viewNotif() : ui.view === "contracts" ? viewContracts() : ui.view === "contract" ? (cur() ? viewContract() : viewContracts()) : ui.view === "prices" ? viewPrices() : ui.view === "team" ? viewTeam() : ui.view === "stats" ? viewStats() : ui.view === "post" ? viewPost() : ui.view === "quotes" ? viewQuotes() : ui.view === "invoices" ? viewQuotes("invoice") : ui.view === "quote" ? viewQuote() : ui.view === "company" ? viewCompany() : ui.view === "kit" ? viewKit() : ui.view === "tools" ? viewTools() : ui.view === "clients" ? viewClients() : viewAgenda();
+    body = ui.view === "wed" ? viewWed() : ui.view === "rdv" ? viewRdv() : ui.view === "send" ? viewSend() : ui.view === "site" ? viewSite() : ui.view === "pay" ? viewPay() : ui.view === "dest" ? viewDest() : ui.view === "requests" ? viewRequests() : ui.view === "notif" ? viewNotif() : ui.view === "contracts" ? viewContracts() : ui.view === "contract" ? (cur() ? viewContract() : viewContracts()) : ui.view === "prices" ? viewPrices() : ui.view === "team" ? viewTeam() : ui.view === "stats" ? viewStats() : ui.view === "post" ? viewPost() : ui.view === "quotes" ? viewQuotes() : ui.view === "invoices" ? viewQuotes("invoice") : ui.view === "quote" ? viewQuote() : ui.view === "company" ? viewCompany() : ui.view === "kit" ? viewKit() : ui.view === "tools" ? viewTools() : ui.view === "clients" ? viewClients() : viewAgenda();
   }
   const nav = `<nav class="nav"><div class="in">
     <button data-act="nav" data-v="home" aria-current="false">${ICON.house}Accueil</button>
@@ -1238,6 +1238,7 @@ function menuHTML(){
     <div class="row between"><h2>Menu</h2><button class="x" data-act="mclose" aria-label="Fermer">×</button></div>
     <div class="menu">
       <button data-act="go" data-v="quotes">${ICON.doc}<span>Mes devis<small>Créer, modifier et télécharger en PDF</small></span><span class="pill cnt">${Object.values(S.quotes).filter(q=>!isInv(q)).length}</span></button>
+      <button data-act="go" data-v="pay">${ICON.euro}<span>Lien PayPal<small>Un montant, un lien, envoyé au client</small></span></button>
       <button data-act="go" data-v="invoices">${ICON.doc}<span>Mes factures<small>Depuis un devis accepté ou vierges</small></span><span class="pill cnt">${Object.values(S.quotes).filter(isInv).length}</span></button>
       <button data-act="go" data-v="contracts">${ICON.pen}<span>Contrats<small>Contrat de prestation prêt à signer</small></span></button>
       <button data-act="wednew"><span style="font-size:20px;width:24px;text-align:center">💍</span><span>Ajouter un mariage<small>Les mariés, la date, et ça s'affiche sur l'accueil</small></span></button>
@@ -2160,6 +2161,33 @@ function vmEditor(){
 }
 const ytThumb = u => { const m = String(u||"").match(/(?:youtu\.be\/|v=|shorts\/|embed\/)([\w-]{11})/); return m ? `https://i.ytimg.com/vi/${m[1]}/hqdefault.jpg` : ""; };
 
+/* ---------- Lien de paiement PayPal à envoyer au client ---------- */
+const payUser = () => { const m = String(sfGet("paiement.shooting") || "").match(/paypal\.me\/([A-Za-z0-9._-]+)/i); return m ? m[1] : "ApocaDrive"; };
+const payAmt = () => { const n = parseFloat(String(ui.payAmt || "").replace(",", ".").replace(/[^\d.]/g, "")); return n > 0 ? Math.round(n * 100) / 100 : 0; };
+const payLinkOf = () => { const n = payAmt(); return n ? `https://paypal.me/${payUser()}/${String(n).replace(/\.0+$/, "")}EUR` : ""; };
+const payMsg = () => { const n = payAmt(), f = String(ui.payFor || "").trim(); return `Bonjour, voici le lien pour régler ${f ? f.charAt(0).toLowerCase() + f.slice(1) : "votre paiement"} de ${String(n).replace(".", ",")} € à Apoca Drive : ${payLinkOf()}\nVous pouvez payer par PayPal ou par carte bancaire. Merci !`; };
+function viewPay(){
+  const L = payLinkOf();
+  return `<h2>Lien PayPal</h2><p class="small muted" style="margin:0">Tapez un montant : le lien PayPal est prêt. Le client clique, PayPal s'ouvre avec le montant déjà rempli, il paie (PayPal ou carte) et l'argent arrive sur votre PayPal.</p>
+  <section class="panel">
+    <label class="f">Montant à payer (€)<input type="text" inputmode="decimal" id="pay-amt" data-pay="amt" value="${esc(ui.payAmt || "")}" placeholder="Ex. 45" maxlength="10" style="font-size:22px"></label>
+    <div class="chips">${[45, 100, 150, 300, 500].map(n => `<button class="chip${payAmt() === n ? " tu" : ""}" data-act="payq" data-v="${n}">${n} €</button>`).join("")}</div>
+    <label class="f">Pour quoi ? (facultatif, écrit dans le message)<input type="text" data-pay="for" value="${esc(ui.payFor || "")}" placeholder="Ex. l'acompte de votre mariage" maxlength="80"></label>
+  </section>
+  <section class="panel" id="pay-out"${L ? "" : " hidden"}>
+    <h3 style="margin:0">Le lien</h3>
+    <p id="pay-link" style="margin:0;font-size:17px;font-weight:600;word-break:break-all">${esc(L)}</p>
+    <div class="row" style="flex-wrap:wrap;gap:8px">
+      <button class="btn primary" data-act="paywa">Envoyer sur WhatsApp</button>
+      <button class="btn" data-act="payshare">Partager…</button>
+      <button class="btn" data-act="paycopy">Copier le lien</button>
+      <a class="btn ghost" id="pay-test" href="${esc(L)}" target="_blank" rel="noopener">Tester</a>
+    </div>
+    <p class="small muted" style="margin:0">Pensez à vérifier sur PayPal que le paiement est bien arrivé avant de confirmer au client.</p>
+  </section>`;
+}
+function payRefresh(){ const L = payLinkOf(), o = $("#pay-out"); if (!o) return; o.hidden = !L; $("#pay-link").textContent = L; $("#pay-test").href = L || "#";
+  document.querySelectorAll('[data-act="payq"]').forEach(b => b.classList.toggle("tu", +b.dataset.v === payAmt())); }
 function viewSite(){
   siteStart();
   if (!window.__apocaSiteAdmin) return `<h2>Mon site</h2><div class="empty">Disponible dans l'appli en ligne uniquement.</div>`;
@@ -2695,6 +2723,10 @@ function siteClick(a, b){
       f.r.created = f.r.created || Date.now(); f.r.done = false; rdvSave(f.id, f.r); ui.rdvForm = null; render(true); toast("Rendez-vous enregistré"); return true; }
     case "rvdone": { const r = S.rdv[b.dataset.id]; if (r){ r.done = true; rdvSave(b.dataset.id, r); render(); } return true; }
     case "rvdel": { const id = b.dataset.id; if (ui.rvDel !== id){ ui.rvDel = id; render(); return true; } ui.rvDel = null; delete S.rdv[id]; if (S.db) S.db.doc("rdv/" + id).delete().catch(() => {}); render(); toast("Supprimé"); return true; }
+    case "payq": ui.payAmt = b.dataset.v; { const i = $("#pay-amt"); if (i) i.value = b.dataset.v; } payRefresh(); return true;
+    case "paycopy": { const v = payLinkOf(); if (!v) return; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié · collez-le dans votre message"), () => toast("Copie impossible : appuyez longtemps sur le lien pour le copier")); return true; }
+    case "paywa": { if (!payLinkOf()) return; window.open("https://wa.me/?text=" + encodeURIComponent(payMsg()), "_blank"); return true; }
+    case "payshare": { if (!payLinkOf()) return; if (navigator.share) navigator.share({text: payMsg()}).catch(() => {}); else (navigator.clipboard ? navigator.clipboard.writeText(payMsg()) : Promise.reject()).then(() => toast("Message copié"), () => {}); return true; }
     case "cqcopy": { const v = "https://apocadrive.web.app/carte"; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié"), () => { const e = $("#cq-link"); if (e){ e.focus(); e.select(); } }); return true; }
     case "cqfond": carteSave({fond: b.dataset.v}); return true;
     case "cqup": { const bs = carteBtns(), i = +b.dataset.i; if (i > 0){ [bs[i-1], bs[i]] = [bs[i], bs[i-1]]; cqSaveBtns(bs); } return true; }
@@ -2974,6 +3006,7 @@ document.addEventListener("change", e => {
 });
 document.addEventListener("input", e => {
   const el = e.target;
+  if (el.dataset.pay){ if (el.dataset.pay === "amt") ui.payAmt = el.value; else ui.payFor = el.value; payRefresh(); return; }
   if (el.dataset.pr){ const x = S.prices.items.find(i=>i.id===el.dataset.pr); if (x){ x[el.dataset.prf] = el.dataset.prf==="price" ? (el.value===""?"":+el.value) : el.value; touchPr(); } return; }
   if (el.dataset.ct && ui.view === "contract"){ const c = contractOf(cur()); c[el.dataset.ct] = el.dataset.num ? (el.value===""?"":+el.value) : el.value; touch(ui.id); return; }
   if (el.dataset.crew){ const sh = cur(); const c = sh && (sh.crew||[]).find(x=>x.id===el.dataset.crew); if (c){ c.fee = el.value===""?"":+el.value; touch(ui.id); } return; }
@@ -3106,7 +3139,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-coulisses";
+const APP_VER = "2026-11-02-lien-paypal";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
