@@ -2164,7 +2164,7 @@ function viewSite(){
   if (!window.__apocaSiteAdmin) return `<h2>Mon site</h2><div class="empty">Disponible dans l'appli en ligne uniquement.</div>`;
   const t = ui.siteTab || "accueil";
   const np = (S.sitePend||[]).length;
-  const tabs = [["accueil","Accueil"],["apropos","À propos"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
+  const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
   let h = `<h2>Mon site</h2><p class="small muted" style="margin:0">Ce que vous changez ici s'affiche tout de suite sur <b>apocadrive.web.app</b>.</p>
     <div class="chips">${tabs.map(([k, l]) => `<button class="chip${t===k?" tu":""}" data-act="stab" data-v="${k}">${l}</button>`).join("")}</div>`;
   if (S.site === null) return h + `<div class="empty"><span class="spin"></span>Chargement…</div>`;
@@ -2306,6 +2306,10 @@ function viewSite(){
     h += `<p class="small muted" style="margin:0">${list.length} photo${list.length > 1 ? "s" : ""}</p><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">` + list.map(x => `<div style="display:flex;flex-direction:column;gap:6px;min-width:0">
         <img src="${esc(x.img)}" alt="" loading="lazy" style="width:100%;aspect-ratio:10/7;object-fit:cover;object-position:${esc(moPos(x))};border-radius:8px;display:block">
         <button class="btn sm" data-act="mocrop" data-id="${x.id}">Cadrer</button><button class="btn ghost sm" data-act="model" data-id="${x.id}" style="color:var(--rec)">${ui.moDel===x.id?"Confirmer":"Retirer"}</button></div>`).join("") + `</div>`;
+  } else if (t === "realis"){
+    h += `<section class="panel"><h3 style="margin:0">Photos et vidéos de chaque prestation</h3><p class="small muted" style="margin:0">Choisissez une prestation, puis ajoutez vos photos et vidéos. Elles s'affichent sur sa page du site. Touchez <b>☆ Haut</b> sur une photo pour qu'elle devienne la grande photo en haut de la page.</p></section>`;
+    h += RESA_ITEMS.map(([k, l, parent]) => { const n = S.gal && S.gal[k] ? S.gal[k].length : 0;
+      return `<button class="btn${ui.galK===k?"":" primary"}" data-act="galk" data-k="${k}" style="justify-content:space-between${parent?";margin-left:14px":""}"><span>${esc(parent ? l : l)}</span><span>${ui.galK===k ? "Fermer" : (n ? n + " ›" : "＋ Ajouter")}</span></button>` + (ui.galK===k ? galEditor(k, l) : ""); }).join("");
   } else if (t === "reserver"){
     h += `<section class="panel"><h3 style="margin:0">Conditions de réservation</h3><p class="small muted" style="margin:0">Affichées sur l'accueil. Une condition par ligne, sous la forme « Titre : explication ». Laissez vide pour cacher le bloc.</p>
       ${sfTa("conditions.texte","Conditions","Acompte : 30 % du prix…")}</section>`;
@@ -3075,7 +3079,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-retour-etapes";
+const APP_VER = "2026-11-02-onglet-realisations";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
