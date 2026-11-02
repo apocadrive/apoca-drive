@@ -1717,6 +1717,14 @@ ytp.addEventListener("click", e => {
 });
 addEventListener("keydown", e => { if (e.key === "Escape" && !ytp.hidden) ytClose(); });
 $("#gal-yt").onclick = ytOpen;
+/* « Films à la une » : le filtre Clip ouvre directement « Mes clips en salle » */
+{ const fb = document.querySelector('#films .filters [data-f="clip"]');
+  if (fb) fb.addEventListener("click", e => { e.preventDefault(); e.stopImmediatePropagation();
+    const go = yt => { BK.galInfo = Object.assign({}, BK.galInfo || {}, {youtube: yt}); ytOpen(); };
+    if (window.__clipYT != null) return go(window.__clipYT);
+    fetch("https://firestore.googleapis.com/v1/projects/apoca-drive/databases/(default)/documents/galerieInfo/clip?key=AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc&mask.fieldPaths=youtube")
+      .then(r => r.ok ? r.json() : {}).then(d => { window.__clipYT = (((d || {}).fields || {}).youtube || {}).stringValue || ""; go(window.__clipYT); }).catch(() => go(""));
+  }, true); }
 $("#gal-go").onclick = () => bkAfterGal();
 const bkAfterSub = el => galOpen(BK.subk || (BK.cat && BK.cat.k), BK.subk ? BK.cat.k : null, el);
 let bkSwapT = 0;
