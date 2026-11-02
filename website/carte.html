@@ -164,9 +164,11 @@ film.addEventListener("ended", function(){ if (demoOn) demo(); });
 film.addEventListener("error", function(){ if (demoOn) setTimeout(demo, 300); });
 function setVideo(url){ demoOn = false; film.loop = true; film.removeAttribute("poster"); film.src = url; film.hidden = false; film.play().catch(function(){}); }
 function setPhoto(img){ demoOn = false; film.pause(); film.removeAttribute("src"); film.load(); film.style.backgroundImage = 'url("' + img.replace(/"/g, "") + '")'; }
+var HEAD0 = document.getElementById("head").innerHTML, H10 = document.getElementById("h1").innerHTML;
 window.__carte = {
   buttons: function(cfg){ renderButtons(mergeButtons(cfg)); },
   demo: demo, video: setVideo, photo: setPhoto, none: function(){ noDemo = true; },
+  unjour: function(){ if (!JOUR) return; JOUR = false; document.body.classList.remove("jour"); document.getElementById("head").innerHTML = HEAD0; document.getElementById("h1").innerHTML = H10; document.getElementById("sound").hidden = true; renderButtons(LAST); },
   jour: function(j){
     if (!j) return;
     JOUR = true; document.body.classList.add("jour"); renderButtons(LAST);
@@ -213,8 +215,10 @@ const chunks = async (col, field, val, n, type) => {
   if (cfg.buttons) C.buttons(cfg.buttons);
   const j = cfg.jour || {};
   if (j.on && j.vid && j.vid.n) {
+    C.jour(j); C.none(); // la mise en page du film du jour s'affiche tout de suite, la vidéo arrive ensuite
     const u = await chunks("carteJour", "v", j.vid.v, j.vid.n, j.vid.type).catch(() => "");
-    if (u) { C.jour(j); C.video(u); return; }
+    if (u) { C.video(u); return; }
+    C.unjour();
   }
   if (cfg.fond === "photo" && cfg.photo) { C.photo(cfg.photo); return; }
   if (cfg.fond === "aucun") { C.none(); return; }
