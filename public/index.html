@@ -2381,20 +2381,29 @@ async function siteSetPhoto(w, file){
   ui.siteUp = null; render();
 }
 /* Allège une vidéo sur le téléphone avant l'envoi : réencodage en MP4 (H.264), 1080 px de large maximum, sans le son. */
-async function shrinkVideo(file, onProg){
+async function shrinkVideo(file, onProg, opts){
+  opts = opts || {}; let ac = null;
   const MR = window.MediaRecorder; if (!MR || !HTMLCanvasElement.prototype.captureStream) return file;
-  const mime = ["video/mp4;codecs=avc1.640028", "video/mp4;codecs=avc1.4d0028", "video/mp4;codecs=avc1", "video/mp4"].find(t => { try { return MR.isTypeSupported(t); } catch(e){ return false; } });
+  const mime = (opts.audio ? ["video/mp4;codecs=avc1.640028,mp4a.40.2", "video/mp4;codecs=avc1,mp4a.40.2"] : []).concat(["video/mp4;codecs=avc1.640028", "video/mp4;codecs=avc1.4d0028", "video/mp4;codecs=avc1", "video/mp4"]).find(t => { try { return MR.isTypeSupported(t); } catch(e){ return false; } });
   if (!mime) return file;
   const url = URL.createObjectURL(file), v = document.createElement("video");
   v.muted = true; v.playsInline = true; v.setAttribute("playsinline", ""); v.preload = "auto"; v.src = url;
   v.style.cssText = "position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none"; document.body.appendChild(v);
-  const cleanup = () => { try { v.pause(); } catch(e){} v.remove(); URL.revokeObjectURL(url); };
+  const cleanup = () => { try { v.pause(); } catch(e){} v.remove(); URL.revokeObjectURL(url); try { ac && ac.close(); } catch(e){} };
   try {
     await new Promise((res, rej) => { v.onloadedmetadata = res; v.onerror = rej; setTimeout(() => rej(new Error("meta")), 15000); });
     const sc = Math.min(1, 1080 / Math.max(1, Math.min(v.videoWidth, v.videoHeight)));
     const W = Math.round(v.videoWidth * sc / 2) * 2, H = Math.round(v.videoHeight * sc / 2) * 2;
     const c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
-    const stream = c.captureStream(30), rec = new MR(stream, {mimeType: mime, videoBitsPerSecond: 3000000}), parts = [];
+    const stream = c.captureStream(30);
+    if (opts.audio){
+      // le son passe par le téléphone sans sortir du haut-parleur, et il est enregistré avec l'image
+      const AC = window.AudioContext || window.webkitAudioContext; if (!AC) throw new Error("audio");
+      ac = new AC(); await ac.resume().catch(() => {});
+      const src = ac.createMediaElementSource(v), dst = ac.createMediaStreamDestination(); src.connect(dst);
+      dst.stream.getAudioTracks().forEach(t => stream.addTrack(t)); v.muted = false;
+    }
+    const rec = new MR(stream, {mimeType: mime, videoBitsPerSecond: 3000000, audioBitsPerSecond: 128000}), parts = [];
     rec.ondataavailable = e => { if (e.data && e.data.size) parts.push(e.data); };
     const done = new Promise(r => { rec.onstop = r; });
     let on = true; const draw = () => { if (!on) return; g.drawImage(v, 0, 0, W, H); onProg && v.duration && onProg(Math.min(1, v.currentTime / v.duration));
@@ -2534,9 +2543,17 @@ function rvGrab(){ const f = ui.rdvForm; if (!f) return; const g = id => { const
   ["nom","date","heure","lieu","notes"].forEach(k => { const v = g("rv-" + k); if (v !== undefined) f.r[k] = k === "notes" ? v : v.trim(); }); }
 function cqSaveBtns(bs){ return carteSave({buttons: bs.map(x => ({k:x.k, label:x.label, url:x.url, on:x.on, ...(x.custom ? {custom:true} : {})}))}); }
 async function cqVideo(file){
-  if (file.size > 60 * 1024 * 1024){ toast("Vidéo trop lourde (plus de 60 Mo). Exporte-la en 1080p, 30 s maximum."); return; }
+  if (file.size > 150 * 1024 * 1024){ toast("Vidéo trop lourde (plus de 150 Mo). Choisis une vidéo plus courte (30 s à 1 min)."); return; }
+  const poster = await videoPoster(file).catch(() => "");
+  if (file.size > 5 * 1024 * 1024){
+    ui.carteUp = "Allègement de la vidéo… 0 % (garde l'appli ouverte)"; render();
+    const small = await shrinkVideo(file, p => { ui.carteUp = `Allègement de la vidéo… ${Math.round(p*100)} % (garde l'appli ouverte)`; softRender(); }, {audio: true});
+    if (small !== file) toast(`Vidéo allégée : ${Math.round(file.size/1048576)} Mo → ${Math.max(1, Math.round(small.size/1048576))} Mo`);
+    file = small;
+  }
+  if (file.size > 60 * 1024 * 1024){ ui.carteUp = null; render(); toast("Vidéo encore trop lourde (plus de 60 Mo). Choisis une vidéo plus courte."); return; }
   ui.carteUp = "Envoi de la vidéo… 0 %"; render();
-  try { const poster = await videoPoster(file).catch(() => ""); await window.__apocaCarte.setJourVideo(file, f => { ui.carteUp = `Envoi de la vidéo… ${Math.round(f*100)} %`; render(); }); if (poster && poster.length < 400000) await window.__apocaCarte.save({jour: {poster}}).catch(() => {}); toast("Vidéo du jour en ligne"); }
+  try { await window.__apocaCarte.setJourVideo(file, f => { ui.carteUp = `Envoi de la vidéo… ${Math.round(f*100)} %`; render(); }); if (poster && poster.length < 400000) await window.__apocaCarte.save({jour: {poster}}).catch(() => {}); toast("Vidéo du jour en ligne"); }
   catch(e){ toast("La vidéo n'a pas pu être envoyée. Vérifie ta connexion."); }
   ui.carteUp = null; render();
 }
@@ -3079,7 +3096,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-carte-apercu";
+const APP_VER = "2026-11-02-film-allege";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
