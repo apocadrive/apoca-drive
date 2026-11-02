@@ -288,15 +288,15 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(217,190,134,.55)}80%,100%{box-shadow:0 0 0 18px rgba(217,190,134,0)}}
 @media (max-width:620px){.pin span{display:none}.count b{font-size:48px}}
 .strip{margin-top:36px;display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px;scrollbar-width:thin;scrollbar-color:#3a352c transparent}
-.card{flex:0 0 clamp(240px,30vw,330px);scroll-snap-align:start;text-align:left;border:0;padding:0;background:none;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:14px;font:inherit}
-.card .frame{aspect-ratio:3/4;background:radial-gradient(120% 80% at 70% 10%,var(--tone,#3b3122) 0%,var(--night-2) 70%);border:1px solid rgba(217,190,134,.14);transition:border-color .6s}
+.card{flex:0 0 clamp(150px,22vw,210px);text-decoration:none;scroll-snap-align:start;text-align:left;border:0;padding:0;background:none;color:inherit;cursor:pointer;display:flex;flex-direction:column;gap:14px;font:inherit}
+.card .frame{aspect-ratio:3/4;border-radius:18px;background:radial-gradient(120% 80% at 70% 10%,var(--tone,#3b3122) 0%,var(--night-2) 70%);border:1px solid rgba(217,190,134,.14);transition:border-color .6s}
 .card[aria-pressed="true"] .frame,.card:hover .frame{border-color:var(--gold-2)}
-.card .big{position:absolute;left:20px;bottom:18px;right:20px;display:flex;flex-direction:column;gap:6px}
-.card .big b{font:400 44px/1 var(--f-display);color:#F4EEE2}
-.card .big i{font:400 11px/1 var(--f-body);font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:rgba(237,230,216,.6);font-variant-numeric:tabular-nums}
-.card .flag{position:absolute;top:18px;left:20px;font-size:22px}
-.card .n{position:absolute;top:20px;right:20px;font:400 11px/1 var(--f-body);letter-spacing:.2em;color:var(--gold-2)}
-.card .meta{display:flex;justify-content:space-between;font:400 12px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:rgba(237,230,216,.6)}
+.card .big{position:absolute;left:14px;bottom:14px;right:14px;display:flex;flex-direction:column;gap:5px}
+.card .big b{font:400 30px/1 var(--f-display);color:#F4EEE2;overflow-wrap:anywhere}
+.card .big i{font:400 9px/1.3 var(--f-body);font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:rgba(237,230,216,.6);font-variant-numeric:tabular-nums}
+.card .flag{position:absolute;top:12px;left:14px;font-size:18px}
+.card .n{position:absolute;top:14px;right:14px;font:400 11px/1 var(--f-body);letter-spacing:.2em;color:var(--gold-2)}
+.card .meta{display:flex;flex-direction:column;gap:5px;font:400 10px/1.3 var(--f-body);letter-spacing:.14em;text-transform:uppercase;color:rgba(237,230,216,.6)}
 .gal{margin-top:28px;border:1px solid rgba(217,190,134,.2);padding:clamp(20px,3vw,32px);display:flex;flex-direction:column;gap:20px}
 .gal-h{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
 .gal-h h3{font-size:36px}
@@ -890,7 +890,7 @@ html{overflow-x:hidden}body{overflow-x:clip}
 
 <section id="destinations" class="dest wrap" hidden><div class="in">
   <div class="dest-h">
-    <div><p class="eyebrow">Carnet de voyage</p><h2>Basé en France. Filmé <em>partout.</em></h2><p class="lede">Chaque destination où j'ai posé ma caméra. Choisissez un pays pour voir ce que j'y ai filmé.</p></div>
+    <div><p class="eyebrow">Carnet de voyage</p><h2>Basé en France. Filmé <em>partout.</em></h2><p class="lede">Chaque destination où j'ai posé ma caméra. Touchez une destination pour voir les photos et les films que j'y ai tournés.</p></div>
     <div class="count"><div><b id="n-pays">0</b><span>Pays</span></div><div><b id="n-villes">0</b><span>Villes</span></div></div>
   </div>
   <div class="map" id="map"><canvas id="mapc" aria-hidden="true"></canvas></div>
@@ -1396,13 +1396,14 @@ let cur = -1;
 function renderDest(){
   $("#n-pays").textContent = new Set(D.map(d => d.pays)).size;
   $("#n-villes").textContent = new Set(D.map(d => d.ville)).size;
-  strip.innerHTML = D.map((d,i) => `<button type="button" class="card" data-i="${i}" aria-pressed="false">
+  strip.innerHTML = D.map((d,i) => `${d.id ? `<a class="card" href="/destination?id=${encodeURIComponent(d.id)}" data-i="${i}">` : `<button type="button" class="card" data-i="${i}" aria-pressed="false">`}
     <div class="frame" style="--tone:${d.tone||"#3b3122"}">${d.cover?`<img class="cov" src="${d.cover}" alt="">`:""}<span class="flag" aria-hidden="true">${d.flag}</span><span class="n">${String(i+1).padStart(2,"0")}</span>
     <div class="big"><b>${esc(d.ville)}</b><i>${Math.abs(d.lat).toFixed(2)}° ${d.lat>=0?"N":"S"} · ${Math.abs(d.lon).toFixed(2)}° ${d.lon>=0?"E":"O"}</i></div></div>
-    <div class="meta"><span>${esc(d.pays)}</span><span>${[d.n ? `${d.n} média${d.n>1?"s":""}` : "", d.an ? esc(d.an) : ""].filter(Boolean).join(" · ")}</span></div></button>`).join("");
+    <div class="meta"><span>${esc(d.pays)}</span><span>${[d.n ? `${d.n} média${d.n>1?"s":""}` : "", d.an ? esc(d.an) : ""].filter(Boolean).join(" · ")}</span></div>${d.id ? "</a>" : "</button>"}`).join("");
   map.querySelectorAll(".pin").forEach(p => p.remove());
   D.forEach((d,i) => { const b = document.createElement("button"); b.type = "button"; b.className = "pin"; b.dataset.i = i; b.style.left = x(d.lon)+"%"; b.style.top = y(d.lat)+"%"; b.setAttribute("aria-label", `${d.ville}, ${d.pays}`); b.innerHTML = `<span>${esc(d.ville)}</span>`; map.appendChild(b); });
-  if (D.length) show(Math.min(Math.max(cur,0), D.length-1)); else gal.innerHTML = "";
+  if (D.length && !live) show(Math.min(Math.max(cur,0), D.length-1)); else gal.innerHTML = "";
+  gal.hidden = live;
 }
 const vidLabel = u => /instagram/.test(u) ? "Instagram" : /tiktok/.test(u) ? "TikTok" : /youtu/.test(u) ? "YouTube" : /vimeo/.test(u) ? "Vimeo" : "Vidéo";
 let PHOTOS = [];
@@ -1421,7 +1422,7 @@ async function show(i){
 }
 document.addEventListener("click", e => {
   const t = e.target.closest(".ptile"); if (t){ openLb(+t.dataset.k); return; }
-  const b = e.target.closest(".card,.pin"); if (b){ show(+b.dataset.i); if (b.classList.contains("pin") && strip.children[+b.dataset.i]) strip.children[+b.dataset.i].scrollIntoView({behavior:"smooth", inline:"center", block:"nearest"}); }
+  const b = e.target.closest(".card,.pin"); if (b){ const dd = D[+b.dataset.i]; if (live && dd && dd.id){ if (b.classList.contains("pin")){ e.preventDefault(); location.href = "/destination?id=" + encodeURIComponent(dd.id); } return; } show(+b.dataset.i); if (b.classList.contains("pin") && strip.children[+b.dataset.i]) strip.children[+b.dataset.i].scrollIntoView({behavior:"smooth", inline:"center", block:"nearest"}); }
 });
 /* lightbox */
 const lb = document.createElement("div"); lb.className = "lb"; lb.hidden = true; lb.setAttribute("role","dialog"); lb.setAttribute("aria-label","Photo en grand");

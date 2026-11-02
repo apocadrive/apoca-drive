@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carnet de voyage · Apoca Drive</title>
+<meta name="description" content="Les films et les photos d'Apoca Drive, vidéaste et photographe basé en France, tournés dans cette destination.">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Apoca Drive"><meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Carnet de voyage · Apoca Drive"><meta property="og:image" content="https://apocadrive.web.app/og.png">
+<meta name="theme-color" content="#0E0D0B">
+<link rel="icon" href="/favicon.ico" sizes="48x48"><link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png"><link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/prestation.css?v=1">
+<style>
+.hero .meta{margin:0;font:400 12px/1 var(--f-body);letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.75)}
+.hero .bg[hidden]{display:none}
+.vgrid{margin-top:clamp(28px,4vw,44px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.vbox{position:relative;aspect-ratio:16/9;border:0;padding:0;border-radius:14px;overflow:hidden;background:#141210;cursor:pointer;color:#fff}
+.vbox img{width:100%;height:100%;object-fit:cover;display:block;opacity:.85;transition:opacity .4s}
+.vbox:hover img{opacity:1}
+.vbox .pl{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;border:1px solid rgba(255,255,255,.85);background:rgba(14,13,11,.45);display:grid;place-items:center}
+.vbox .src{position:absolute;left:14px;bottom:12px;font:500 10px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.85)}
+.vbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+a.vbox{display:grid;place-items:center;text-decoration:none}
+.pgrid{margin-top:clamp(28px,4vw,44px);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pgrid button{position:relative;padding:0;border:0;border-radius:12px;overflow:hidden;aspect-ratio:1;background:#E9E3D8;cursor:zoom-in}
+.pgrid img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;transition:opacity .8s ease,transform 1.2s cubic-bezier(.16,1,.3,1)}
+.pgrid img.ok{opacity:1}
+.pgrid button:hover img{transform:scale(1.05)}
+.pgrid button:focus-visible,.vbox:focus-visible{outline:2px solid var(--gold-2);outline-offset:3px}
+.empty{margin-top:24px;color:var(--ink-2)}
+.state{min-height:60vh;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:18px}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(8,7,6,.95);display:flex;align-items:center;justify-content:center;padding:max(56px,env(safe-area-inset-top,0px)) 12px max(24px,env(safe-area-inset-bottom,0px))}
+.lb[hidden]{display:none}
+.lb img{max-width:100%;max-height:100%;object-fit:contain}
+.lb button{position:absolute;background:none;border:0;color:#EDE6D8;font:300 40px/1 var(--f-display);width:56px;height:56px;cursor:pointer}
+.lb .x{top:calc(8px + env(safe-area-inset-top,0px));right:8px}
+.lb .p{left:4px;top:50%;margin-top:-28px}.lb .n{right:4px;top:50%;margin-top:-28px}
+.lb .c{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;font:400 12px/1 var(--f-body);letter-spacing:.2em;color:rgba(237,230,216,.6)}
+@media (max-width:860px){.pgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:620px){.vgrid{grid-template-columns:minmax(0,1fr)}.pgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}}
+</style>
+</head>
+<body>
+<header class="hd wrap"><div class="in">
+  <a class="logo" href="/" aria-label="Apoca Drive, accueil"><img class="sym" src="/logo-sym-k.png" alt="" width="217" height="240"><span class="lw"><img src="/logo-name-k.png" alt="Apoca Drive" width="510" height="64"><small>Filmmaker · France</small></span></a>
+  <nav aria-label="Navigation"><a class="lk" href="/#destinations">Destinations</a><a class="lk" href="/#films">Films</a><a class="btn" href="/#reserver">Réserver</a></nav>
+</div></header>
+<main id="main">
+<section class="hero wrap">
+  <img class="bg" id="cov" alt="" hidden>
+  <div class="in">
+    <p class="crumbs"><a href="/">Accueil</a> · <a href="/#destinations">Destinations</a> · <span id="cr">…</span></p>
+    <p class="eyebrow" id="eye">Carnet de voyage</p>
+    <h1 id="ttl">Chargement…</h1>
+    <p class="lead" id="txt" hidden></p>
+    <p class="meta" id="meta"></p>
+  </div>
+</section>
+
+<section class="gal sec wrap" id="films" hidden><div class="in">
+  <p class="eyebrow">Les films</p>
+  <h2>Regardez, <em>ressentez.</em></h2>
+  <div class="vgrid" id="vgrid"></div>
+</div></section>
+
+<section class="sec wrap" id="photos" hidden><div class="in">
+  <p class="eyebrow">Les photos</p>
+  <h2>La galerie <em id="pgt"></em></h2>
+  <div class="pgrid" id="pgrid"></div>
+</div></section>
+
+<section class="close sec wrap" style="--cbg:url('/accueil.jpg')"><div class="in">
+  <p class="eyebrow">Commençons</p>
+  <h2>Votre projet, <em>ici ou ailleurs.</em></h2>
+  <p>Je me déplace partout en France, et à l'étranger sur demande.</p>
+  <div class="row"><a class="btn gold" href="/#reserver">Réserver ma date</a><a class="btn line" href="/#destinations">Toutes les destinations</a></div>
+</div></section>
+</main>
+
+<footer class="wrap"><div class="in">
+  <div class="ft">
+    <div><h4>Apoca Drive</h4><p>Vidéaste et photographe basé en France : mariages civils, religieux et coutumiers, clips, outfits et shootings. Partout en France, et à l'étranger sur demande.</p></div>
+    <nav aria-label="Prestations"><h4>Prestations</h4><a href="/mariage">Vidéaste &amp; photographe de mariage</a><a href="/mariage-coutumier">Mariage coutumier</a><a href="/clip">Clips musicaux</a><a href="/outfit">Outfit</a><a href="/shooting">Shooting photo et vidéo</a></nav>
+    <div><h4>Contact</h4><a href="https://wa.me/33607055384" target="_blank" rel="noopener">+33 6 07 05 53 84</a><a href="https://www.instagram.com/apocadrive/" target="_blank" rel="noopener">Instagram</a></div>
+  </div>
+  <div class="legal"><span>© 2026 Apoca Drive</span><span>Vidéaste &amp; photographe · France</span></div>
+</div></footer>
+<a class="wa" href="https://wa.me/33607055384" target="_blank" rel="noopener" aria-label="Écrire sur WhatsApp"><svg width="30" height="30" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 7L3 29l6.4-2c2 1.1 4.3 1.7 6.6 1.7 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.4c-2.1 0-4.1-.6-5.8-1.7l-.4-.3-3.8 1.2 1.2-3.7-.3-.4A10.4 10.4 0 0 1 5.4 15.8C5.4 10 10.2 5.3 16 5.3S26.6 10 26.6 15.8 21.8 26.4 16 26.4zm5.8-7.8c-.3-.2-1.9-.9-2.2-1-.3-.1-.5-.2-.7.2-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.6-1.6-1-.9-1.6-1.9-1.8-2.2-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.4 0-.6l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.4-.3.3-1.2 1.1-1.2 2.8s1.2 3.2 1.4 3.4c.2.2 2.4 3.6 5.8 5 .8.4 1.4.6 1.9.7.8.3 1.5.2 2.1.1.6-.1 1.9-.8 2.2-1.5.3-.7.3-1.4.2-1.5-.1-.1-.3-.2-.6-.4z"/></svg></a>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Photo en grand" hidden>
+  <button type="button" class="x" aria-label="Fermer">×</button>
+  <button type="button" class="p" aria-label="Photo précédente">‹</button>
+  <img alt="">
+  <button type="button" class="n" aria-label="Photo suivante">›</button>
+  <span class="c"></span>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getFirestore, doc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const fs = getFirestore(initializeApp({ apiKey: "AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc", authDomain: "apoca-drive.firebaseapp.com", projectId: "apoca-drive", appId: "1:826000114685:web:4ed7cf006753e352a24f94", messagingSenderId: "826000114685" }));
+const $ = (s) => document.querySelector(s);
+const E = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const flag = (cc) => cc && cc.length === 2 ? String.fromCodePoint(...[...cc.toUpperCase()].map((c) => 0x1F1E6 + c.charCodeAt(0) - 65)) : "";
+const ytId = (u) => { const m = String(u || "").match(/(?:youtu\.be\/|v=|shorts\/|embed\/|live\/)([\w-]{11})/); return m ? m[1] : ""; };
+const vmId = (u) => { const m = String(u || "").match(/vimeo\.com\/(?:.*?\/)?(\d{6,})(?:\/([0-9a-f]{6,}))?/i); return m ? { id: m[1], h: m[2] || (String(u).match(/[?&]h=([0-9a-f]+)/i) || [])[1] || "" } : null; };
+const PLAY = '<span class="pl" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>';
+
+function fail(msg){
+  document.title = "Destination introuvable · Apoca Drive";
+  $("#main").innerHTML = `<section class="sec wrap"><div class="in state"><p class="eyebrow">Carnet de voyage</p><h1 style="font-size:clamp(40px,7vw,72px)">${msg}</h1><a class="btn gold" href="/#destinations">Voir toutes les destinations</a></div></section>`;
+}
+
+const id = new URLSearchParams(location.search).get("id");
+let PH = [];
+(async () => {
+  if (!id) return fail("Destination introuvable.");
+  let d;
+  try { const s = await getDoc(doc(fs, "destinations", id)); if (!s.exists()) return fail("Destination introuvable."); d = s.data(); }
+  catch (e) { return fail("Connexion impossible, réessayez dans un instant."); }
+  if (d.hidden) return fail("Cette destination n'est pas disponible.");
+  const ville = d.ville || "Destination", pays = d.paysNom || "";
+  document.title = `${ville}${pays ? ", " + pays : ""} · Carnet de voyage · Apoca Drive`;
+  $("#cr").textContent = ville;
+  $("#eye").textContent = `Carnet de voyage${pays ? " · " + pays : ""}`;
+  $("#ttl").innerHTML = `${flag(d.pays) ? `<span aria-hidden="true">${flag(d.pays)}</span> ` : ""}${E(ville)}`;
+  $("#pgt").textContent = `de ${ville}.`;
+  if (d.texte){ $("#txt").textContent = d.texte; $("#txt").hidden = false; }
+  if (d.cover){ const c = $("#cov"); c.src = d.cover; c.hidden = false; }
+
+  /* vidéos : YouTube et Vimeo se lisent sur la page, les autres liens s'ouvrent à part */
+  const vids = (d.videos || []).map((v) => v.url).filter(Boolean);
+  $("#vgrid").innerHTML = vids.map((u, k) => {
+    const y = ytId(u); if (y) return `<button type="button" class="vbox" data-yt="${y}" aria-label="Lire la vidéo ${k + 1}"><img src="https://i.ytimg.com/vi/${y}/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()">${PLAY}<span class="src">YouTube</span></button>`;
+    const m = vmId(u); if (m) return `<button type="button" class="vbox" data-vm="${m.id}" data-h="${E(m.h)}" aria-label="Lire la vidéo ${k + 1}">${PLAY}<span class="src">Vimeo</span></button>`;
+    return /^https?:\/\//.test(u) ? `<a class="vbox" href="${E(u)}" target="_blank" rel="noopener" aria-label="Voir la vidéo ${k + 1}">${PLAY}<span class="src">Voir la vidéo</span></a>` : "";
+  }).join("");
+  $("#films").hidden = !$("#vgrid").children.length;
+  /* miniature Vimeo (facultative) */
+  document.querySelectorAll(".vbox[data-vm]").forEach((b) => {
+    fetch(`https://vimeo.com/api/oembed.json?url=${encodeURIComponent("https://vimeo.com/" + b.dataset.vm + (b.dataset.h ? "/" + b.dataset.h : ""))}&width=960`).then((r) => r.ok ? r.json() : null).then((j) => {
+      if (j && j.thumbnail_url && !b.querySelector("iframe")) b.insertAdjacentHTML("afterbegin", `<img src="${E(j.thumbnail_url)}" alt="" loading="lazy">`);
+    }).catch(() => {});
+  });
+
+  /* photos */
+  try { PH = (await getDocs(collection(fs, `destinations/${id}/photos`))).docs.map((x) => x.data()).filter((x) => x.img).sort((a, b) => (a.order || 0) - (b.order || 0)); } catch (e) { PH = []; }
+  $("#pgrid").innerHTML = PH.map((p, k) => `<button type="button" data-k="${k}" aria-label="Agrandir la photo ${k + 1}"><img src="${E(p.img)}" alt="${E(ville)}, photo ${k + 1}" loading="lazy" onload="this.classList.add('ok')"></button>`).join("");
+  $("#photos").hidden = !PH.length;
+  const n = PH.length, nv = $("#vgrid").children.length;
+  $("#meta").textContent = [n ? `${n} photo${n > 1 ? "s" : ""}` : "", nv ? `${nv} vidéo${nv > 1 ? "s" : ""}` : "", d.an || ""].filter(Boolean).join(" · ");
+  if (!n && !nv) $("#main").querySelector(".hero .in").insertAdjacentHTML("beforeend", `<p class="lead">Les photos et les films de ${E(ville)} arrivent bientôt.</p>`);
+})();
+
+document.addEventListener("click", (e) => {
+  const v = e.target.closest(".vbox[data-yt],.vbox[data-vm]");
+  if (v && !v.querySelector("iframe")){
+    const src = v.dataset.yt ? `https://www.youtube-nocookie.com/embed/${v.dataset.yt}?autoplay=1&rel=0&playsinline=1` : `https://player.vimeo.com/video/${v.dataset.vm}?autoplay=1${v.dataset.h ? "&h=" + v.dataset.h : ""}`;
+    v.innerHTML = `<iframe src="${src}" title="Vidéo" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    return;
+  }
+  const p = e.target.closest(".pgrid button"); if (p) openLb(+p.dataset.k);
+});
+
+/* agrandissement des photos */
+const lb = $("#lb"), lbi = lb.querySelector("img"); let k = 0, last = null;
+function openLb(i){ if (!PH.length) return; if (lb.hidden) last = document.activeElement; k = (i + PH.length) % PH.length; lbi.src = PH[k].img; lb.querySelector(".c").textContent = `${k + 1} / ${PH.length}`; lb.querySelector(".p").hidden = lb.querySelector(".n").hidden = PH.length < 2; lb.hidden = false; document.body.style.overflow = "hidden"; lb.querySelector(".x").focus(); }
+function closeLb(){ lb.hidden = true; document.body.style.overflow = ""; if (last && last.focus) last.focus(); }
+lb.addEventListener("click", (e) => { if (e.target.closest(".n")) openLb(k + 1); else if (e.target.closest(".p")) openLb(k - 1); else if (e.target.closest(".x") || e.target === lb) closeLb(); });
+addEventListener("keydown", (e) => { if (lb.hidden) return; if (e.key === "Escape") closeLb(); if (e.key === "ArrowRight") openLb(k + 1); if (e.key === "ArrowLeft") openLb(k - 1); });
+let tx = null; lb.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+lb.addEventListener("touchend", (e) => { if (tx == null) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 50) openLb(k + (dx < 0 ? 1 : -1)); });
+</script>
+</body>
+</html>
