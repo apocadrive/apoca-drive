@@ -2524,6 +2524,22 @@ function viewSite(){
     const ROWS = [["visits","Visites du site"],["carte","Ouvertures de la carte (QR code)"],["resa","Clics sur « Réserver »"],["demande","Demandes envoyées"],["wa","Clics WhatsApp"],["tel","Clics « Appeler »"],["contact","Contacts enregistrés"]];
     const days = Array.from({length: 14}, (_, i) => dk(13 - i));
     const vals = days.map(d => +((st[d] || {}).visits || 0)); const mx = Math.max(1, ...vals);
+    { // semaine du lundi au dimanche
+      const today = new Date(new Date().toLocaleDateString("sv-SE", {timeZone: "Europe/Paris"}) + "T12:00:00");
+      const mon = new Date(today); mon.setDate(today.getDate() - ((today.getDay() + 6) % 7) + 7 * (ui.wk || 0));
+      const wd = Array.from({length: 7}, (_, i) => { const d = new Date(mon); d.setDate(mon.getDate() + i); return d; });
+      const key = d => d.toLocaleDateString("sv-SE"), todayK = key(today);
+      const WR = [["visits","Site"],["carte","QR code"],["resa","Réserver"],["wa","WhatsApp"]];
+      const fmt = d => d.toLocaleDateString("fr-FR", {day: "numeric", month: "short"});
+      h += `<section class="panel"><div class="row between" style="align-items:center"><button class="btn sm ghost" data-act="wkp" aria-label="Semaine précédente">‹</button>
+        <h3 style="margin:0;text-align:center">${(ui.wk || 0) === 0 ? "Cette semaine" : (ui.wk === -1 ? "Semaine dernière" : "Semaine du " + fmt(wd[0]))}<br><span class="small muted" style="font-weight:400">${fmt(wd[0])} – ${fmt(wd[6])}</span></h3>
+        <button class="btn sm ghost" data-act="wkn" aria-label="Semaine suivante"${(ui.wk || 0) >= 0 ? " disabled" : ""}>›</button></div>
+        <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:14px;text-align:center">
+          <tr><th></th>${wd.map(d => `<th class="small${key(d) === todayK ? "" : " muted"}" style="padding:4px 2px;font-weight:600">${["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"][(d.getDay() + 6) % 7]}<br><span style="font-weight:400">${d.getDate()}</span></th>`).join("")}<th class="small" style="padding:4px 2px">Total</th></tr>
+          ${WR.map(([f, l]) => { const v = wd.map(d => +((st[key(d)] || {})[f] || 0)); return `<tr style="border-top:1px solid var(--line, rgba(128,128,128,.25))"><td style="text-align:left;padding:8px 4px;white-space:nowrap">${l}</td>${v.map((x, i) => `<td style="padding:8px 2px;${key(wd[i]) === todayK ? "font-weight:700" : ""}">${wd[i] > today ? "·" : x}</td>`).join("")}<td style="padding:8px 2px;font-weight:700">${v.reduce((a, b) => a + b, 0)}</td></tr>`; }).join("")}
+        </table></div>
+        <p class="small muted" style="margin:0"><b>Site</b> = personnes qui ont ouvert ton site. <b>QR code</b> = personnes qui ont ouvert ta carte (en scannant le QR code ou avec le lien de la carte).</p></section>`;
+    }
     h += `<section class="panel"><h3 style="margin:0">Visites du site</h3>
       <p class="small muted" style="margin:0">Une visite = une personne qui ouvre le site (une seule fois par ouverture). Rien n'est enregistré sur elle : pas de nom, pas de cookie.</p>
       <div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(4,auto);gap:8px 14px;align-items:baseline;font-size:14px">
@@ -2855,6 +2871,8 @@ function siteClick(a, b){
     case "rvdel": { const id = b.dataset.id; if (ui.rvDel !== id){ ui.rvDel = id; render(); return true; } ui.rvDel = null; delete S.rdv[id]; if (S.db) S.db.doc("rdv/" + id).delete().catch(() => {}); render(); toast("Supprimé"); return true; }
     case "gridnew": case "gridmix": case "gridsave": case "gridsite": case "gridchg": case "gridctr": case "gridzin": case "gridzout": gridAct(a); return true;
     case "gridfmt": S.grid.fmt = b.dataset.v; gridNew(); render(); return true;
+    case "wkp": ui.wk = (ui.wk || 0) - 1; render(); return true;
+    case "wkn": ui.wk = Math.min(0, (ui.wk || 0) + 1); render(); return true;
     case "payq": ui.payAmt = b.dataset.v; { const i = $("#pay-amt"); if (i) i.value = b.dataset.v; } payRefresh(); return true;
     case "paycopy": { const v = payLinkOf(); if (!v) return; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié · collez-le dans votre message"), () => toast("Copie impossible : appuyez longtemps sur le lien pour le copier")); return true; }
     case "paywa": { if (!payLinkOf()) return; window.open("https://wa.me/?text=" + encodeURIComponent(payMsg()), "_blank"); return true; }
@@ -3271,7 +3289,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-commercial";
+const APP_VER = "2026-11-02-semaine";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
