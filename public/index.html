@@ -819,7 +819,13 @@ function shrinkImage(file, type, maxSide){
     const url = URL.createObjectURL(file); const img = new Image();
     img.onload = () => { const max = maxSide || 2200; let w = img.naturalWidth, h = img.naturalHeight; const k = Math.min(1, max/Math.max(w,h)); w = Math.round(w*k); h = Math.round(h*k);
       const c = document.createElement("canvas"); c.width = w; c.height = h; c.getContext("2d").drawImage(img, 0, 0, w, h); URL.revokeObjectURL(url);
-      c.toBlob(b => b ? res(b) : rej(new Error("conversion")), type || "image/jpeg", 0.86); };
+      const t = type || "image/jpeg";
+      c.toBlob(b => {
+        if (!b) return rej(new Error("conversion"));
+        if (t !== "image/jpeg") return res(b);
+        // WebP : même qualité, fichier plus léger. Si le téléphone ne sait pas le faire, on garde le JPEG.
+        c.toBlob(w2 => res(w2 && w2.type === "image/webp" && w2.size < b.size ? w2 : b), "image/webp", 0.84);
+      }, t, 0.86); };
     img.onerror = () => { URL.revokeObjectURL(url); rej(new Error("lecture")); };
     img.src = url;
   });
@@ -3055,7 +3061,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-02-dest-page";
+const APP_VER = "2026-11-02-photos-webp";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
