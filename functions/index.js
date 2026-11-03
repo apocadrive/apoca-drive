@@ -165,7 +165,11 @@ async function ppLog(uid, msg) { await db.doc(`users/${uid}/meta/paypalStatus`).
 async function ppToken(cfg) {
   const r = await fetch(`${PP}/v1/oauth2/token`, { method: "POST", headers: { Authorization: "Basic " + Buffer.from(`${cfg.clientId}:${cfg.secret}`).toString("base64"), "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok || !j.access_token) throw new Error(`paypal-auth ${r.status} ${clip(j.error || "", 30)} · id ${cfg.clientId.length} car. · secret ${cfg.secret.length} car.`);
+  if (!r.ok || !j.access_token) {
+    let sb = "";
+    if (r.status === 401) { const t = await fetch("https://api-m.sandbox.paypal.com/v1/oauth2/token", { method: "POST", headers: { Authorization: "Basic " + Buffer.from(`${cfg.clientId}:${cfg.secret}`).toString("base64"), "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" }).catch(() => null); sb = t && t.ok ? " · ce sont des clés SANDBOX (test)" : " · refusées aussi en sandbox"; }
+    throw new Error(`paypal-auth ${r.status} ${clip(j.error || "", 30)}${sb}`);
+  }
   return j.access_token;
 }
 async function cadeauOf(uid, id) {
