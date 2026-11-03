@@ -2042,7 +2042,7 @@ function viewRequests(){
 }
 /* ---------- Cartes cadeaux ---------- */
 let ppSecUnsub = null;
-const ppSecretOk = () => { if (!ppSecUnsub && window.__apocaCadeau && window.__apocaCadeau.watchSecret) ppSecUnsub = window.__apocaCadeau.watchSecret(ok => { S.ppSecret = ok; if (ui.view === "site") softRender(); }); return !!S.ppSecret; };
+const ppSecretOk = () => { if (!ppSecUnsub && window.__apocaCadeau && window.__apocaCadeau.watchSecret){ ppSecUnsub = window.__apocaCadeau.watchSecret(ok => { S.ppSecret = ok; if (ui.view === "site") softRender(); }); if (window.__apocaCadeau.watchStatus) window.__apocaCadeau.watchStatus(d => { S.ppStatus = d; if (ui.view === "site") softRender(); }); } return !!S.ppSecret; };
 const cdWait = () => Object.values(S.cadeaux||{}).filter(c => (c.status||"En attente") === "En attente").length;
 const cdLink = id => "https://www.apocadrive.com/cadeau?c=" + id;
 const cdToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
@@ -2576,6 +2576,7 @@ function viewSite(){
       ${sfIn("cadeau.ppClient","Client ID (« API Key »)","ASy67d4i…",120)}
       ${ppSecretOk() ? `<p class="small" style="margin:0;color:#2F7A4A">✅ Secret enregistré${String(sfGet("cadeau.ppClient")).trim() ? " · paiement automatique actif" : " · ajoute aussi le Client ID"}.</p>` : ""}
       <label class="f">Secret ${ppSecretOk() ? "(pour le changer, colle le nouveau)" : ""}<input type="password" data-ppsec="1" placeholder="${ppSecretOk() ? "•••••••• enregistré" : "Colle ici le Secret PayPal"}" autocomplete="off" maxlength="200"></label>
+      ${S.ppStatus && S.ppStatus.msg ? `<p class="small" style="margin:0;color:#ecc94b">⚠️ Dernier essai (${esc(new Date(S.ppStatus.at).toLocaleString("fr-FR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}) : ${esc(S.ppStatus.msg)}</p>` : S.ppStatus && S.ppStatus.ok ? `<p class="small" style="margin:0;color:#2F7A4A">✅ Connexion à PayPal vérifiée.</p>` : ""}
       <p class="small muted" style="margin:0">Le Secret est gardé dans ton espace privé : il n'apparaît jamais sur le site.</p></section>`;
   } else if (t === "visites"){
     const st = S.stats || {};

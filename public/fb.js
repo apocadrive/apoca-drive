@@ -210,6 +210,7 @@ window.__apocaCadeau = {
   publish(id, d) { return setDoc(doc(fs, `cartesCadeau/${id}`), JSON.parse(JSON.stringify(d)), { merge: true }); },
   remove(id) { return deleteDoc(doc(fs, `cartesCadeau/${id}`)); },
   saveSecret(secret) { const u = auth.currentUser; if (!u) return Promise.reject(new Error("not-signed-in")); return setDoc(doc(fs, `users/${u.uid}/private/paypal`), { secret: String(secret || "").trim(), updated: Date.now() }); },
+  watchStatus(cb) { const u = auth.currentUser; if (!u) return () => {}; return onSnapshot(doc(fs, `users/${u.uid}/meta/paypalStatus`), (s) => cb(s.exists() ? s.data() : null), () => cb(null)); },
   watchSecret(cb) { const u = auth.currentUser; if (!u) return () => {}; return onSnapshot(doc(fs, `users/${u.uid}/private/paypal`), (s) => cb(!!(s.exists() && s.data().secret)), () => cb(false)); }
 };
 

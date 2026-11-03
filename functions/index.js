@@ -161,6 +161,7 @@ async function paypalCfg(uid) {
   return clientId && secret ? { clientId, secret, mois: parseInt(c.mois, 10) } : null;
 }
 const PP = "https://api-m.paypal.com";
+async function ppLog(uid, msg) { await db.doc(`users/${uid}/meta/paypalStatus`).set({ at: Date.now(), msg: msg || "", ok: !msg }, { merge: true }).catch(() => {}); }
 async function ppToken(cfg) {
   const r = await fetch(`${PP}/v1/oauth2/token`, { method: "POST", headers: { Authorization: "Basic " + Buffer.from(`${cfg.clientId}:${cfg.secret}`).toString("base64"), "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" });
   const j = await r.json().catch(() => ({}));
@@ -210,7 +211,8 @@ exports.paypalCadeau = onRequest({ region: "europe-west1", cors: false, maxInsta
         application_context: { brand_name: "Apoca Drive", shipping_preference: "NO_SHIPPING", user_action: "PAY_NOW", locale: "fr-FR" }
       }) });
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || !j.id) { logger.error("paypal create", { id, status: r.status, j: JSON.stringify(j).slice(0, 400) }); return res.status(502).json({ error: "paypal-create" }); }
+      if (!r.ok || !j.id) { logger.error("paypal create", { id, status: r.status, j: JSON.stringify(j).slice(0, 400) }); await ppLog(uid, `Création refusée par PayPal (${r.status}) : ${clip((j.details && j.details[0] && (j.details[0].issue + " " + (j.details[0].description || ""))) || j.message || j.name || "", 200)}`); return res.status(502).json({ error: "paypal-create", detail: clip(j.name || j.message || "", 80) }); }
+      await ppLog(uid, "");
       await s.ref.set({ ppOrder: j.id }, { merge: true });
       return res.json({ orderID: j.id });
     }
@@ -237,6 +239,7 @@ exports.paypalCadeau = onRequest({ region: "europe-west1", cors: false, maxInsta
       const expire = addMonths(cfg.mois);
       await s.ref.set({ status: "Payée", paidAt: Date.now(), expire, paidVia: "PayPal", ppCapture: cap.id || "" }, { merge: true });
       await db.doc(`cartesCadeau/${id}`).set({ status: "payee", code: c.code, expire }, { merge: true });
+      await ppLog(uid, "");
       const n = await sendToUser(uid, `💰 Carte cadeau payée · ${c.montant} €`, `${c.de} pour ${c.pour} · code ${c.code} · déjà activée`, "https://apoca-drive.web.app/?cadeaux=1");
       logger.info("carte cadeau payée", { id, sent: n });
       return res.json({ ok: true });
@@ -244,6 +247,7 @@ exports.paypalCadeau = onRequest({ region: "europe-west1", cors: false, maxInsta
     return res.status(400).json({ error: "action" });
   } catch (e) {
     logger.error("paypalCadeau", { id, err: String(e && e.message) });
+    try { await ppLog(await ownerUid(), /paypal-auth 401/.test(String(e && e.message)) ? "PayPal refuse les clés (401) : vérifie le Client ID et le Secret, en mode Live." : `Erreur : ${clip(e && e.message, 160)}`); } catch (x) {}
     return res.status(500).json({ error: "serveur" });
   }
 });

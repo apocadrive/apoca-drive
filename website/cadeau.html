@@ -236,7 +236,7 @@ function viewBuy(){
 }
 
 /* ---------- 2. La carte d'un acheteur (en attente, puis active) ---------- */
-let weroSent = false, ppBusy = false;
+let weroSent = false, ppBusy = false, lastErr = "";
 function loadPP(){ return window.paypal ? Promise.resolve() : new Promise((ok, ko) => { const s = document.createElement("script"); s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(CFG.ppClient)}&currency=EUR&intent=capture&locale=fr_FR&components=buttons&enable-funding=card`; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
 async function api(body){ const r = await fetch("/api/paypal", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); return { status: r.status, j }; }
 async function mountPP(montant){
@@ -244,7 +244,8 @@ async function mountPP(montant){
   try { await loadPP(); } catch(e){ box.outerHTML = `<div class="acts"><a class="btn pp" href="${E(ppLink(montant))}" target="_blank" rel="noopener">Payer ${E(eur(montant))} avec PayPal</a></div>`; return; }
   window.paypal.Buttons({
     style: { layout: "vertical", color: "gold", shape: "pill", label: "pay", height: 48 },
-    createOrder: async () => { const e = err(); if (e) e.textContent = ""; const { status, j } = await api({ action: "create", id: cid }); if (!j.orderID) { throw new Error(status === 503 ? "off" : "create"); } return j.orderID; },
+    createOrder: async () => { const e = err(); if (e) e.textContent = ""; let r; try { r = await api({ action: "create", id: cid }); } catch(x){ r = { status: 0, j: {} }; }
+      if (!r.j.orderID) { lastErr = `Le paiement PayPal n'a pas pu démarrer (code ${r.status || "réseau"}${r.j.error ? " · " + r.j.error : ""}). Réessayez dans un instant, ou payez par Wero.`; throw new Error("create"); } return r.j.orderID; },
     onApprove: async (data) => {
       ppBusy = true; box.innerHTML = `<p style="margin:0;padding:24px 8px;text-align:center;color:#0E0D0B;font:500 16px/1.4 var(--f-body)">Paiement reçu, activation de votre carte…</p>`;
       const { status, j } = await api({ action: "capture", id: cid, orderID: data.orderID });
@@ -252,7 +253,7 @@ async function mountPP(montant){
       ppBusy = false;
       box.innerHTML = `<p style="margin:0;padding:20px 8px;text-align:center;color:#0E0D0B;font:400 15px/1.5 var(--f-body)">${status === 202 ? "PayPal vérifie encore votre paiement. Votre carte s'affichera ici dès qu'il sera confirmé." : j.error === "refuse" ? "Le paiement a été refusé par votre banque. Rechargez la page pour réessayer avec un autre moyen." : "Le paiement n'a pas pu être finalisé. Rechargez la page, ou contactez-nous sur WhatsApp."}</p>`;
     },
-    onError: () => { const e = err(); if (e) e.textContent = "PayPal n'a pas pu s'ouvrir. Réessayez dans un instant."; }
+    onError: () => { const e = err(); if (e) e.textContent = lastErr || "PayPal n'a pas pu s'ouvrir. Réessayez dans un instant."; lastErr = ""; }
   }).render(box).catch(() => {});
 }
 function viewCard(){
