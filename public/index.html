@@ -1988,7 +1988,7 @@ async function sendGo(){
       co:{name:co.name||"Apoca Drive", activity:co.activity||"", address:co.address||"", phone:co.phone||"", email:co.email||"", siret:co.siret||"", iban:co.iban||"", logoUrl: (co.logoUrl && co.logoUrl.length < 300000) ? co.logoUrl : ""},
       qid, sent:Date.now()};
     await window.__apocaDevis.publish(token, pub);
-    const link = `https://apocadrive.web.app/devis?d=${token}`;
+    const link = `https://www.apocadrive.com/devis?d=${token}`;
     q.publicToken = token; if (q.status !== "Accepté") q.status = "Envoyé"; q.sentAt = Date.now(); touchQ(qid);
     const st = {qid, phase:"done", link, mail:"none", to:c.email||""};
     if (hasMail){
@@ -2090,7 +2090,7 @@ function viewDestOne(d){
       <label class="f">Lien YouTube<div class="row" style="gap:6px"><input type="url" id="dv-yt" placeholder="https://youtu.be/…" style="flex:1;min-width:0"><button class="btn sm" data-act="dvadd" data-src="yt">Ajouter</button></div></label>
       <label class="f">Lien Vimeo<div class="row" style="gap:6px"><input type="url" id="dv-vm" placeholder="https://vimeo.com/…" style="flex:1;min-width:0"><button class="btn sm" data-act="dvadd" data-src="vm">Ajouter</button></div></label>
     </section>
-    <div class="row" style="flex-wrap:wrap;gap:8px"><a class="btn" href="https://apocadrive.web.app/destination?id=${encodeURIComponent(d.id)}" target="_blank" rel="noopener">Voir la page sur mon site</a>
+    <div class="row" style="flex-wrap:wrap;gap:8px"><a class="btn" href="https://www.apocadrive.com/destination?id=${encodeURIComponent(d.id)}" target="_blank" rel="noopener">Voir la page sur mon site</a>
       <button class="btn ghost" data-act="ddel" style="color:var(--rec)">${ui.dDel?"Confirmer : supprimer la destination et ses photos":"Supprimer la destination"}</button></div>`;
   return h;
 }
@@ -2109,7 +2109,7 @@ async function destAddPhotos(files){
   await destSave(id, {count: start + n + (d.videos||[]).length});
   ui.destUp = null; render(); toast(n ? `${n} photo${n>1?"s":""} ajoutée${n>1?"s":""} · visible${n>1?"s":""} sur le site` : "Ces photos n'ont pas pu être ajoutées");
 }
-/* ---------- Mon site : tout ce qui s'affiche sur apocadrive.web.app ---------- */
+/* ---------- Mon site : tout ce qui s'affiche sur www.apocadrive.com ---------- */
 const SITE_DEF = {
   pourquoi:{eyebrow:"Dans les coulisses", titre:"Pourquoi", titreOr:"Apoca Drive ?", points:"Un regard de cinéma : chaque film est pensé comme un court-métrage, avec une lumière, des mouvements et un son soignés.\nLivré en 2 à 4 semaines : votre film arrive vite, prêt à partager avec vos proches.\nPartout en France : basé en France, je me déplace partout, et à l'étranger sur demande.\nSouple sur les dates : un changement de date est possible, selon mes disponibilités."},
   hero:{eyebrow:"France · partout dans le monde", titre:"Vos plus beaux jours,", titreOr:"filmés comme au cinéma.", accroche:"Mariages, clips et événements, en photo et en vidéo.", video:"", badges:"Livré en 2 à 4 semaines\nPartout en France\nAcompte 30 % en ligne\nShooting dès 150 €"},
@@ -2324,7 +2324,7 @@ function viewSite(){
   const t = ui.siteTab || "accueil";
   const np = (S.sitePend||[]).length;
   const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["pourquoi","Coulisses"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
-  let h = `<h2>Mon site</h2><p class="small muted" style="margin:0">Ce que vous changez ici s'affiche tout de suite sur <b>apocadrive.web.app</b>.</p>
+  let h = `<h2>Mon site</h2><p class="small muted" style="margin:0">Ce que vous changez ici s'affiche tout de suite sur <b>www.apocadrive.com</b>.</p>
     <div class="chips">${tabs.map(([k, l]) => `<button class="chip${t===k?" tu":""}" data-act="stab" data-v="${k}">${l}</button>`).join("")}</div>`;
   if (S.site === null) return h + `<div class="empty"><span class="spin"></span>Chargement…</div>`;
   if (t === "accueil"){
@@ -2396,8 +2396,8 @@ function viewSite(){
     const list = siteSorted(S.siteAvis); const f = ui.saForm;
     const pend = (S.sitePend||[]).slice().sort((a, b) => (b.at||0) - (a.at||0));
     h += `<section class="panel"><h3 style="margin:0">Lien à envoyer à vos clients</h3><p class="small muted" style="margin:0">Après la livraison, envoyez ce lien : le client choisit ses étoiles et écrit son avis. Il arrive ici, et n'apparaît sur le site que si vous le publiez.</p>
-      <div class="row" style="gap:6px"><input type="text" readonly value="https://apocadrive.web.app/#avis-client" style="flex:1;min-width:0" id="sa-link"><button class="btn sm" data-act="salink">Copier</button></div>
-      <a class="btn sm" style="align-self:flex-start" href="https://wa.me/?text=${encodeURIComponent("Merci encore pour votre confiance ! Si vous avez un instant, laissez-moi un avis ici : https://apocadrive.web.app/#avis-client")}" target="_blank" rel="noopener">Envoyer par WhatsApp</a></section>`;
+      <div class="row" style="gap:6px"><input type="text" readonly value="https://www.apocadrive.com/#avis-client" style="flex:1;min-width:0" id="sa-link"><button class="btn sm" data-act="salink">Copier</button></div>
+      <a class="btn sm" style="align-self:flex-start" href="https://wa.me/?text=${encodeURIComponent("Merci encore pour votre confiance ! Si vous avez un instant, laissez-moi un avis ici : https://www.apocadrive.com/#avis-client")}" target="_blank" rel="noopener">Envoyer par WhatsApp</a></section>`;
     if (pend.length) h += `<section class="panel"><div class="row between"><h3 style="margin:0">Avis à valider</h3><span class="pill rec">${pend.length}</span></div>` + pend.map(x => `<div style="border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px">
         <div class="row between"><b>${esc(x.nom||"")}</b><span style="color:#C9A45C;letter-spacing:.1em">${starTxt(x.etoiles)}</span></div>
         <p style="margin:0;white-space:pre-wrap">${esc(x.texte||"")}</p><span class="small muted">${esc(x.type||"")}${x.at?" · reçu le "+new Date(x.at).toLocaleDateString("fr-FR",{day:"numeric",month:"long"}):""}</span>
@@ -2549,13 +2549,13 @@ function viewSite(){
       <section class="panel"><h3 style="margin:0">Les 14 derniers jours</h3>
       <div style="display:flex;align-items:flex-end;gap:4px;height:110px">${vals.map((v, i) => `<div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%"><span class="small muted" style="font-size:10px">${v || ""}</span><div style="width:100%;height:${Math.max(3, Math.round(v / mx * 80))}px;background:var(--tungsten);border-radius:4px 4px 0 0;opacity:${v ? 1 : .25}"></div></div>`).join("")}</div>
       <div style="display:flex;gap:4px">${days.map(d => `<span class="small muted" style="flex:1;text-align:center;font-size:10px">${+d.slice(8)}</span>`).join("")}</div>
-      <p class="small muted" style="margin:0">Vos propres visites : ouvrez une fois <b>apocadrive.web.app/?nocount=1</b> sur chaque appareil pour qu'elles ne comptent plus. Les chiffres sont indicatifs.</p></section>`;
+      <p class="small muted" style="margin:0">Vos propres visites : ouvrez une fois <b>www.apocadrive.com/?nocount=1</b> sur chaque appareil pour qu'elles ne comptent plus. Les chiffres sont indicatifs.</p></section>`;
   } else {
     const hide = (S.site||{}).hide || {};
     h += `<section class="panel"><h3 style="margin:0">Parties affichées sur le site</h3><p class="small muted" style="margin:0">Décochez pour cacher une partie sans rien supprimer. Les films, destinations et avis restent aussi cachés tant qu'ils sont vides.</p>
       ${SITE_SECS.map(([k, l]) => `<label class="row" style="gap:10px;font-size:15px"><input type="checkbox" data-sh="${k}" ${hide[k]?"":"checked"}> ${l}</label>`).join("")}</section>`;
   }
-  h += `<a class="btn" href="https://apocadrive.web.app/" target="_blank" rel="noopener" style="align-self:flex-start">Voir mon site</a>`;
+  h += `<a class="btn" href="https://www.apocadrive.com/" target="_blank" rel="noopener" style="align-self:flex-start">Voir mon site</a>`;
   return h;
 }
 async function siteSetPhoto(w, file){
@@ -2692,7 +2692,7 @@ function rdvCard(r, past){
 }
 /* ---------- Carte QR ---------- */
 S.carte = null; let carteUnsub = null;
-const CARTE_DEF = [["site","Voir mon site","https://apocadrive.web.app/"],["wa","WhatsApp direct","https://wa.me/33607055384"],["tel","Appeler","tel:+33607055384"],["resa","Réserver ma date","https://apocadrive.web.app/#reserver"],["ig","Instagram","https://www.instagram.com/apocadrive/"],["tt","TikTok","https://www.tiktok.com/@apocadrive"],["yt","YouTube","https://www.youtube.com/@apocadrive"],["vcf","Ajouter à mes contacts","apoca-drive.vcf"]];
+const CARTE_DEF = [["site","Voir mon site","https://www.apocadrive.com/"],["wa","WhatsApp direct","https://wa.me/33607055384"],["tel","Appeler","tel:+33607055384"],["resa","Réserver ma date","https://www.apocadrive.com/#reserver"],["ig","Instagram","https://www.instagram.com/apocadrive/"],["tt","TikTok","https://www.tiktok.com/@apocadrive"],["yt","YouTube","https://www.youtube.com/@apocadrive"],["vcf","Ajouter à mes contacts","apoca-drive.vcf"]];
 function carteBtns(){ const c = (S.carte && Array.isArray(S.carte.buttons) && S.carte.buttons.length) ? S.carte.buttons.map(x => ({...x})) : [];
   const keys = c.map(x => x.k); CARTE_DEF.forEach(([k, l, u]) => { if (!keys.includes(k)) c.push({k, label:l, url:u, on:true}); });
   return c.map(x => { const d = CARTE_DEF.find(y => y[0] === x.k); return {k:x.k, custom:!!x.custom || !d, label:x.label || (d && d[1]) || "", url:x.url || (d && d[2]) || "", on:x.on !== false}; }); }
@@ -2701,7 +2701,7 @@ function carteSave(patch){ return window.__apocaCarte.save(patch).then(() => toa
 function carteEditor(){
   if (!window.__apocaCarte) return `<div class="empty">Disponible dans l'application en ligne.</div>`;
   carteWatch(); if (S.carte === null) return `<div class="empty"><span class="spin"></span>Chargement…</div>`;
-  const c = S.carte || {}, j = c.jour || {}, up = ui.carteUp; const link = "https://apocadrive.web.app/carte";
+  const c = S.carte || {}, j = c.jour || {}, up = ui.carteUp; const link = "https://www.apocadrive.com/carte";
   let h = `<section class="panel"><h3 style="margin:0">Ta carte QR</h3><p class="small muted" style="margin:0">La page qui s'ouvre quand on scanne ton QR code. Tout ce que tu changes ici s'affiche tout de suite, le QR code imprimé ne change jamais.</p>
     <div class="row" style="gap:6px"><input type="text" readonly value="${link}" style="flex:1;min-width:0" id="cq-link"><button class="btn sm" data-act="cqcopy">Copier</button><a class="btn sm" href="${link}" target="_blank" rel="noopener">Voir</a></div></section>`;
   h += `<section class="panel" style="${j.on ? "border-color:#F2C14E" : ""}"><div class="row between"><div><h3 style="margin:0">Film du jour</h3><p class="small muted" style="margin:2px 0 0">Pendant un mariage : le film se lance en plein écran quand les invités scannent.</p></div>
@@ -2877,7 +2877,7 @@ function siteClick(a, b){
     case "paycopy": { const v = payLinkOf(); if (!v) return; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié · collez-le dans votre message"), () => toast("Copie impossible : appuyez longtemps sur le lien pour le copier")); return true; }
     case "paywa": { if (!payLinkOf()) return; window.open("https://wa.me/?text=" + encodeURIComponent(payMsg()), "_blank"); return true; }
     case "payshare": { if (!payLinkOf()) return; if (navigator.share) navigator.share({text: payMsg()}).catch(() => {}); else (navigator.clipboard ? navigator.clipboard.writeText(payMsg()) : Promise.reject()).then(() => toast("Message copié"), () => {}); return true; }
-    case "cqcopy": { const v = "https://apocadrive.web.app/carte"; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié"), () => { const e = $("#cq-link"); if (e){ e.focus(); e.select(); } }); return true; }
+    case "cqcopy": { const v = "https://www.apocadrive.com/carte"; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié"), () => { const e = $("#cq-link"); if (e){ e.focus(); e.select(); } }); return true; }
     case "cqfond": carteSave({fond: b.dataset.v}); return true;
     case "cqup": { const bs = carteBtns(), i = +b.dataset.i; if (i > 0){ [bs[i-1], bs[i]] = [bs[i], bs[i-1]]; cqSaveBtns(bs); } return true; }
     case "cqdel": { const bs = carteBtns(); bs.splice(+b.dataset.i, 1); cqSaveBtns(bs); return true; }
@@ -2921,7 +2921,7 @@ function siteClick(a, b){
       const id = uid(), d = {texte, nom:$("#san-nom").value.trim(), type:$("#san-type").value.trim(), etoiles:+$("#san-et").value, created:Date.now()};
       S.siteAvis = [...(S.siteAvis||[]), {id, ...d}]; A.saveAvis(id, d).then(() => toast("Avis ajouté · visible sur le site"), siteErr); ui.saForm = null; render(); return true; }
     case "satop": { const min = Math.min(0, ...(S.siteAvis||[]).map(x => x.order ?? 0)); A.saveAvis(b.dataset.id, {order: min - 1}).then(() => toast("Placé en premier"), siteErr); return true; }
-    case "salink": { const v = "https://apocadrive.web.app/#avis-client"; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié"), () => { const e = $("#sa-link"); if (e){ e.focus(); e.select(); } toast("Sélectionnez le lien pour le copier"); }); return true; }
+    case "salink": { const v = "https://www.apocadrive.com/#avis-client"; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié"), () => { const e = $("#sa-link"); if (e){ e.focus(); e.select(); } toast("Sélectionnez le lien pour le copier"); }); return true; }
     case "sapub": { const x = (S.sitePend||[]).find(p => p.id === b.dataset.id); if (!x) return true; const d = {texte:x.texte||"", nom:x.nom||"", type:x.type||"", etoiles:+x.etoiles||0, created:Date.now(), source:"site"};
       A.publish(x.id, d).then(() => toast("Avis publié · visible sur le site"), siteErr); return true; }
     case "sapdel": { const id = b.dataset.id; if (ui.sapDel !== id){ ui.sapDel = id; render(); return true; } ui.sapDel = null; A.delPending(id).then(() => toast("Avis non publié"), siteErr); return true; }

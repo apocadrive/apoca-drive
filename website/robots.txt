@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://apocadrive.web.app/sitemap.xml
+Sitemap: https://www.apocadrive.com/sitemap.xml

@@ -159,7 +159,7 @@ window.__apocaDest = {
   async delDest(id) { const ps = await getDocs(collection(fs, `destinations/${id}/photos`)); await Promise.all(ps.docs.map((d) => deleteDoc(d.ref))); await deleteDoc(doc(fs, `destinations/${id}`)); }
 };
 
-/* ---------- Carte QR (page apocadrive.web.app/carte) ---------- */
+/* ---------- Carte QR (page www.apocadrive.com/carte) ---------- */
 window.__apocaCarte = {
   listen(cb) { return onSnapshot(doc(fs, "site/carte"), (s) => cb(s.exists() ? s.data() : {}), () => cb({})); },
   save(patch) { return setDoc(doc(fs, "site/carte"), JSON.parse(JSON.stringify(patch)), { merge: true }); },
