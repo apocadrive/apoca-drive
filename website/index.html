@@ -126,9 +126,9 @@ nav.main .btn{padding:13px 20px;color:var(--paper)}
 .hlead{font-weight:300;font-size:clamp(16px,1.6vw,19px);letter-spacing:.05em;color:rgba(255,255,255,.86);max-width:40ch}
 .hctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
 .btn.gold{background:var(--gold-2);border-color:var(--gold-2);color:var(--night)}
-.btn.gold:hover{background:#fff;border-color:#fff}
+@media (hover:hover){.btn.gold:hover{background:#fff;border-color:#fff}}
 .btn.line{background:transparent;border-color:rgba(255,255,255,.7);color:#fff}
-.btn.line:hover{background:#fff;color:var(--night);border-color:#fff}
+@media (hover:hover){.btn.line:hover{background:#fff;color:var(--night);border-color:#fff}}
 @media (max-width:560px){.hctas{flex-direction:column;width:100%;max-width:320px}.hctas .btn{justify-content:center}}
 .hscroll{position:absolute;z-index:2;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font:400 10px/1 var(--f-body);letter-spacing:.42em;text-transform:uppercase;color:rgba(255,255,255,.7);text-decoration:none;padding-left:.42em}
 .hscroll{transition:opacity .5s ease}.hscroll.gone{opacity:0;pointer-events:none}
@@ -863,7 +863,7 @@ html{overflow-x:hidden}body{overflow-x:clip}
     <p class="heye reveal" id="h-eye">Vidéaste &amp; photographe de mariage · France</p>
     <h1 class="reveal r1" id="h-titre">Vos plus beaux jours, <em>filmés comme au cinéma.</em></h1>
     <p class="hlead reveal r2" id="h-acc">Mariages civils, religieux et coutumiers, clips et shootings, en photo et en vidéo, partout en France.</p>
-    <div class="hctas reveal r3"><a class="btn gold" href="#films" id="h-films">Voir mes films</a><a class="btn line" href="#reserver">Réserver ma date</a></div>
+    <div class="hctas reveal r3"><a class="btn gold" href="/films" id="h-films">Voir mes films</a><a class="btn line" href="#reserver">Réserver ma date</a></div>
     <ul class="hbadges reveal r3" id="h-badges"><li>Livré en 2 à 4 semaines</li><li>Partout en France</li><li>Acompte 30 % en ligne</li><li>Shooting dès 150 €</li></ul>
   </div></div>
   <a class="hscroll" href="#apropos">Défiler<span></span></a>
