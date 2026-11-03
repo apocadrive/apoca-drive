@@ -165,7 +165,7 @@ async function ppLog(uid, msg) { await db.doc(`users/${uid}/meta/paypalStatus`).
 async function ppToken(cfg) {
   const r = await fetch(`${PP}/v1/oauth2/token`, { method: "POST", headers: { Authorization: "Basic " + Buffer.from(`${cfg.clientId}:${cfg.secret}`).toString("base64"), "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok || !j.access_token) throw new Error("paypal-auth " + r.status);
+  if (!r.ok || !j.access_token) throw new Error(`paypal-auth ${r.status} ${clip(j.error || "", 30)} · id ${cfg.clientId.length} car. · secret ${cfg.secret.length} car.`);
   return j.access_token;
 }
 async function cadeauOf(uid, id) {
@@ -248,7 +248,7 @@ exports.paypalCadeau = onRequest({ region: "europe-west1", cors: false, maxInsta
   } catch (e) {
     logger.error("paypalCadeau", { id, err: String(e && e.message) });
     try { await ppLog(await ownerUid(), /paypal-auth 401/.test(String(e && e.message)) ? "PayPal refuse les clés (401) : vérifie le Client ID et le Secret, en mode Live." : `Erreur : ${clip(e && e.message, 160)}`); } catch (x) {}
-    return res.status(500).json({ error: "serveur" });
+    return res.status(500).json({ error: "serveur", detail: clip(e && e.message, 60) });
   }
 });
 
