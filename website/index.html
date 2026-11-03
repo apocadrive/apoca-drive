@@ -845,8 +845,8 @@ html{overflow-x:hidden}body{overflow-x:clip}
 #cadeau .gh{font:500 clamp(24px,3.4vw,34px)/1.05 var(--f-display)}
 #cadeau .gh em{color:#D9BE86}
 #cadeau .gsub{font:300 14px/1.4 var(--f-body);color:#D8D1C4}
-#cadeau .gbtn{flex:none;padding:15px 24px;border-radius:999px;background:#D9BE86;color:#0E0D0B;font:600 12.5px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase}
-@media (max-width:560px){#cadeau .gico{display:none}#cadeau .gift{flex-wrap:wrap}#cadeau .gbtn{width:100%;text-align:center}}
+#cadeau .gbtn{flex:none;box-sizing:border-box;padding:15px 24px;border-radius:999px;background:#D9BE86;color:#0E0D0B;font:600 12.5px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase}
+@media (max-width:560px){#cadeau .gico{display:none}#cadeau .gift{flex-wrap:wrap}#cadeau .gbtn{display:block;width:100%;text-align:center}#cadeau .gift{box-sizing:border-box}}
 /* ===== Conditions de réservation, en clair ===== */
 #conditions{background:var(--ivory);color:var(--ink);padding-top:clamp(64px,9vw,110px);padding-bottom:clamp(64px,9vw,110px)}
 #conditions h2{margin-top:18px;font-size:clamp(36px,5vw,58px)}#conditions h2 em{color:var(--gold)}
