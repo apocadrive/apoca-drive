@@ -834,6 +834,16 @@ html{overflow-x:hidden}body{overflow-x:clip}
 .hbadges li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--gold-2);flex:none}
 .hbadges li.g::before{display:none}.hbadges li.g a{color:inherit;text-decoration:none;display:flex;align-items:center;gap:8px}.hbadges li.g b{color:var(--gold-2);font-weight:500;letter-spacing:.12em}
 @media (max-width:560px){.hbadges{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:360px}.hbadges li{padding:9px 11px;font-size:11px;letter-spacing:.04em;justify-content:flex-start;text-align:left}.hbadges li.g{grid-column:1/-1;justify-content:center}}
+/* ===== Carte cadeau en bas de « Réserver » ===== */
+.bk-gift{display:flex;align-items:center;gap:16px;margin:26px auto 8px;max-width:760px;box-sizing:border-box;padding:18px 20px;border:1px solid #C9A35E;border-radius:16px;background:#17150F;color:#F4EFE6;text-decoration:none;animation:giftGlow 1.6s ease-in-out infinite}
+.bk-gift svg{flex:none;color:#D9BE86}
+.bk-gtx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px}
+.bk-gtx b{font:500 22px/1.1 var(--f-display);font-weight:500}
+.bk-gtx span{font:300 13.5px/1.4 var(--f-body);color:#D8D1C4}
+.bk-gbtn{flex:none;padding:12px 18px;border-radius:999px;background:#D9BE86;color:#0E0D0B;font:600 12px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase}
+.bk-gift.off{display:none}
+@media (max-width:560px){.bk-gift{flex-wrap:wrap}.bk-gift svg{display:none}.bk-gbtn{display:block;width:100%;box-sizing:border-box;text-align:center}}
+@media (prefers-reduced-motion:reduce){.bk-gift{animation:none}}
 /* ===== Bannière carte cadeau ===== */
 #cadeau{background:var(--night);padding-top:clamp(18px,3vw,28px);padding-bottom:clamp(18px,3vw,28px)}
 #cadeau.off{display:none}
@@ -996,7 +1006,9 @@ html{overflow-x:hidden}body{overflow-x:clip}
   <div class="bk-in">
     <p class="eyebrow" id="bk-step">Réserver ma date</p>
     <h2 id="bk-t">Quel est <em>votre projet ?</em></h2>
-    <div class="bk-p" data-p="1"><div class="bk-grid" id="bk-cats"></div></div>
+    <div class="bk-p" data-p="1"><div class="bk-grid" id="bk-cats"></div>
+      <a class="bk-gift" id="bk-gift" href="/cadeau"><svg width="34" height="34" viewBox="0 0 46 46" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><rect x="6" y="18" width="34" height="22" rx="2"/><rect x="3" y="12" width="40" height="7" rx="1.5"/><path d="M23 12v28"/><path d="M23 12c-3-6-11-7-11-2 0 3 6 2 11 2zM23 12c3-6 11-7 11-2 0 3-6 2-11 2z"/></g></svg><span class="bk-gtx"><b>Vous voulez l'offrir ?</b><span>Une carte cadeau, valable sur toutes les prestations</span></span><span class="bk-gbtn">Offrir</span></a>
+    </div>
     <div class="bk-p" data-p="2" hidden><div class="bk-grid" id="bk-subs"></div></div>
     <div class="bk-p bk-gal" data-p="6" hidden>
       <div class="gal-hero"><div id="gal-hero" style="position:absolute;inset:0"></div><div class="gal-cap"><p id="gal-eb"></p><h3 id="gal-h"></h3></div></div>
@@ -1400,7 +1412,7 @@ function applyAll(){
   vis("#apropos", !hide.apropos); vis('a[href="#apropos"]', !hide.apropos);
   vis("#collections", !hide.collections); vis('a[href="#collections"]', !hide.collections);
   vis("#etapes", !hide.etapes);
-  vis("#cadeau", !hide.cadeau); vis('a[href="/cadeau"]', !hide.cadeau);
+  vis("#cadeau", !hide.cadeau); vis('a[href="/cadeau"]', !hide.cadeau); vis("#bk-gift", !hide.cadeau);
   { const g = c.cadeau || {}, mo = parseInt(g.mois, 10), mn = Math.round(parseFloat(String(g.min || "").replace(",", "."))); const gs = $("#gsub");
     if (gs) gs.textContent = `Shooting, outfit, clip ou mariage · ${mn >= 10 ? "dès " + mn + " € · " : ""}valable ${!(mo >= 1) || mo === 12 ? "1 an" : mo % 12 === 0 ? mo / 12 + " ans" : mo + " mois"}`; }
   { const cl = document.querySelector("section.close"); if (cl) cl.style.setProperty("--cbg", `url("${SITE.heroPhoto || "apropos.jpg"}")`); }
