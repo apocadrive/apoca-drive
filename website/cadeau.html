@@ -242,7 +242,7 @@ async function api(body){ const r = await fetch("/api/paypal", { method: "POST",
 async function mountPP(montant){
   const box = document.getElementById("ppbtn"), err = () => document.getElementById("pperr"); if (!box) return;
   try { await loadPP(); } catch(e){ box.outerHTML = `<div class="acts"><a class="btn pp" href="${E(ppLink(montant))}" target="_blank" rel="noopener">Payer ${E(eur(montant))} avec PayPal</a></div>`; return; }
-  window.paypal.Buttons({
+  const btns = window.paypal.Buttons({
     style: { layout: "vertical", color: "gold", shape: "pill", label: "pay", height: 48 },
     createOrder: async () => { const e = err(); if (e) e.textContent = ""; let r; try { r = await api({ action: "create", id: cid }); } catch(x){ r = { status: 0, j: {} }; }
       if (!r.j.orderID) { lastErr = `Le paiement PayPal n'a pas pu démarrer (code ${r.status || "réseau"}${r.j.error ? " · " + r.j.error : ""}). Réessayez dans un instant, ou payez par Wero.`; throw new Error("create"); } return r.j.orderID; },
@@ -254,7 +254,11 @@ async function mountPP(montant){
       box.innerHTML = `<p style="margin:0;padding:20px 8px;text-align:center;color:#0E0D0B;font:400 15px/1.5 var(--f-body)">${status === 202 ? "PayPal vérifie encore votre paiement. Votre carte s'affichera ici dès qu'il sera confirmé." : j.error === "refuse" ? "Le paiement a été refusé par votre banque. Rechargez la page pour réessayer avec un autre moyen." : "Le paiement n'a pas pu être finalisé. Rechargez la page, ou contactez-nous sur WhatsApp."}</p>`;
     },
     onError: () => { const e = err(); if (e) e.textContent = lastErr || "PayPal n'a pas pu s'ouvrir. Réessayez dans un instant."; lastErr = ""; }
-  }).render(box).catch(() => {});
+  });
+  const fallback = why => { if (!document.getElementById("ppbtn")) return; box.outerHTML = `<div class="acts"><a class="btn pp" href="${E(ppLink(montant))}" target="_blank" rel="noopener">Payer ${E(eur(montant))} avec PayPal</a></div><p class="hint">${why ? E(why) + " · " : ""}Après le paiement, votre carte est activée à la main, en général dans la journée.</p>`; };
+  if (btns.isEligible && !btns.isEligible()) { fallback("Boutons PayPal indisponibles ici"); return; }
+  btns.render(box).catch(e => fallback("PayPal : " + String((e && e.message) || "erreur").slice(0, 90)));
+  setTimeout(() => { const b = document.getElementById("ppbtn"); if (b && !b.querySelector("iframe") && !ppBusy) fallback("Les boutons PayPal n'ont pas pu s'afficher"); }, 9000);
 }
 function viewCard(){
   let local = null; try { local = JSON.parse(sessionStorage.getItem("cadeau-" + cid) || "null"); } catch(e){}
