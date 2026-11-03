@@ -2,6 +2,7 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onDocumentCreated, onDocumentWritten } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions, logger } = require("firebase-functions/v2");
+const { onRequest } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
@@ -146,8 +147,105 @@ exports.nouvelleCarteCadeau = onDocumentCreated("cadeauxDemandes/{id}", async (e
   // La page publique de la carte : sans le code tant que le paiement n'est pas confirmé dans l'appli.
   await db.doc(`cartesCadeau/${id}`).set({ status: "attente", montant, pour: r.pour, de: r.de, message: r.message, created: r.created });
   await event.data.ref.delete();
+  // Avec le paiement PayPal automatique, on ne prévient qu'au paiement (PayPal confirmé, ou Wero annoncé par le client).
+  if (await paypalCfg(uid)) { logger.info("carte cadeau commandée", { id }); return; }
   const n = await sendToUser(uid, `🎁 Carte cadeau · ${montant} €`, `${r.de} pour ${r.pour} · Vérifie le paiement (PayPal ou Wero) puis touche « Paiement reçu »`, "https://apoca-drive.web.app/?cadeaux=1");
   logger.info("carte cadeau", { id, sent: n });
+});
+
+/* Paiement PayPal vérifié par le serveur (boutons PayPal de la page /cadeau) */
+async function paypalCfg(uid) {
+  const p = (await db.doc(`users/${uid}/private/paypal`).get()).data() || {};
+  const c = ((await db.doc("site/content").get()).data() || {}).cadeau || {};
+  const clientId = String(c.ppClient || "").trim(), secret = String(p.secret || "").trim();
+  return clientId && secret ? { clientId, secret, mois: parseInt(c.mois, 10) } : null;
+}
+const PP = "https://api-m.paypal.com";
+async function ppToken(cfg) {
+  const r = await fetch(`${PP}/v1/oauth2/token`, { method: "POST", headers: { Authorization: "Basic " + Buffer.from(`${cfg.clientId}:${cfg.secret}`).toString("base64"), "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.access_token) throw new Error("paypal-auth " + r.status);
+  return j.access_token;
+}
+async function cadeauOf(uid, id) {
+  for (let t = 0; t < 6; t++) {
+    const s = await db.doc(`users/${uid}/cadeaux/${id}`).get();
+    if (s.exists) return s;
+    await new Promise((res) => setTimeout(res, 1000)); // la commande vient peut-être d'arriver
+  }
+  return null;
+}
+function addMonths(mois) { const d = new Date(); d.setMonth(d.getMonth() + (mois >= 1 && mois <= 60 ? mois : 12)); return ymd(d); }
+
+exports.paypalCadeau = onRequest({ region: "europe-west1", cors: false, maxInstances: 2 }, async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  if (req.method !== "POST") return res.status(405).json({ error: "method" });
+  const b = req.body || {};
+  const id = String(b.id || "");
+  if (!/^[a-f0-9]{24}$/.test(id)) return res.status(400).json({ error: "id" });
+  try {
+    const uid = await ownerUid();
+    // Le client annonce un paiement Wero : une seule notification par carte.
+    if (b.action === "wero") {
+      const s = await cadeauOf(uid, id); if (!s) return res.status(404).json({ error: "introuvable" });
+      const c = s.data();
+      if (c.status === "En attente" && !c.weroAt) {
+        await s.ref.set({ weroAt: Date.now() }, { merge: true });
+        await sendToUser(uid, `🎁 Carte cadeau · ${c.montant} € par Wero`, `${c.de} dit avoir payé par Wero · Vérifie ta banque puis touche « Paiement reçu »`, "https://apoca-drive.web.app/?cadeaux=1");
+      }
+      return res.json({ ok: true });
+    }
+    const cfg = await paypalCfg(uid);
+    if (!cfg) return res.status(503).json({ error: "paypal-off" });
+    const s = await cadeauOf(uid, id); if (!s) return res.status(404).json({ error: "introuvable" });
+    const c = s.data();
+    if (c.status !== "En attente") return res.json({ ok: true, deja: true });
+    const value = (Math.round(Number(c.montant) * 100) / 100).toFixed(2);
+    const tok = await ppToken(cfg);
+    const H = { Authorization: `Bearer ${tok}`, "Content-Type": "application/json" };
+    if (b.action === "create") {
+      const r = await fetch(`${PP}/v2/checkout/orders`, { method: "POST", headers: { ...H, "PayPal-Request-Id": `cadeau-${id}-${value}` }, body: JSON.stringify({
+        intent: "CAPTURE",
+        purchase_units: [{ reference_id: id, custom_id: id, description: clip(`Carte cadeau Apoca Drive pour ${c.pour}`, 120), amount: { currency_code: "EUR", value } }],
+        application_context: { brand_name: "Apoca Drive", shipping_preference: "NO_SHIPPING", user_action: "PAY_NOW", locale: "fr-FR" }
+      }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || !j.id) { logger.error("paypal create", { id, status: r.status, j: JSON.stringify(j).slice(0, 400) }); return res.status(502).json({ error: "paypal-create" }); }
+      await s.ref.set({ ppOrder: j.id }, { merge: true });
+      return res.json({ orderID: j.id });
+    }
+    if (b.action === "capture") {
+      const orderID = String(b.orderID || "");
+      if (!/^[A-Z0-9]{8,40}$/.test(orderID) || orderID !== c.ppOrder) return res.status(400).json({ error: "commande" });
+      const r = await fetch(`${PP}/v2/checkout/orders/${orderID}/capture`, { method: "POST", headers: H, body: "{}" });
+      let j = await r.json().catch(() => ({}));
+      if (!r.ok && j && j.details && j.details[0] && j.details[0].issue === "ORDER_ALREADY_CAPTURED") {
+        const g = await fetch(`${PP}/v2/checkout/orders/${orderID}`, { headers: H }); j = await g.json().catch(() => ({}));
+      } else if (!r.ok) {
+        logger.error("paypal capture", { id, status: r.status, j: JSON.stringify(j).slice(0, 400) });
+        const issue = (j.details && j.details[0] && j.details[0].issue) || "";
+        return res.status(402).json({ error: issue === "INSTRUMENT_DECLINED" ? "refuse" : "paypal-capture" });
+      }
+      const pu = (j.purchase_units || [])[0] || {};
+      const cap = ((pu.payments || {}).captures || [])[0] || {};
+      const okPaid = j.status === "COMPLETED" && cap.status === "COMPLETED" && cap.amount && cap.amount.currency_code === "EUR" && Number(cap.amount.value) >= Number(value) - 0.001 && (cap.custom_id || pu.custom_id) === id;
+      if (!okPaid) {
+        logger.warn("paypal non confirmé", { id, status: j.status, cap: cap.status });
+        if (cap.status === "PENDING") await s.ref.set({ ppPending: Date.now() }, { merge: true });
+        return res.status(202).json({ pending: true });
+      }
+      const expire = addMonths(cfg.mois);
+      await s.ref.set({ status: "Payée", paidAt: Date.now(), expire, paidVia: "PayPal", ppCapture: cap.id || "" }, { merge: true });
+      await db.doc(`cartesCadeau/${id}`).set({ status: "payee", code: c.code, expire }, { merge: true });
+      const n = await sendToUser(uid, `💰 Carte cadeau payée · ${c.montant} €`, `${c.de} pour ${c.pour} · code ${c.code} · déjà activée`, "https://apoca-drive.web.app/?cadeaux=1");
+      logger.info("carte cadeau payée", { id, sent: n });
+      return res.json({ ok: true });
+    }
+    return res.status(400).json({ error: "action" });
+  } catch (e) {
+    logger.error("paypalCadeau", { id, err: String(e && e.message) });
+    return res.status(500).json({ error: "serveur" });
+  }
 });
 
 /* ---------- Devis envoyés au client ---------- */

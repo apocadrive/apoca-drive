@@ -181,6 +181,15 @@
             }
           ]
         }
+      ],
+      "rewrites": [
+        {
+          "source": "/api/paypal",
+          "function": {
+            "functionId": "paypalCadeau",
+            "region": "europe-west1"
+          }
+        }
       ]
     }
   ],

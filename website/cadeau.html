@@ -126,7 +126,7 @@ const waNum = t => { let x = String(t || "").replace(/[^\d+]/g, "").replace(/^\+
 const rid = () => Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, "0")).join("");
 
 /* Réglages venant de l'appli (Mon site › Carte cadeau) */
-let CFG = { montants: [50, 100, 150, 250, 500], min: 50, mois: 12, pp: "ApocaDrive", wero: "", tel: "+33 6 07 05 53 84" };
+let CFG = { montants: [50, 100, 150, 250, 500], min: 50, mois: 12, pp: "ApocaDrive", wero: "", ppClient: "", tel: "+33 6 07 05 53 84" };
 async function loadCfg(){
   try {
     const s = await getDoc(doc(fs, "site", "content")); const c = s.exists() ? s.data() : {};
@@ -137,6 +137,7 @@ async function loadCfg(){
     const mo = parseInt(g.mois, 10); if (mo >= 1 && mo <= 60) CFG.mois = mo;
     const pm = c.paiement || {}; for (const v of Object.values(pm)) { const m = String(v || "").match(/paypal\.me\/([A-Za-z0-9._-]+)/i); if (m){ CFG.pp = m[1]; break; } }
     CFG.wero = String(pm.wero || "").trim().slice(0, 80);
+    const pc = String(g.ppClient || "").trim(); if (/^[A-Za-z0-9_-]{20,120}$/.test(pc)) CFG.ppClient = pc;
     if (c.contact && c.contact.tel) CFG.tel = String(c.contact.tel);
   } catch(e){}
 }
@@ -235,6 +236,25 @@ function viewBuy(){
 }
 
 /* ---------- 2. La carte d'un acheteur (en attente, puis active) ---------- */
+let weroSent = false, ppBusy = false;
+function loadPP(){ return window.paypal ? Promise.resolve() : new Promise((ok, ko) => { const s = document.createElement("script"); s.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(CFG.ppClient)}&currency=EUR&intent=capture&locale=fr_FR&components=buttons&enable-funding=card`; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+async function api(body){ const r = await fetch("/api/paypal", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body) }); const j = await r.json().catch(() => ({})); return { status: r.status, j }; }
+async function mountPP(montant){
+  const box = document.getElementById("ppbtn"), err = () => document.getElementById("pperr"); if (!box) return;
+  try { await loadPP(); } catch(e){ box.outerHTML = `<div class="acts"><a class="btn pp" href="${E(ppLink(montant))}" target="_blank" rel="noopener">Payer ${E(eur(montant))} avec PayPal</a></div>`; return; }
+  window.paypal.Buttons({
+    style: { layout: "vertical", color: "gold", shape: "pill", label: "pay", height: 48 },
+    createOrder: async () => { const e = err(); if (e) e.textContent = ""; const { status, j } = await api({ action: "create", id: cid }); if (!j.orderID) { throw new Error(status === 503 ? "off" : "create"); } return j.orderID; },
+    onApprove: async (data) => {
+      ppBusy = true; box.innerHTML = `<p style="margin:0;padding:24px 8px;text-align:center;color:#0E0D0B;font:500 16px/1.4 var(--f-body)">Paiement reçu, activation de votre carte…</p>`;
+      const { status, j } = await api({ action: "capture", id: cid, orderID: data.orderID });
+      if (j.ok) return; // la page passe toute seule à la carte active
+      ppBusy = false;
+      box.innerHTML = `<p style="margin:0;padding:20px 8px;text-align:center;color:#0E0D0B;font:400 15px/1.5 var(--f-body)">${status === 202 ? "PayPal vérifie encore votre paiement. Votre carte s'affichera ici dès qu'il sera confirmé." : j.error === "refuse" ? "Le paiement a été refusé par votre banque. Rechargez la page pour réessayer avec un autre moyen." : "Le paiement n'a pas pu être finalisé. Rechargez la page, ou contactez-nous sur WhatsApp."}</p>`;
+    },
+    onError: () => { const e = err(); if (e) e.textContent = "PayPal n'a pas pu s'ouvrir. Réessayez dans un instant."; }
+  }).render(box).catch(() => {});
+}
 function viewCard(){
   let local = null; try { local = JSON.parse(sessionStorage.getItem("cadeau-" + cid) || "null"); } catch(e){}
   const isNew = P.get("n") === "1";
@@ -252,14 +272,17 @@ function viewCard(){
         <div class="box">
           <h2>Payer <em>${E(eur(info.montant))}</em></h2>
           <p>${CFG.wero ? "Au choix : PayPal (compte PayPal ou carte bancaire) ou Wero depuis l'appli de votre banque." : "Le paiement se fait sur PayPal, avec un compte PayPal ou une carte bancaire."}</p>
-          <p class="note">Dans le message du paiement, écrivez : <b>Carte cadeau pour ${E(info.pour)}</b></p>
-          <div class="acts"><a class="btn pp" href="${E(ppLink(info.montant))}" target="_blank" rel="noopener">Payer ${E(eur(info.montant))} avec PayPal</a></div>
-          ${CFG.wero ? `<div class="wero"><p style="margin:0;color:var(--cream)"><b>Ou par Wero</b>, depuis l'appli de votre banque : envoyez <b>${E(eur(info.montant))}</b> à <b class="w" style="white-space:nowrap">${E(CFG.wero)}</b>.</p><button class="btn line" id="cw" type="button" style="min-height:46px">Copier le numéro Wero</button></div>` : ""}
-          <p>Dès que le paiement est confirmé, <b>votre carte s'affiche sur cette page</b>, avec son code. Gardez ce lien précieusement :</p>
+          ${CFG.ppClient && !CFG.wero ? "" : `<p class="note">Dans le message du paiement, écrivez : <b>Carte cadeau pour ${E(info.pour)}</b></p>`}
+          ${CFG.ppClient ? `<div id="ppbtn" style="min-height:110px;background:#fff;border-radius:12px;padding:12px 12px 2px"></div><p class="err" id="pperr" role="alert"></p>`
+            : `<div class="acts"><a class="btn pp" href="${E(ppLink(info.montant))}" target="_blank" rel="noopener">Payer ${E(eur(info.montant))} avec PayPal</a></div>`}
+          ${CFG.wero ? `<div class="wero"><p style="margin:0;color:var(--cream)"><b>Ou par Wero</b>, depuis l'appli de votre banque : envoyez <b>${E(eur(info.montant))}</b> à <b class="w" style="white-space:nowrap">${E(CFG.wero)}</b>.</p><button class="btn line" id="cw" type="button" style="min-height:46px">Copier le numéro Wero</button>${CFG.ppClient ? `<button class="btn line" id="wdone" type="button" style="min-height:46px">${weroSent ? "Paiement Wero signalé ✓" : "J'ai payé par Wero"}</button>` : ""}</div>` : ""}
+          <p>${CFG.ppClient ? "Avec PayPal, <b>votre carte s'affiche ici tout de suite</b> après le paiement, avec son code." : "Dès que le paiement est confirmé, <b>votre carte s'affiche sur cette page</b>, avec son code."} Gardez ce lien précieusement :</p>
           <div class="acts"><button class="btn line" id="cp" type="button">Copier le lien de ma carte</button><a class="btn line" href="${E(wa)}" target="_blank" rel="noopener">Une question ? WhatsApp</a></div>
-          <p class="hint">La confirmation se fait à la main, en général dans la journée.</p>
+          <p class="hint">${CFG.ppClient ? (CFG.wero ? "Avec Wero, la confirmation se fait à la main, en général dans la journée." : "") : "La confirmation se fait à la main, en général dans la journée."}</p>
         </div>
       </div>`;
+      if (CFG.ppClient) mountPP(info.montant);
+      const wd = document.getElementById("wdone"); if (wd) wd.onclick = async () => { if (weroSent) return; wd.disabled = true; try { const r = await fetch("/api/paypal", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ action: "wero", id: cid }) }); if (!r.ok) throw 0; weroSent = true; wd.textContent = "Paiement Wero signalé ✓ · merci !"; } catch(e){ wd.disabled = false; wd.textContent = "Réessayer"; } };
       const cw = document.getElementById("cw"); if (cw) cw.onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(CFG.wero) : Promise.reject()).then(() => { cw.textContent = "Copié ✓"; }, () => prompt("Numéro Wero :", CFG.wero)); };
       const cp = document.getElementById("cp"); cp.onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(pageLink) : Promise.reject()).then(() => { cp.textContent = "Lien copié ✓"; }, () => prompt("Copiez ce lien :", pageLink)); };
       return;
@@ -284,8 +307,9 @@ function viewCard(){
     const sh = document.getElementById("sh");
     sh.onclick = async () => { const t = `Une carte cadeau Apoca Drive pour toi, ${info.pour} ! 🎁`; if (navigator.share) { try { await navigator.share({ title: "Carte cadeau Apoca Drive", text: t, url: pageLink }); } catch(e){} } else { location.href = `https://wa.me/?text=${encodeURIComponent(t + " " + pageLink)}`; } };
   };
-  let first = true;
-  onSnapshot(doc(fs, "cartesCadeau", cid), s => { first = false; render(s.exists() ? s.data() : null); }, () => { if (first) render(null); });
+  let first = true, lastSt = null;
+  onSnapshot(doc(fs, "cartesCadeau", cid), s => { first = false; const d = s.exists() ? s.data() : null; const st = d ? d.status : "attente";
+    if (st === lastSt && st === "attente" && document.getElementById("ppbtn")) return; lastSt = st; render(d); }, () => { if (first) render(null); });
   if (local) render(null);
 }
 

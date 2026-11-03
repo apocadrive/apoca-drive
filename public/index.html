@@ -2041,6 +2041,8 @@ function viewRequests(){
   return h;
 }
 /* ---------- Cartes cadeaux ---------- */
+let ppSecUnsub = null;
+const ppSecretOk = () => { if (!ppSecUnsub && window.__apocaCadeau && window.__apocaCadeau.watchSecret) ppSecUnsub = window.__apocaCadeau.watchSecret(ok => { S.ppSecret = ok; if (ui.view === "site") softRender(); }); return !!S.ppSecret; };
 const cdWait = () => Object.values(S.cadeaux||{}).filter(c => (c.status||"En attente") === "En attente").length;
 const cdLink = id => "https://www.apocadrive.com/cadeau?c=" + id;
 const cdToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
@@ -2070,7 +2072,7 @@ function viewCadeaux(){
       <div class="row between" style="align-items:flex-start"><div><h3 style="margin:0">${esc(c.montant)} € · pour ${esc(c.pour||"")}</h3><p class="small muted" style="margin:2px 0 0">De la part de ${esc(c.de||"")} · commandée le ${esc(when)}</p></div><span class="pill ${pill}">${esc(st)}</span></div>
       <p style="margin:0;font-size:20px;font-weight:600;letter-spacing:.06em" class="mono">${esc(c.code||"")}</p>
       ${c.message ? `<p class="small" style="margin:0;white-space:pre-wrap">« ${esc(c.message)} »</p>` : ""}
-      <div class="small" style="display:flex;flex-direction:column;gap:2px">${c.email?`<span class="mono" style="user-select:all">${esc(c.email)}</span>`:""}${c.tel?`<span class="mono" style="user-select:all">${esc(c.tel)}</span>`:""}${c.expire?`<span class="muted">Valable jusqu'au ${esc(cdDate(c.expire))}</span>`:""}${c.usedAt?`<span class="muted">Utilisée le ${esc(new Date(c.usedAt).toLocaleDateString("fr-FR"))}</span>`:""}</div>
+      <div class="small" style="display:flex;flex-direction:column;gap:2px">${c.email?`<span class="mono" style="user-select:all">${esc(c.email)}</span>`:""}${c.tel?`<span class="mono" style="user-select:all">${esc(c.tel)}</span>`:""}${c.expire?`<span class="muted">Valable jusqu'au ${esc(cdDate(c.expire))}</span>`:""}${c.paidVia?`<span class="muted">Payée par ${esc(c.paidVia)}, vérifiée automatiquement</span>`:""}${c.weroAt && st==="En attente"?`<span style="color:#ecc94b">Le client dit avoir payé par Wero · vérifie ta banque</span>`:""}${c.usedAt?`<span class="muted">Utilisée le ${esc(new Date(c.usedAt).toLocaleDateString("fr-FR"))}</span>`:""}</div>
       ${st === "En attente" ? `<p class="small muted" style="margin:0">Cherchez sur PayPal ou dans votre banque (Wero) un paiement de <b>${esc(c.montant)} €</b> de ${esc(c.de||"l'acheteur")} avant de valider.</p>` : ""}
       <div class="row" style="flex-wrap:wrap;gap:6px">
         ${st === "En attente" ? `<button class="btn sm primary" data-act="cdpaid" data-id="${c.id}">${ui.cdOk===c.id?"Confirmer : l'argent est arrivé":"Paiement reçu"}</button>` : ""}
@@ -2568,7 +2570,13 @@ function viewSite(){
       ${sfIn("cadeau.mois","Durée de validité (en mois, à partir du paiement)","12",3)}
       ${sfIn("paiement.wero","Wero : votre numéro ou e-mail Wero (affiché comme 2e moyen de paiement)","06 07 05 53 84",80)}
       <div class="row" style="flex-wrap:wrap;gap:8px"><a class="btn" href="https://www.apocadrive.com/cadeau" target="_blank" rel="noopener">Voir la page</a><button class="btn ghost" data-act="go" data-v="cadeaux">Cartes vendues</button></div>
-      <p class="small muted" style="margin:0">Pour cacher la bannière de l'accueil après Noël : onglet « Sections ».</p></section>`;
+      <p class="small muted" style="margin:0">Pour cacher la bannière de l'accueil après Noël : onglet « Sections ».</p></section>
+      <section class="panel"><h3 style="margin:0">Paiement PayPal automatique</h3>
+      <p class="small muted" style="margin:0">Avec tes clés PayPal (developer.paypal.com › Apps &amp; Credentials, mode Live), le client paie avec les boutons PayPal sur la page, le paiement est vérifié auprès de PayPal et la carte s'active toute seule. Tu es prévenu seulement quand l'argent est arrivé.</p>
+      ${sfIn("cadeau.ppClient","Client ID (« API Key »)","ASy67d4i…",120)}
+      ${ppSecretOk() ? `<p class="small" style="margin:0;color:#2F7A4A">✅ Secret enregistré${String(sfGet("cadeau.ppClient")).trim() ? " · paiement automatique actif" : " · ajoute aussi le Client ID"}.</p>` : ""}
+      <label class="f">Secret ${ppSecretOk() ? "(pour le changer, colle le nouveau)" : ""}<input type="password" data-ppsec="1" placeholder="${ppSecretOk() ? "•••••••• enregistré" : "Colle ici le Secret PayPal"}" autocomplete="off" maxlength="200"></label>
+      <p class="small muted" style="margin:0">Le Secret est gardé dans ton espace privé : il n'apparaît jamais sur le site.</p></section>`;
   } else if (t === "visites"){
     const st = S.stats || {};
     const dk = n => new Date(Date.now() - n * 864e5).toLocaleDateString("sv-SE", {timeZone: "Europe/Paris"});
@@ -3196,6 +3204,7 @@ document.addEventListener("click", async e => {
 document.addEventListener("change", e => {
   const el = e.target; const s = cur();
   if (el.dataset.cdq){ ui.cdQ = el.value; render(); return; }
+  if (el.dataset.ppsec){ const v = el.value.trim(); if (!v) return; if (v.length < 20){ toast("Ce Secret semble trop court."); return; } window.__apocaCadeau.saveSecret(v).then(() => { el.value = ""; S.ppSecret = true; toast("Secret PayPal enregistré"); render(); }, () => toast("Enregistrement refusé : reconnecte-toi.")); return; }
   if (window.__apocaSiteAdmin && siteChange(el)) return;
   if (el.dataset.act === "gcheck"){ const it = s.gear.find(x=>x.id===el.dataset.gid); it[ui.gearMode==="depart"?"packed":"back"] = el.checked; touch(ui.id); render(); return; }
   if (el.dataset.act === "ctport"){ contractOf(cur()).portfolio = el.checked; touch(ui.id); return; }
