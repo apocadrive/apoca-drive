@@ -839,6 +839,9 @@ html{overflow-x:hidden}body{overflow-x:clip}
 #cadeau.off{display:none}
 #cadeau .gift{display:flex;align-items:center;gap:clamp(14px,3vw,28px);padding:clamp(18px,3vw,26px) clamp(18px,3.4vw,34px);border:1px solid #C9A35E;border-radius:18px;background:#17150F;color:#F4EFE6;text-decoration:none;transition:border-color .4s,background .4s}
 #cadeau .gift:hover{background:#1D1A13;border-color:#D9BE86}
+#cadeau .gift{animation:giftGlow 1.6s ease-in-out infinite}
+@keyframes giftGlow{0%,100%{border-color:#C9A35E;box-shadow:0 0 0 0 rgba(217,190,134,0)}50%{border-color:#F2D9A0;box-shadow:0 0 0 2px rgba(242,217,160,.55),0 0 26px 4px rgba(217,190,134,.45)}}
+@media (prefers-reduced-motion:reduce){#cadeau .gift{animation:none}}
 #cadeau .gico{flex:none;color:#D9BE86}
 #cadeau .gtx{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:6px}
 #cadeau .geye{font:500 10.5px/1 var(--f-body);letter-spacing:.36em;text-transform:uppercase;color:#D9BE86}
