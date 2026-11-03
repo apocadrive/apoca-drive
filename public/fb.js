@@ -205,6 +205,12 @@ window.__apocaDevis = {
   email() { return (auth.currentUser && auth.currentUser.email) || ""; }
 };
 
+/* ---------- Cartes cadeaux : la page publique que voit l'acheteur ---------- */
+window.__apocaCadeau = {
+  publish(id, d) { return setDoc(doc(fs, `cartesCadeau/${id}`), JSON.parse(JSON.stringify(d)), { merge: true }); },
+  remove(id) { return deleteDoc(doc(fs, `cartesCadeau/${id}`)); }
+};
+
 /* ---------- Mon site (contenu public du site, modifiable par le propriétaire) ---------- */
 window.__apocaSiteAdmin = {
   listen(cb) {

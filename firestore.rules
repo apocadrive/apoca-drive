@@ -114,6 +114,25 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
       allow update, delete: if false;
     }
+    // Carte cadeau commandée sur le site : tout le monde peut en créer une, personne ne la relit (le serveur la range dans l'appli).
+    match /cadeauxDemandes/{id} {
+      allow create: if id.matches('^[a-f0-9]{24}$')
+        && request.resource.data.keys().hasOnly(['montant','pour','de','message','email','tel','at'])
+        && request.resource.data.keys().hasAll(['montant','pour','de','email','at'])
+        && request.resource.data.montant is int && request.resource.data.montant >= 10 && request.resource.data.montant <= 5000
+        && request.resource.data.pour is string && request.resource.data.pour.size() > 0 && request.resource.data.pour.size() <= 60
+        && request.resource.data.de is string && request.resource.data.de.size() > 0 && request.resource.data.de.size() <= 60
+        && (!('message' in request.resource.data) || (request.resource.data.message is string && request.resource.data.message.size() <= 300))
+        && request.resource.data.email is string && request.resource.data.email.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$') && request.resource.data.email.size() <= 200
+        && (!('tel' in request.resource.data) || (request.resource.data.tel is string && request.resource.data.tel.size() <= 40))
+        && request.resource.data.at == request.time;
+      allow read, update, delete: if false;
+    }
+    // Carte cadeau affichée à l'acheteur : lisible avec le lien (adresse impossible à deviner), seul le propriétaire modifie.
+    match /cartesCadeau/{id} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == "apocadrive7@gmail.com" && request.auth.token.email_verified == true;
+    }
     // Booking requests from the website: anyone may send one, nobody can read them back.
     match /bookings/{id} {
       allow create: if request.resource.data.keys().hasOnly(['nom','email','tel','type','date','dates','lieu','message','at'])

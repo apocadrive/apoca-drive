@@ -803,7 +803,7 @@ function frameSVG(plan, shoot, idx){
 }
 
 /* ---------- State & storage ---------- */
-const S = { shoots:{}, kit:{items:[]}, home:{url:"", id:"", pos:"center", fit:"cover", tagline:"Photographe · Vidéaste"}, quotes:{}, prices:{items:[]}, team:{members:[]}, company:{name:"Apoca Drive", activity:"Photographie & vidéo événementielle", address:"", phone:"", email:"", siret:"", iban:"", mention:"TVA non applicable, art. 293 B du CGI", conditions:"Acompte à la signature du devis, solde à la livraison des images.", validity:30, deposit:30, logoUrl:"", logoId:"", invMention:"Pénalités de retard : 3 fois le taux d'intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 € (clients professionnels uniquement)."}, downloads:null, ready:false, mode:"local", db:null, sample:null, assets:null, requests:{} };
+const S = { shoots:{}, kit:{items:[]}, home:{url:"", id:"", pos:"center", fit:"cover", tagline:"Photographe · Vidéaste"}, quotes:{}, prices:{items:[]}, team:{members:[]}, company:{name:"Apoca Drive", activity:"Photographie & vidéo événementielle", address:"", phone:"", email:"", siret:"", iban:"", mention:"TVA non applicable, art. 293 B du CGI", conditions:"Acompte à la signature du devis, solde à la livraison des images.", validity:30, deposit:30, logoUrl:"", logoId:"", invMention:"Pénalités de retard : 3 fois le taux d'intérêt légal. Indemnité forfaitaire pour frais de recouvrement : 40 € (clients professionnels uniquement)."}, downloads:null, ready:false, mode:"local", db:null, sample:null, assets:null, requests:{}, cadeaux:{} };
 const ui = { plus:null, lightbox:null, menu:false, qid:null, qprev:false, qdel:false, hist:[], homeEdit:false, uploading:false, cli:null, view:"home", id:null, tab:"infos", gearMode:"depart", board:false, month:null, showPast:false, confirmDel:false, ai:null, aiBusy:false, aiErr:"", tool:{city:"Paris", date:todayStr(), codec:3, mins:120, cams:1, photos:600, mb:30, card:128, fps:25} };
 const LS = "apocadrive-v1";
 const dirty = new Set(); const qDirty = new Set(); let coDirty = false; let prDirty = false; let tmDirty = false; let kitDirty = false; let flushT = null; let flushing = false;
@@ -997,7 +997,7 @@ function render(scrollTop){
     if (ui.view === "shoot") ui.view = "agenda";
     const t = new Date();
     header = `<div class="top"><div class="wrap">${BACK}<button class="brandbtn brand" data-act="nav" data-v="home" aria-label="Écran d'accueil">Apoca<b>drive</b></button><span class="sub">${esc(DOW[t.getDay()].toUpperCase())} ${pad(t.getDate())}.${pad(t.getMonth()+1)}.${t.getFullYear()}<br>${S.mode==="db"?"SYNCHRO ON":"HORS LIGNE"}</span>${DOTS}</div><div class="stripes"></div></div>`;
-    body = ui.view === "wed" ? viewWed() : ui.view === "rdv" ? viewRdv() : ui.view === "send" ? viewSend() : ui.view === "site" ? viewSite() : ui.view === "pay" ? viewPay() : ui.view === "grid" ? viewGrid() : ui.view === "dest" ? viewDest() : ui.view === "requests" ? viewRequests() : ui.view === "notif" ? viewNotif() : ui.view === "contracts" ? viewContracts() : ui.view === "contract" ? (cur() ? viewContract() : viewContracts()) : ui.view === "prices" ? viewPrices() : ui.view === "team" ? viewTeam() : ui.view === "stats" ? viewStats() : ui.view === "post" ? viewPost() : ui.view === "quotes" ? viewQuotes() : ui.view === "invoices" ? viewQuotes("invoice") : ui.view === "quote" ? viewQuote() : ui.view === "company" ? viewCompany() : ui.view === "kit" ? viewKit() : ui.view === "tools" ? viewTools() : ui.view === "clients" ? viewClients() : viewAgenda();
+    body = ui.view === "wed" ? viewWed() : ui.view === "rdv" ? viewRdv() : ui.view === "send" ? viewSend() : ui.view === "site" ? viewSite() : ui.view === "pay" ? viewPay() : ui.view === "cadeaux" ? viewCadeaux() : ui.view === "grid" ? viewGrid() : ui.view === "dest" ? viewDest() : ui.view === "requests" ? viewRequests() : ui.view === "notif" ? viewNotif() : ui.view === "contracts" ? viewContracts() : ui.view === "contract" ? (cur() ? viewContract() : viewContracts()) : ui.view === "prices" ? viewPrices() : ui.view === "team" ? viewTeam() : ui.view === "stats" ? viewStats() : ui.view === "post" ? viewPost() : ui.view === "quotes" ? viewQuotes() : ui.view === "invoices" ? viewQuotes("invoice") : ui.view === "quote" ? viewQuote() : ui.view === "company" ? viewCompany() : ui.view === "kit" ? viewKit() : ui.view === "tools" ? viewTools() : ui.view === "clients" ? viewClients() : viewAgenda();
   }
   const nav = `<nav class="nav"><div class="in">
     <button data-act="nav" data-v="home" aria-current="false">${ICON.house}Accueil</button>
@@ -1240,6 +1240,7 @@ function menuHTML(){
       <button data-act="go" data-v="quotes">${ICON.doc}<span>Mes devis<small>Créer, modifier et télécharger en PDF</small></span><span class="pill cnt">${Object.values(S.quotes).filter(q=>!isInv(q)).length}</span></button>
       <button data-act="go" data-v="grid">${ICON.plus}<span>Grilles photos<small>Une nouvelle mise en page à chaque fois, pour Instagram ou le site</small></span></button>
       <button data-act="go" data-v="pay">${ICON.euro}<span>Lien PayPal<small>Un montant, un lien, envoyé au client</small></span></button>
+      <button data-act="go" data-v="cadeaux"><span style="font-size:20px;width:24px;text-align:center">🎁</span><span>Cartes cadeaux<small>Les cartes achetées sur le site, paiements et codes</small></span>${cdWait()?`<span class="pill rec cnt">${cdWait()}</span>`:`<span class="pill cnt">${Object.keys(S.cadeaux||{}).length}</span>`}</button>
       <button data-act="go" data-v="invoices">${ICON.doc}<span>Mes factures<small>Depuis un devis accepté ou vierges</small></span><span class="pill cnt">${Object.values(S.quotes).filter(isInv).length}</span></button>
       <button data-act="go" data-v="contracts">${ICON.pen}<span>Contrats<small>Contrat de prestation prêt à signer</small></span></button>
       <button data-act="wednew"><span style="font-size:20px;width:24px;text-align:center">💍</span><span>Ajouter un mariage<small>Les mariés, la date, et ça s'affiche sur l'accueil</small></span></button>
@@ -2039,6 +2040,48 @@ function viewRequests(){
       </div></section>`; }).join("");
   return h;
 }
+/* ---------- Cartes cadeaux ---------- */
+const cdWait = () => Object.values(S.cadeaux||{}).filter(c => (c.status||"En attente") === "En attente").length;
+const cdLink = id => "https://www.apocadrive.com/cadeau?c=" + id;
+const cdToday = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; };
+const cdExpired = c => c.status === "Payée" && c.expire && c.expire < cdToday();
+const cdDate = iso => { if (!/^\d{4}-\d{2}-\d{2}$/.test(iso||"")) return ""; const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d).toLocaleDateString("fr-FR",{day:"numeric",month:"long",year:"numeric"}); };
+function cdSave(id, patch, pub){ const c = S.cadeaux[id]; if (!c) return; Object.assign(c, patch); render();
+  const done = [S.db ? S.db.doc("cadeaux/" + id).set(JSON.parse(JSON.stringify(c))) : Promise.resolve()];
+  if (pub && window.__apocaCadeau) done.push(window.__apocaCadeau.publish(id, pub));
+  return Promise.all(done).catch(e => { toast(errMsg(e)); throw e; }); }
+function cdMsg(c, id){ return `Bonjour ${c.de || ""}, merci pour votre achat ! Voici la carte cadeau Apoca Drive de ${c.montant} € pour ${c.pour || ""}, à imprimer ou à transférer : ${cdLink(id)}\nCode : ${c.code}${c.expire ? ` · valable jusqu'au ${cdDate(c.expire)}` : ""}.`; }
+function viewCadeaux(){
+  const all = Object.entries(S.cadeaux||{}).map(([id,c]) => ({id, ...c})).sort((a,b) => (b.created||0) - (a.created||0));
+  const grp = c => (c.status||"En attente") === "En attente" ? "wait" : c.status === "Payée" && !cdExpired(c) ? "paid" : "done";
+  const tab = ui.cdTab || (cdWait() ? "wait" : "paid");
+  const q = String(ui.cdQ||"").trim().toUpperCase();
+  const list = q ? all.filter(c => String(c.code||"").toUpperCase().includes(q) || String(c.pour||"").toUpperCase().includes(q) || String(c.de||"").toUpperCase().includes(q)) : all.filter(c => grp(c) === tab);
+  const n = k => all.filter(c => grp(c) === k).length;
+  const tel = t => String(t||"").replace(/[^\d+]/g,""); const wa = t => { let x = tel(t); if (x.startsWith("0")) x = "33" + x.slice(1); return x.replace("+",""); };
+  let h = `<h2>Cartes cadeaux</h2><p class="small muted" style="margin:0">Quand une carte est commandée sur votre site, elle arrive ici « en attente ». Vérifiez sur PayPal que l'argent est bien arrivé, puis touchez « Paiement reçu » : la carte s'affiche alors chez l'acheteur, avec son code.</p>
+    <label class="f">Retrouver une carte (code ou prénom)<input type="search" data-cdq="1" value="${esc(ui.cdQ||"")}" placeholder="Ex. APD-7K4Q" autocapitalize="characters"></label>
+    ${q ? "" : `<div class="chips"><button class="chip${tab==="wait"?" tu":""}" data-act="cdtab" data-v="wait">À valider (${n("wait")})</button><button class="chip${tab==="paid"?" tu":""}" data-act="cdtab" data-v="paid">Payées (${n("paid")})</button><button class="chip${tab==="done"?" tu":""}" data-act="cdtab" data-v="done">Utilisées, expirées (${n("done")})</button></div>`}`;
+  if (!list.length) return h + `<div class="empty">${q ? "Aucune carte ne correspond." : tab === "wait" ? "Aucune carte en attente. Elles arrivent ici dès qu'un client en commande une sur www.apocadrive.com/cadeau." : tab === "paid" ? "Aucune carte payée à utiliser pour l'instant." : "Rien ici pour l'instant."}</div>`;
+  h += list.map(c => { const st = cdExpired(c) ? "Expirée" : (c.status || "En attente");
+    const when = c.created ? new Date(c.created).toLocaleDateString("fr-FR",{day:"numeric",month:"short"}) + " à " + new Date(c.created).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) : "";
+    const pill = st === "En attente" ? "rec" : "";
+    return `<section class="panel">
+      <div class="row between" style="align-items:flex-start"><div><h3 style="margin:0">${esc(c.montant)} € · pour ${esc(c.pour||"")}</h3><p class="small muted" style="margin:2px 0 0">De la part de ${esc(c.de||"")} · commandée le ${esc(when)}</p></div><span class="pill ${pill}">${esc(st)}</span></div>
+      <p style="margin:0;font-size:20px;font-weight:600;letter-spacing:.06em" class="mono">${esc(c.code||"")}</p>
+      ${c.message ? `<p class="small" style="margin:0;white-space:pre-wrap">« ${esc(c.message)} »</p>` : ""}
+      <div class="small" style="display:flex;flex-direction:column;gap:2px">${c.email?`<span class="mono" style="user-select:all">${esc(c.email)}</span>`:""}${c.tel?`<span class="mono" style="user-select:all">${esc(c.tel)}</span>`:""}${c.expire?`<span class="muted">Valable jusqu'au ${esc(cdDate(c.expire))}</span>`:""}${c.usedAt?`<span class="muted">Utilisée le ${esc(new Date(c.usedAt).toLocaleDateString("fr-FR"))}</span>`:""}</div>
+      ${st === "En attente" ? `<p class="small muted" style="margin:0">Cherchez sur PayPal un paiement de <b>${esc(c.montant)} €</b> de ${esc(c.de||"l'acheteur")} avant de valider.</p>` : ""}
+      <div class="row" style="flex-wrap:wrap;gap:6px">
+        ${st === "En attente" ? `<button class="btn sm primary" data-act="cdpaid" data-id="${c.id}">${ui.cdOk===c.id?"Confirmer : l'argent est arrivé":"Paiement reçu"}</button>` : ""}
+        ${st === "Payée" || st === "Expirée" ? `${c.tel?`<a class="btn sm primary" href="https://wa.me/${wa(c.tel)}?text=${encodeURIComponent(cdMsg(c, c.id))}" target="_blank" rel="noopener">Envoyer sur WhatsApp</a>`:""}${c.email?`<a class="btn sm${c.tel?"":" primary"}" href="mailto:${esc(c.email)}?subject=${encodeURIComponent("Votre carte cadeau Apoca Drive")}&body=${encodeURIComponent(cdMsg(c, c.id))}">Envoyer par e-mail</a>`:""}<button class="btn sm" data-act="cdcopy" data-id="${c.id}">Copier le lien</button><a class="btn sm ghost" href="${cdLink(c.id)}" target="_blank" rel="noopener">Voir la carte</a>` : ""}
+        ${st === "Payée" ? `<button class="btn sm" data-act="cdused" data-id="${c.id}">${ui.cdOk===c.id+"u"?"Confirmer : carte utilisée":"Marquer utilisée"}</button>` : ""}
+        ${st === "Utilisée" ? `<button class="btn sm ghost" data-act="cdunused" data-id="${c.id}">Remettre active</button>` : ""}
+        ${st === "En attente" ? `<button class="btn sm ghost" data-act="cdcancel" data-id="${c.id}">${ui.cdOk===c.id+"c"?"Confirmer l'annulation":"Pas payée, annuler"}</button>` : ""}
+        <button class="btn sm ghost" data-act="cddel" data-id="${c.id}" style="color:var(--rec)">${ui.cdDel===c.id?"Confirmer la suppression":"Supprimer"}</button>
+      </div></section>`; }).join("");
+  return h;
+}
 function rqSet(id, patch){ const r = S.requests[id]; if (!r) return; Object.assign(r, patch); if (S.db) S.db.doc("requests/" + id).set(JSON.parse(JSON.stringify(r))).catch(e => toast(errMsg(e))); render(); }
 const VILLES = {"paris":[48.86,2.35],"lyon":[45.76,4.84],"marseille":[43.30,5.37],"toulouse":[43.60,1.44],"nice":[43.70,7.27],"nantes":[47.22,-1.55],"strasbourg":[48.57,7.75],"montpellier":[43.61,3.88],"bordeaux":[44.84,-0.58],"lille":[50.63,3.06],"rennes":[48.11,-1.68],"reims":[49.26,4.03],"toulon":[43.12,5.93],"saint-etienne":[45.44,4.39],"le havre":[49.49,0.11],"grenoble":[45.19,5.72],"dijon":[47.32,5.04],"angers":[47.47,-0.55],"nimes":[43.84,4.36],"villeurbanne":[45.77,4.88],"clermont-ferrand":[45.78,3.08],"le mans":[48.00,0.20],"aix-en-provence":[43.53,5.45],"brest":[48.39,-4.49],"tours":[47.39,0.69],"amiens":[49.89,2.30],"limoges":[45.83,1.26],"annecy":[45.90,6.13],"perpignan":[42.70,2.90],"metz":[49.12,6.18],"besancon":[47.24,6.02],"orleans":[47.90,1.91],"rouen":[49.44,1.10],"mulhouse":[47.75,7.34],"caen":[49.18,-0.37],"nancy":[48.69,6.18],"avignon":[43.95,4.81],"cannes":[43.55,7.01],"chambery":[45.56,5.92],"valence":[44.93,4.89],"la rochelle":[46.16,-1.15],"biarritz":[43.48,-1.56],"ajaccio":[41.93,8.74],"bruxelles":[50.85,4.35],"geneve":[46.20,6.14],"lausanne":[46.52,6.63],"zurich":[47.37,8.54],"luxembourg":[49.61,6.13],"monaco":[43.74,7.42],"londres":[51.51,-0.13],"london":[51.51,-0.13],"amsterdam":[52.37,4.90],"berlin":[52.52,13.40],"madrid":[40.42,-3.70],"barcelone":[41.39,2.17],"barcelona":[41.39,2.17],"lisbonne":[38.72,-9.14],"porto":[41.15,-8.61],"rome":[41.90,12.50],"milan":[45.46,9.19],"florence":[43.77,11.25],"venise":[45.44,12.32],"naples":[40.85,14.27],"dubai":[25.20,55.27],"duba\u00ef":[25.20,55.27],"new york":[40.71,-74.01],"miami":[25.76,-80.19],"los angeles":[34.05,-118.24],"montreal":[45.50,-73.57],"marrakech":[31.63,-7.99],"casablanca":[33.57,-7.59],"dakar":[14.72,-17.47],"abidjan":[5.36,-4.01],"kinshasa":[-4.32,15.31],"brazzaville":[-4.26,15.24],"lubumbashi":[-11.66,27.48],"goma":[-1.68,29.22],"douala":[4.05,9.77],"yaounde":[3.85,11.50],"libreville":[0.42,9.47],"lome":[6.13,1.22],"cotonou":[6.37,2.39],"bamako":[12.64,-8.00],"tunis":[36.81,10.18],"alger":[36.75,3.06],"kigali":[-1.95,30.06],"luanda":[-8.84,13.23],"johannesburg":[-26.20,28.05]};
 const villeCoord = v => VILLES[String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/\s+/g," ")] || null;
@@ -2115,9 +2158,10 @@ const SITE_DEF = {
   hero:{eyebrow:"France · partout dans le monde", titre:"Vos plus beaux jours,", titreOr:"filmés comme au cinéma.", accroche:"Mariages, clips et événements, en photo et en vidéo.", video:"", badges:"Livré en 2 à 4 semaines\nPartout en France\nAcompte 30 % en ligne\nShooting dès 150 €"},
   conditions:{texte:"Acompte : 30 % du prix, payé en ligne, pour bloquer votre date. Le reste se règle comme prévu dans votre devis.\nChangement de date : possible, selon mes disponibilités. Votre acompte est reporté sur la nouvelle date.\nAnnulation : l'acompte n'est pas remboursé, car la date vous était réservée.\nDate indisponible : si je ne suis pas libre à votre date, l'acompte vous est remboursé en entier.\nLivraison : vos films et photos sont livrés en 2 à 4 semaines, dans votre espace privé."},
   about:{prenom:"", titre:"Plus que des images,", titreOr:"des émotions.", p1:"Photographe et vidéaste, fondateur d'Apoca Drive. Basé en France, je filme partout dans le monde.", p2:"Pour moi, un film réussi fait revivre ce qu'on a ressenti : un regard, un rire, une émotion qu'on n'avait pas vue sur le moment. Je filme avec discrétion, pour que vous viviez votre journée sans penser à la caméra.", services:"Événements, Mariages, Corporate, Clips & projets"},
+  cadeau:{montants:"50\n100\n150\n250\n500", min:"50", mois:"12"},
   contact:{tel:"+33 6 07 05 53 84", email:"", instagram:"apocadrive", tiktok:"apocadrive", youtube:"apocadrive", phrase:"Parlons de votre projet", zones:"Partout en France · À l'étranger sur demande", google:"", googleNote:"", googleNb:""}
 };
-const SITE_SECS = [["apropos","À propos"],["pourquoi","Pourquoi Apoca Drive (coulisses)"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["conditions","Conditions de réservation"],["journal","Journal"],["insta","Instagram"],["moments","Moments (photos qui défilent)"]];
+const SITE_SECS = [["apropos","À propos"],["pourquoi","Pourquoi Apoca Drive (coulisses)"],["films","Films"],["destinations","Carnet de voyage"],["collections","Collections"],["etapes","Comment ça se passe"],["avis","Avis clients"],["conditions","Conditions de réservation"],["journal","Journal"],["insta","Instagram"],["moments","Moments (photos qui défilent)"],["cadeau","Carte cadeau (bannière de l'accueil)"]];
 const FILM_CATS = [["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Commercial"]];
 const RESA_ITEMS = [["mariage","Mariage",""],["mariage-civil","Mariage civil","Mariage"],["mariage-religieux","Mariage religieux","Mariage"],["mariage-civil-religieux","Mariage civil & religieux","Mariage"],["mariage-coutumier","Mariage coutumier","Mariage"],["fiancailles","Fiançailles","Mariage"],["clip","Clip musique",""],["anniversaire","Anniversaire",""],["podcast","Podcast",""],["shooting","Shooting photo & vidéo",""],["outfit","Outfit",""]];
 S.resa = null;
@@ -2323,7 +2367,7 @@ function viewSite(){
   if (!window.__apocaSiteAdmin) return `<h2>Mon site</h2><div class="empty">Disponible dans l'appli en ligne uniquement.</div>`;
   const t = ui.siteTab || "accueil";
   const np = (S.sitePend||[]).length;
-  const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["pourquoi","Coulisses"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
+  const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["pourquoi","Coulisses"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["cadeau","Carte cadeau"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
   let h = `<h2>Mon site</h2><p class="small muted" style="margin:0">Ce que vous changez ici s'affiche tout de suite sur <b>www.apocadrive.com</b>.</p>
     <div class="chips">${tabs.map(([k, l]) => `<button class="chip${t===k?" tu":""}" data-act="stab" data-v="${k}">${l}</button>`).join("")}</div>`;
   if (S.site === null) return h + `<div class="empty"><span class="spin"></span>Chargement…</div>`;
@@ -2516,6 +2560,14 @@ function viewSite(){
       ${sfIn("contact.google","Lien de ta fiche Google (avis)","https://g.page/r/…",300)}
       ${sfIn("contact.googleNote","Ta note Google","5,0",8)}
       ${sfIn("contact.googleNb","Nombre d'avis Google","12",8)}</section>`;
+  } else if (t === "cadeau"){
+    h += `<section class="panel"><h3 style="margin:0">Carte cadeau</h3>
+      <p class="small muted" style="margin:0">Vos clients offrent un montant à utiliser sur n'importe quelle prestation. Page : <b>www.apocadrive.com/cadeau</b>. Les cartes achetées arrivent dans le menu « Cartes cadeaux ».</p>
+      ${sfTa("cadeau.montants","Montants proposés en euros (un par ligne)","50")}
+      ${sfIn("cadeau.min","Montant minimum (€) pour « Autre montant »","50",6)}
+      ${sfIn("cadeau.mois","Durée de validité (en mois, à partir du paiement)","12",3)}
+      <div class="row" style="flex-wrap:wrap;gap:8px"><a class="btn" href="https://www.apocadrive.com/cadeau" target="_blank" rel="noopener">Voir la page</a><button class="btn ghost" data-act="go" data-v="cadeaux">Cartes vendues</button></div>
+      <p class="small muted" style="margin:0">Pour cacher la bannière de l'accueil après Noël : onglet « Sections ».</p></section>`;
   } else if (t === "visites"){
     const st = S.stats || {};
     const dk = n => new Date(Date.now() - n * 864e5).toLocaleDateString("sv-SE", {timeZone: "Europe/Paris"});
@@ -3035,6 +3087,16 @@ document.addEventListener("click", async e => {
     case "dvdel": { const d = (S.dest||[]).find(x => x.id === ui.destId); if (!d) break; const videos = (d.videos||[]).filter(v => v.id !== b.dataset.vid); d.videos = videos; destSave(d.id, {videos, count:(S.destPhotos[d.id]||[]).length + videos.length}); render(); break; }
     case "ddel": { if (!ui.dDel){ ui.dDel = true; render(); break; } const id = ui.destId; ui.dDel = false; ui.destId = null; S.dest = (S.dest||[]).filter(x => x.id !== id); window.__apocaDest.delDest(id).then(() => toast("Destination supprimée")).catch(() => toast("Suppression impossible pour le moment")); render(true); break; }
     case "rqtab": ui.rqTab = b.dataset.v; render(); break;
+    case "cdtab": ui.cdTab = b.dataset.v; render(); break;
+    case "cdpaid": { const id = b.dataset.id, c = S.cadeaux[id]; if (!c) break; if (ui.cdOk !== id){ ui.cdOk = id; render(); break; } ui.cdOk = null;
+      const mois = Math.max(1, Math.min(60, parseInt(sfGet("cadeau.mois"), 10) || 12)); const d = new Date(); d.setMonth(d.getMonth() + mois);
+      const expire = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      siteStart(); cdSave(id, {status:"Payée", paidAt: Date.now(), expire}, {status:"payee", code: c.code, expire}).then(() => toast("Carte activée · envoyez-la à l'acheteur"), () => {}); break; }
+    case "cdused": { const id = b.dataset.id; if (ui.cdOk !== id + "u"){ ui.cdOk = id + "u"; render(); break; } ui.cdOk = null; cdSave(id, {status:"Utilisée", usedAt: Date.now()}, {status:"utilisee"}).then(() => toast("Carte marquée utilisée"), () => {}); break; }
+    case "cdunused": cdSave(b.dataset.id, {status:"Payée", usedAt: null}, {status:"payee"}); break;
+    case "cdcancel": { const id = b.dataset.id; if (ui.cdOk !== id + "c"){ ui.cdOk = id + "c"; render(); break; } ui.cdOk = null; cdSave(b.dataset.id, {status:"Annulée"}, {status:"annulee"}).then(() => toast("Carte annulée"), () => {}); break; }
+    case "cdcopy": { const l = cdLink(b.dataset.id); (navigator.clipboard ? navigator.clipboard.writeText(l) : Promise.reject()).then(() => toast("Lien copié"), () => toast(l)); break; }
+    case "cddel": { const id = b.dataset.id; if (ui.cdDel !== id){ ui.cdDel = id; render(); break; } ui.cdDel = null; delete S.cadeaux[id]; if (S.db) S.db.doc("cadeaux/" + id).delete().catch(e => toast(errMsg(e))); if (window.__apocaCadeau) window.__apocaCadeau.remove(id).catch(() => {}); render(); toast("Carte supprimée"); break; }
     case "rqdevis": devisFromRequest(b.dataset.id); break;
     case "qsend": pushHist(); ui.view = "send"; render(true); break;
     case "sendfull": pushHist(); ui.view = "quote"; ui.qprev = false; render(true); break;
@@ -3132,6 +3194,7 @@ document.addEventListener("click", async e => {
 });
 document.addEventListener("change", e => {
   const el = e.target; const s = cur();
+  if (el.dataset.cdq){ ui.cdQ = el.value; render(); return; }
   if (window.__apocaSiteAdmin && siteChange(el)) return;
   if (el.dataset.act === "gcheck"){ const it = s.gear.find(x=>x.id===el.dataset.gid); it[ui.gearMode==="depart"?"packed":"back"] = el.checked; touch(ui.id); render(); return; }
   if (el.dataset.act === "ctport"){ contractOf(cur()).portfolio = el.checked; touch(ui.id); return; }
@@ -3295,8 +3358,9 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 setTimeout(checkVer, 3000);
 /* ---------- Boot ---------- */
 try { const rv = new URLSearchParams(location.search).get("rdv"); if (rv){ ui.view = "rdv"; ui.rdvHi = rv; history.replaceState(null, "", location.pathname); } } catch(e){}
+try { if (new URLSearchParams(location.search).get("cadeaux")){ ui.view = "cadeaux"; history.replaceState(null, "", location.pathname); } } catch(e){}
 try { const pd = new URLSearchParams(location.search).get("devis"); if (pd){ ui.pendingDevis = pd; history.replaceState(null, "", location.pathname); } } catch(e){}
-if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { const d = e.data || {}; if (d.type !== "open" || !d.link) return; try { const u2 = new URL(d.link, location.href), id = u2.searchParams.get("devis"), rv = u2.searchParams.get("rdv"); if (id){ ui.pendingDevis = id; tryPendingDevis(); } if (rv){ pushHist(); ui.view = "rdv"; ui.rdvHi = rv; render(true); } } catch(err){} });
+if ("serviceWorker" in navigator) navigator.serviceWorker.addEventListener("message", e => { const d = e.data || {}; if (d.type !== "open" || !d.link) return; try { const u2 = new URL(d.link, location.href), id = u2.searchParams.get("devis"), rv = u2.searchParams.get("rdv"); if (u2.searchParams.get("cadeaux")){ pushHist(); ui.view = "cadeaux"; render(true); } if (id){ ui.pendingDevis = id; tryPendingDevis(); } if (rv){ pushHist(); ui.view = "rdv"; ui.rdvHi = rv; render(true); } } catch(err){} });
 render();
 (async function boot(){
   const use = window.claude && window.claude.use;
@@ -3327,6 +3391,7 @@ render();
     db.doc("meta/pushStatus").onSnapshot(d => { S.pushStatus = d.exists ? d.data() : null; if (ui.view === "notif") softRender(); }, () => {});
     db.collection("rdv").onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = d.data(); }); S.rdv = JSON.parse(JSON.stringify(next)); if (S.ready && !isEditing()) softRender(); }, () => {});
     db.collection("requests").onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = d.data(); }); S.requests = JSON.parse(JSON.stringify(next)); if (S.ready) softRender(); tryPendingDevis(); }, () => {});
+    db.collection("cadeaux").onSnapshot(snap => { const next = {}; snap.docs.forEach(d => { next[d.id] = d.data(); }); S.cadeaux = JSON.parse(JSON.stringify(next)); if (S.ready && !isEditing()) softRender(); }, () => {});
     if (window.__apocaDevis) window.__apocaDevis.watchMail(m => { S.mailCfg = m; if (ui.view === "send") softRender(); });
     setTimeout(tryPendingDevis, 1500); setTimeout(tryPendingDevis, 5000); setTimeout(tryPendingDevis, 9000);
     db.doc("settings/prices").onSnapshot(d => { if (!prDirty){ S.prices = d.exists ? JSON.parse(JSON.stringify(d.data())) : {items:[]}; if (!Array.isArray(S.prices.items)) S.prices.items = []; if (S.ready) softRender(); } }, () => {});

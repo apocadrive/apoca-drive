@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carte cadeau · Apoca Drive</title>
+<meta name="description" content="Offrez un souvenir filmé : une carte cadeau Apoca Drive à utiliser sur un shooting, un outfit, un clip ou un mariage. Paiement en ligne, carte à imprimer ou à envoyer.">
+<link rel="canonical" href="https://www.apocadrive.com/cadeau">
+<meta property="og:title" content="Carte cadeau · Apoca Drive"><meta property="og:description" content="Offrez un souvenir filmé : shooting, outfit, clip ou mariage."><meta property="og:image" content="https://www.apocadrive.com/og.png"><meta property="og:url" content="https://www.apocadrive.com/cadeau">
+<meta name="theme-color" content="#0E0D0B">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--night:#0E0D0B;--panel:#17150F;--line:#3A352C;--line-2:#2A2722;--cream:#F4EFE6;--soft:#D8D1C4;--mute:#A9A192;--gold:#D9BE86;--gold-e:#C9A35E;--pp:#0070BA;
+  --f-display:"Cormorant Garamond",Georgia,serif;--f-body:"Jost",system-ui,sans-serif}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--night);color:var(--cream)}
+body{font:300 16px/1.6 var(--f-body);-webkit-font-smoothing:antialiased;padding:0 0 calc(40px + env(safe-area-inset-bottom))}
+a{color:var(--gold)}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:1080px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) 20px 16px;border-bottom:1px solid var(--line-2)}
+.hd a.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--cream)}
+.hd img.sym{height:34px;width:auto}
+.hd .nm{display:flex;flex-direction:column;gap:5px}
+.hd .nm b{font:600 16px/1 var(--f-body);letter-spacing:.24em}
+.hd .nm i{font:400 8px/1 var(--f-body);font-style:normal;letter-spacing:.42em;color:var(--gold)}
+.hd a.back{font:400 12px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;text-decoration:none;color:var(--soft);padding:12px 4px}
+main{max-width:1080px;margin:0 auto;padding:0 20px}
+.intro{text-align:center;padding:clamp(36px,7vw,72px) 0 clamp(24px,4vw,40px);display:flex;flex-direction:column;align-items:center;gap:14px}
+.eye{margin:0;font:500 11px/1 var(--f-body);letter-spacing:.4em;text-transform:uppercase;color:var(--gold)}
+h1{margin:0;font:500 clamp(40px,7vw,68px)/1.02 var(--f-display)}
+h1 em,h2 em{color:var(--gold)}
+.intro p.lead{margin:0;max-width:34ch;color:var(--soft);font-size:clamp(15.5px,1.6vw,18px)}
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(24px,4vw,48px);align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+/* La carte */
+.gc{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:12px;container-type:inline-size}
+.gc .in{border:1px solid var(--gold-e);border-radius:11px;display:flex;min-height:clamp(220px,52cqw,330px)}
+.gc .l{flex:1 1 auto;min-width:0;padding:clamp(18px,5cqw,34px);display:flex;flex-direction:column;justify-content:space-between;gap:14px;border-right:1px solid var(--line)}
+.gc .r{flex:0 0 32%;padding:clamp(14px,4cqw,26px) 12px;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px;text-align:center}
+.gc .brandl{display:flex;align-items:center;gap:10px}
+.gc .brandl img{height:clamp(26px,6cqw,40px);width:auto}
+.gc .brandl b{font:600 clamp(11px,2.4cqw,16px)/1 var(--f-body);letter-spacing:.28em;color:var(--gold)}
+.gc .k{margin:0;font:500 clamp(9px,1.8cqw,11.5px)/1 var(--f-body);letter-spacing:.36em;text-transform:uppercase;color:var(--gold)}
+.gc .who{margin:6px 0 0;font:500 clamp(30px,8.5cqw,54px)/1 var(--f-display)}
+.gc .who em{color:var(--gold)}
+.gc .msg{margin:4px 0 0;font:italic 400 clamp(14px,3cqw,19px)/1.35 var(--f-display);color:var(--soft);overflow-wrap:anywhere}
+.gc .from{margin:0;font:400 clamp(11.5px,2.2cqw,14px)/1 var(--f-body);color:var(--mute)}
+.gc .small{margin:0;font:300 clamp(9.5px,1.8cqw,11.5px)/1.5 var(--f-body);color:var(--mute)}
+.gc .lab{margin:0;font:400 clamp(8.5px,1.6cqw,10.5px)/1 var(--f-body);letter-spacing:.3em;color:var(--mute);text-transform:uppercase}
+.gc .val{margin:6px 0 0;font:500 clamp(30px,9cqw,60px)/1 var(--f-display)}
+.gc .code{width:100%;padding:12px 0;border-top:1px dashed #4A443A;border-bottom:1px dashed #4A443A;display:flex;flex-direction:column;align-items:center;gap:8px}
+.gc .code b{font:500 clamp(13px,3cqw,19px)/1 ui-monospace,"SF Mono",Menlo,monospace;letter-spacing:.06em;color:var(--gold)}
+.gc .until{margin:6px 0 0;font:500 clamp(11px,2.3cqw,15px)/1.2 var(--f-body)}
+.gc .stamp{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-12deg);padding:10px 22px;border:2px solid var(--gold);color:var(--gold);font:600 clamp(16px,4cqw,26px)/1 var(--f-body);letter-spacing:.24em;background:rgba(14,13,11,.82);border-radius:6px}
+@media (max-width:420px){.gc .in{flex-direction:column}.gc .l{border-right:0;border-bottom:1px solid var(--line)}.gc .r{flex-basis:auto;flex-direction:row;flex-wrap:wrap;justify-content:space-around;padding:16px}.gc .code{width:auto;border:0;padding:0}}
+/* Formulaire */
+form{display:flex;flex-direction:column;gap:24px}
+fieldset{margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:12px}
+legend{padding:0;margin-bottom:12px;font:500 12px/1 var(--f-body);letter-spacing:.24em;color:var(--gold);text-transform:uppercase}
+.amts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.amts button{min-height:52px;border-radius:12px;border:1px solid #4A443A;background:transparent;color:var(--cream);font:500 17px/1.1 var(--f-body);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.amts button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:var(--night);font-weight:600}
+.amts button.other{border-style:dashed;color:var(--soft);font-size:14px;font-weight:400}
+label.f{display:flex;flex-direction:column;gap:7px;font:400 14px/1.2 var(--f-body);color:var(--soft)}
+label.f small{color:var(--mute);font-size:12.5px}
+input,textarea{width:100%;min-height:50px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--cream);padding:12px 14px;font:400 16px/1.4 var(--f-body);outline:none}
+input:focus,textarea:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:92px}
+.hint{margin:0;font-size:13.5px;color:var(--mute)}
+.err{margin:0;color:#F2B8A0;font-size:14px;min-height:0}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;padding:14px 20px;border-radius:999px;border:1px solid var(--gold);background:var(--gold);color:var(--night);font:600 14px/1.1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;cursor:pointer}
+.btn.pp{background:var(--pp);border-color:var(--pp);color:#fff;letter-spacing:.06em;text-transform:none;font-size:16px}
+.btn.line{background:transparent;color:var(--cream);border-color:#6B6559}
+.btn.wa{background:#25D366;border-color:#25D366;color:#0E0D0B}
+.btn[disabled]{opacity:.6;cursor:default}
+.how{margin-top:28px;padding:22px 20px;border-radius:16px;background:var(--panel);border:1px solid var(--line-2);display:flex;flex-direction:column;gap:14px}
+.how .s{display:flex;gap:14px;align-items:flex-start}
+.how .s i{flex:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--gold);color:var(--gold);font:500 13px/26px var(--f-body);font-style:normal;text-align:center}
+.how p{margin:0;font-size:15px;color:#E6DFD2}
+.how .fine{font-size:13px;color:var(--mute)}
+.box{padding:22px 20px;border-radius:16px;background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.box h2{margin:0;font:500 clamp(28px,4vw,38px)/1.1 var(--f-display)}
+.box p{margin:0;color:var(--soft)}
+.box .note{padding:12px 14px;border-radius:10px;border:1px dashed var(--gold-e);color:var(--cream);font-size:15px}
+.acts{display:flex;flex-direction:column;gap:10px}
+.state{text-align:center;padding:80px 10px;color:var(--mute)}
+.ft{text-align:center;margin:44px 0 0;font:400 11px/1.6 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:#8F877A}
+.ft a{color:inherit;text-decoration:none}
+.only-print{display:none}
+@page{size:148mm 105mm;margin:0}
+@media print{
+  html,body{background:#0E0D0B;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:0}
+  .hd,.intro,.side,.ft,.no-print{display:none!important}
+  main{padding:0;max-width:none}
+  .grid{display:block}
+  .gc{width:148mm;height:105mm;border:0;border-radius:0;padding:4mm;background:#0E0D0B}
+  .gc .in{height:100%;min-height:0}
+}
+</style>
+</head>
+<body>
+<header class="hd">
+  <a class="brand" href="/"><img class="sym" src="logo-sym-g.png" alt="" width="217" height="240"><span class="nm"><b>APOCADRIVE</b><i>FILMMAKER · FRANCE</i></span></a>
+  <a class="back" href="/">Le site</a>
+</header>
+<main id="root"><div class="state">Chargement…</div></main>
+<p class="ft no-print"><a href="/">www.apocadrive.com</a></p>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+const app = initializeApp({ apiKey: "AIzaSyC9gZ9xNB3vYiYcOE9pIsgqINYTvT768lc", authDomain: "apoca-drive.firebaseapp.com", projectId: "apoca-drive", appId: "1:826000114685:web:4ed7cf006753e352a24f94", messagingSenderId: "826000114685" });
+const fs = getFirestore(app);
+const root = document.getElementById("root");
+const E = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const P = new URLSearchParams(location.search);
+const cid = P.get("c") || "";
+const eur = n => (Math.round(+n * 100) / 100).toLocaleString("fr-FR") + " €";
+const frDate = s => { if (!/^\d{4}-\d{2}-\d{2}$/.test(s || "")) return ""; const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString("fr-FR", {day:"numeric", month:"long", year:"numeric"}); };
+const waNum = t => { let x = String(t || "").replace(/[^\d+]/g, "").replace(/^\+/, ""); if (x.startsWith("00")) x = x.slice(2); if (x.startsWith("0")) x = "33" + x.slice(1); return x; };
+const rid = () => Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, "0")).join("");
+
+/* Réglages venant de l'appli (Mon site › Carte cadeau) */
+let CFG = { montants: [50, 100, 150, 250, 500], min: 50, mois: 12, pp: "ApocaDrive", tel: "+33 6 07 05 53 84" };
+async function loadCfg(){
+  try {
+    const s = await getDoc(doc(fs, "site", "content")); const c = s.exists() ? s.data() : {};
+    const g = c.cadeau || {};
+    const list = String(g.montants || "").split(/[\s,;]+/).map(x => Math.round(parseFloat(x.replace(",", ".")))).filter(x => x >= 10 && x <= 5000);
+    if (list.length) CFG.montants = [...new Set(list)].slice(0, 8);
+    const mn = Math.round(parseFloat(String(g.min || "").replace(",", "."))); if (mn >= 10 && mn <= 5000) CFG.min = mn;
+    const mo = parseInt(g.mois, 10); if (mo >= 1 && mo <= 60) CFG.mois = mo;
+    const pm = c.paiement || {}; for (const v of Object.values(pm)) { const m = String(v || "").match(/paypal\.me\/([A-Za-z0-9._-]+)/i); if (m){ CFG.pp = m[1]; break; } }
+    if (c.contact && c.contact.tel) CFG.tel = String(c.contact.tel);
+  } catch(e){}
+}
+const validTxt = () => CFG.mois === 12 ? "1 an" : CFG.mois % 12 === 0 ? `${CFG.mois / 12} ans` : `${CFG.mois} mois`;
+const ppLink = n => `https://paypal.me/${encodeURIComponent(CFG.pp)}/${String(Math.round(n * 100) / 100)}EUR`;
+
+/* La carte (aperçu, en attente ou active) */
+function cardHTML(d, opts){
+  opts = opts || {};
+  return `<div class="gc" id="gc">
+    <div class="in">
+      <div class="l">
+        <div class="brandl"><img src="logo-sym-g.png" alt="Apoca Drive" width="217" height="240"><b>APOCADRIVE</b></div>
+        <div>
+          <p class="k">Carte cadeau</p>
+          <p class="who">Pour <em>${E(d.pour || "…")}</em></p>
+          ${d.message ? `<p class="msg">« ${E(d.message)} »</p>` : ""}
+          ${d.de ? `<p class="from" style="margin-top:10px">De la part de ${E(d.de)}</p>` : ""}
+        </div>
+        <p class="small">À utiliser sur un shooting, un outfit, un clip ou un mariage.<br>Réservation sur www.apocadrive.com ou sur WhatsApp avec le code.</p>
+      </div>
+      <div class="r">
+        <div><p class="lab">Valeur</p><p class="val">${d.montant ? E(eur(d.montant)) : "—"}</p></div>
+        <div class="code"><p class="lab">Code</p><b>${E(opts.code || "APD-····")}</b></div>
+        <div><p class="lab">${opts.until ? "Valable jusqu'au" : "Validité"}</p><p class="until">${opts.until ? E(frDate(opts.until)) : E(validTxt()) + " après le paiement"}</p></div>
+      </div>
+    </div>
+    ${opts.stamp ? `<span class="stamp">${E(opts.stamp)}</span>` : ""}
+  </div>`;
+}
+
+/* ---------- 1. Acheter une carte ---------- */
+function viewBuy(){
+  const st = { montant: CFG.montants.includes(150) ? 150 : CFG.montants[Math.min(2, CFG.montants.length - 1)], other: false };
+  root.innerHTML = `
+  <section class="intro"><p class="eye">Carte cadeau</p><h1>Offrez un <em>souvenir filmé.</em></h1><p class="lead">Un shooting, un clip, un outfit ou une partie d'un mariage : la personne choisit, vous offrez.</p></section>
+  <div class="grid">
+    <div class="side-card"><div id="prev"></div></div>
+    <form id="f" novalidate>
+      <fieldset><legend>1 · Le montant</legend>
+        <div class="amts" id="amts">${CFG.montants.map(n => `<button type="button" data-n="${n}" aria-pressed="false">${E(eur(n))}</button>`).join("")}<button type="button" class="other" data-n="other" aria-pressed="false">Autre<br>montant</button></div>
+        <label class="f" id="otherw" hidden>Montant de votre choix (€)<input id="other" type="text" inputmode="decimal" placeholder="Minimum ${E(CFG.min)} €" maxlength="7"></label>
+        <p class="hint" id="amhint"></p>
+      </fieldset>
+      <fieldset><legend>2 · La carte</legend>
+        <label class="f">Pour (prénom de la personne)<input id="pour" type="text" maxlength="60" autocomplete="off" required></label>
+        <label class="f">De la part de<input id="de" type="text" maxlength="60" autocomplete="name" required></label>
+        <label class="f">Petit message <small>facultatif, écrit sur la carte</small><textarea id="msg" maxlength="300" rows="3"></textarea></label>
+      </fieldset>
+      <fieldset><legend>3 · Vos coordonnées</legend>
+        <label class="f">Votre e-mail<input id="email" type="email" maxlength="200" autocomplete="email" required></label>
+        <label class="f">Votre téléphone <small>facultatif, pour recevoir la carte sur WhatsApp</small><input id="tel" type="tel" maxlength="40" autocomplete="tel"></label>
+      </fieldset>
+      <p class="err" id="err" role="alert"></p>
+      <button class="btn pp" id="go" type="submit">Continuer vers le paiement</button>
+      <p class="hint" style="text-align:center">Paiement sécurisé par PayPal, carte bancaire acceptée même sans compte PayPal.</p>
+      <div class="how side">
+        <p class="eye" style="letter-spacing:.24em">Comment ça marche</p>
+        <div class="s"><i>1</i><p>Vous remplissez la carte et payez en ligne avec PayPal (ou par carte bancaire via PayPal).</p></div>
+        <div class="s"><i>2</i><p>Dès que le paiement est confirmé, la carte s'affiche avec son code unique : imprimez-la ou envoyez-la.</p></div>
+        <div class="s"><i>3</i><p>La personne réserve sa date avec le code, sur la prestation de son choix.</p></div>
+        <p class="fine">Valable ${E(validTxt())} après le paiement · à partir de ${E(eur(CFG.min))}.</p>
+      </div>
+    </form>
+  </div>`;
+  const $ = id => document.getElementById(id);
+  const amount = () => st.other ? Math.round(parseFloat(String($("other").value).replace(",", ".")) * 100) / 100 : st.montant;
+  const paint = () => {
+    document.querySelectorAll("#amts button").forEach(b => b.setAttribute("aria-pressed", String(st.other ? b.dataset.n === "other" : +b.dataset.n === st.montant)));
+    $("otherw").hidden = !st.other;
+    const a = amount();
+    $("amhint").textContent = a === 150 ? "150 € = un shooting photo & vidéo complet (2 h · 7 photos + 1 vidéo verticale)." : "";
+    $("prev").innerHTML = cardHTML({ montant: a > 0 ? a : 0, pour: $("pour").value.trim(), de: $("de").value.trim(), message: $("msg").value.trim() });
+    $("go").textContent = a >= CFG.min ? `Continuer · ${eur(a)}` : "Continuer vers le paiement";
+  };
+  $("amts").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; if (b.dataset.n === "other"){ st.other = true; paint(); $("other").focus(); } else { st.other = false; st.montant = +b.dataset.n; paint(); } });
+  ["pour","de","msg","other"].forEach(id => $(id).addEventListener("input", paint));
+  paint();
+  $("f").addEventListener("submit", async e => {
+    e.preventDefault(); const err = $("err"); err.textContent = "";
+    const a = amount(), pour = $("pour").value.trim(), de = $("de").value.trim(), message = $("msg").value.trim(), email = $("email").value.trim(), tel = $("tel").value.trim();
+    if (!(a >= CFG.min) || a > 5000) { err.textContent = `Choisissez un montant entre ${eur(CFG.min)} et 5 000 €.`; return; }
+    if (!pour) { err.textContent = "Indiquez le prénom de la personne qui reçoit la carte."; $("pour").focus(); return; }
+    if (!de) { err.textContent = "Indiquez de la part de qui est la carte."; $("de").focus(); return; }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = "Votre adresse e-mail ne semble pas correcte."; $("email").focus(); return; }
+    const b = $("go"); b.disabled = true; b.textContent = "Préparation de votre carte…";
+    const id = rid(); const montant = Math.round(a);
+    const data = { montant, pour, de, email, at: serverTimestamp() };
+    if (message) data.message = message; if (tel) data.tel = tel;
+    try {
+      await setDoc(doc(fs, "cadeauxDemandes", id), data);
+      try { sessionStorage.setItem("cadeau-" + id, JSON.stringify({ montant, pour, de, message })); } catch(x){}
+      location.href = "/cadeau?c=" + id + "&n=1";
+    } catch(x) { b.disabled = false; paint(); err.textContent = "La commande n'est pas partie. Vérifiez votre connexion et réessayez."; }
+  });
+}
+
+/* ---------- 2. La carte d'un acheteur (en attente, puis active) ---------- */
+function viewCard(){
+  let local = null; try { local = JSON.parse(sessionStorage.getItem("cadeau-" + cid) || "null"); } catch(e){}
+  const isNew = P.get("n") === "1";
+  const pageLink = "https://www.apocadrive.com/cadeau?c=" + cid;
+  const render = d => {
+    const st = d ? d.status : "attente";
+    const info = d || local;
+    if (!info) { root.innerHTML = `<div class="state">Cette carte cadeau est introuvable. Vérifiez le lien, ou contactez Apoca Drive sur WhatsApp au ${E(CFG.tel)}.</div>`; return; }
+    if (st === "annulee") { root.innerHTML = `<div class="state">Cette carte cadeau a été annulée. Pour toute question, contactez Apoca Drive sur WhatsApp au ${E(CFG.tel)}.</div>`; return; }
+    const wa = `https://wa.me/${waNum(CFG.tel)}?text=${encodeURIComponent(`Bonjour, je viens de commander une carte cadeau de ${info.montant} € pour ${info.pour}.`)}`;
+    if (st === "attente") {
+      root.innerHTML = `<section class="intro"><p class="eye">Carte cadeau${isNew ? " · dernière étape" : ""}</p><h1>${isNew ? `Plus qu'à <em>payer.</em>` : `Paiement <em>en attente.</em>`}</h1></section>
+      <div class="grid">
+        <div>${cardHTML(info)}</div>
+        <div class="box">
+          <h2>Payer <em>${E(eur(info.montant))}</em></h2>
+          <p>Le paiement se fait sur PayPal, avec un compte PayPal ou une carte bancaire.</p>
+          <p class="note">Dans le message PayPal, écrivez : <b>Carte cadeau pour ${E(info.pour)}</b></p>
+          <div class="acts"><a class="btn pp" href="${E(ppLink(info.montant))}" target="_blank" rel="noopener">Payer ${E(eur(info.montant))} avec PayPal</a></div>
+          <p>Dès que le paiement est confirmé, <b>votre carte s'affiche sur cette page</b>, avec son code. Gardez ce lien précieusement :</p>
+          <div class="acts"><button class="btn line" id="cp" type="button">Copier le lien de ma carte</button><a class="btn line" href="${E(wa)}" target="_blank" rel="noopener">Une question ? WhatsApp</a></div>
+          <p class="hint">La confirmation se fait à la main, en général dans la journée.</p>
+        </div>
+      </div>`;
+      const cp = document.getElementById("cp"); cp.onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(pageLink) : Promise.reject()).then(() => { cp.textContent = "Lien copié ✓"; }, () => prompt("Copiez ce lien :", pageLink)); };
+      return;
+    }
+    const used = st === "utilisee";
+    const expired = !used && d.expire && d.expire < new Date().toISOString().slice(0, 10);
+    root.innerHTML = `<section class="intro"><p class="eye">Carte cadeau</p><h1>${used ? `Carte <em>utilisée.</em>` : `Votre carte <em>est prête.</em>`}</h1>${used ? "" : `<p class="lead">Imprimez-la, enregistrez-la en PDF ou envoyez ce lien à ${E(info.pour)}.</p>`}</section>
+      <div class="grid">
+        <div>${cardHTML(info, { code: d.code, until: d.expire, stamp: used ? "Utilisée" : expired ? "Expirée" : "" })}</div>
+        <div class="box no-print">
+          <h2>Pour <em>${E(info.pour)}</em></h2>
+          <p>Pour réserver, il suffit de donner le code <b style="color:var(--gold)">${E(d.code || "")}</b> lors de la réservation sur www.apocadrive.com ou sur WhatsApp.</p>
+          <div class="acts">
+            <button class="btn" id="pr" type="button">Imprimer ou PDF</button>
+            <button class="btn line" id="sh" type="button">Envoyer la carte</button>
+            <a class="btn line" href="/#reserver">Réserver une date</a>
+          </div>
+          <p class="hint">Pour un PDF : « Imprimer », puis « Enregistrer au format PDF ».</p>
+        </div>
+      </div>`;
+    document.getElementById("pr").onclick = () => window.print();
+    const sh = document.getElementById("sh");
+    sh.onclick = async () => { const t = `Une carte cadeau Apoca Drive pour toi, ${info.pour} ! 🎁`; if (navigator.share) { try { await navigator.share({ title: "Carte cadeau Apoca Drive", text: t, url: pageLink }); } catch(e){} } else { location.href = `https://wa.me/?text=${encodeURIComponent(t + " " + pageLink)}`; } };
+  };
+  let first = true;
+  onSnapshot(doc(fs, "cartesCadeau", cid), s => { first = false; render(s.exists() ? s.data() : null); }, () => { if (first) render(null); });
+  if (local) render(null);
+}
+
+(async () => {
+  await loadCfg();
+  if (cid) { if (!/^[a-f0-9]{24}$/.test(cid)) { root.innerHTML = `<div class="state">Ce lien de carte cadeau n'est pas valide.</div>`; return; } viewCard(); }
+  else viewBuy();
+})();
+</script>
+</body>
+</html>

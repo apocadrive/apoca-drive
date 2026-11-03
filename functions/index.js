@@ -126,6 +126,30 @@ exports.nouvelAvis = onDocumentCreated("avisClients/{id}", async (event) => {
 });
 
 
+/* ---------- Cartes cadeaux ---------- */
+// Une carte cadeau commandée sur le site arrive dans l'appli (avec son code), en attente du paiement PayPal.
+exports.nouvelleCarteCadeau = onDocumentCreated("cadeauxDemandes/{id}", async (event) => {
+  const c = event.data && event.data.data(); if (!c) return;
+  const id = event.params.id;
+  const uid = await ownerUid();
+  const ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const crypto = require("crypto");
+  let code = "";
+  for (let t = 0; t < 8; t++) {
+    code = "APD-" + Array.from(crypto.randomBytes(4), (b) => ABC[b % ABC.length]).join("");
+    const dup = await db.collection(`users/${uid}/cadeaux`).where("code", "==", code).limit(1).get();
+    if (dup.empty) break;
+  }
+  const montant = Math.max(10, Math.min(5000, Math.round(Number(c.montant) || 0)));
+  const r = { code, montant, pour: clip(c.pour, 60), de: clip(c.de, 60), message: clip(c.message, 300), email: clip(c.email, 200), tel: clip(c.tel, 40), status: "En attente", created: Date.now() };
+  await db.doc(`users/${uid}/cadeaux/${id}`).set(r);
+  // La page publique de la carte : sans le code tant que le paiement n'est pas confirmé dans l'appli.
+  await db.doc(`cartesCadeau/${id}`).set({ status: "attente", montant, pour: r.pour, de: r.de, message: r.message, created: r.created });
+  await event.data.ref.delete();
+  const n = await sendToUser(uid, `🎁 Carte cadeau · ${montant} €`, `${r.de} pour ${r.pour} · Vérifie le paiement PayPal puis touche « Paiement reçu »`, "https://apoca-drive.web.app/?cadeaux=1");
+  logger.info("carte cadeau", { id, sent: n });
+});
+
 /* ---------- Devis envoyés au client ---------- */
 const escH = (v) => String(v == null ? "" : v).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 

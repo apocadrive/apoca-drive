@@ -164,6 +164,15 @@
           ]
         },
         {
+          "source": "/cadeau",
+          "headers": [
+            {
+              "key": "Cache-Control",
+              "value": "no-cache"
+            }
+          ]
+        },
+        {
           "source": "/journal",
           "headers": [
             {
