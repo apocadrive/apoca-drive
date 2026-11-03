@@ -163,6 +163,12 @@ var DEMO = [40627, 5223, 40584, 5224, 5218, 40596].map(function(id){ return "htt
 var demoI = 0, demoOn = false, noDemo = false;
 function demo(){ demoOn = true; film.loop = false; film.src = DEMO[demoI++ % DEMO.length]; film.play().catch(function(){}); }
 film.addEventListener("ended", function(){ if (demoOn) demo(); });
+/* iPhone en mode économie d'énergie (ou autre blocage) : la vidéo ne démarre pas toute seule.
+   On réessaie dès qu'elle est prête, quand on revient sur la page, et au premier toucher ou défilement. */
+function kick(){ if (film.src && film.paused) film.play().catch(function(){}); }
+["loadeddata","canplay"].forEach(function(t){ film.addEventListener(t, kick); });
+document.addEventListener("visibilitychange", function(){ if (!document.hidden) kick(); });
+["touchstart","pointerdown","click","scroll","keydown"].forEach(function(t){ window.addEventListener(t, kick, {passive:true, capture:true}); });
 film.addEventListener("error", function(){ if (demoOn) setTimeout(demo, 300); });
 function setVideo(url){ demoOn = false; film.loop = true; film.removeAttribute("poster"); film.src = url; film.hidden = false; film.play().catch(function(){}); }
 function setPhoto(img){ demoOn = false; film.pause(); film.removeAttribute("src"); film.load(); film.style.backgroundImage = 'url("' + img.replace(/"/g, "") + '")'; }
