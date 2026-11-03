@@ -146,7 +146,7 @@ exports.nouvelleCarteCadeau = onDocumentCreated("cadeauxDemandes/{id}", async (e
   // La page publique de la carte : sans le code tant que le paiement n'est pas confirmé dans l'appli.
   await db.doc(`cartesCadeau/${id}`).set({ status: "attente", montant, pour: r.pour, de: r.de, message: r.message, created: r.created });
   await event.data.ref.delete();
-  const n = await sendToUser(uid, `🎁 Carte cadeau · ${montant} €`, `${r.de} pour ${r.pour} · Vérifie le paiement PayPal puis touche « Paiement reçu »`, "https://apoca-drive.web.app/?cadeaux=1");
+  const n = await sendToUser(uid, `🎁 Carte cadeau · ${montant} €`, `${r.de} pour ${r.pour} · Vérifie le paiement (PayPal ou Wero) puis touche « Paiement reçu »`, "https://apoca-drive.web.app/?cadeaux=1");
   logger.info("carte cadeau", { id, sent: n });
 });
 

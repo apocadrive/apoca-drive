@@ -2059,7 +2059,7 @@ function viewCadeaux(){
   const list = q ? all.filter(c => String(c.code||"").toUpperCase().includes(q) || String(c.pour||"").toUpperCase().includes(q) || String(c.de||"").toUpperCase().includes(q)) : all.filter(c => grp(c) === tab);
   const n = k => all.filter(c => grp(c) === k).length;
   const tel = t => String(t||"").replace(/[^\d+]/g,""); const wa = t => { let x = tel(t); if (x.startsWith("0")) x = "33" + x.slice(1); return x.replace("+",""); };
-  let h = `<h2>Cartes cadeaux</h2><p class="small muted" style="margin:0">Quand une carte est commandée sur votre site, elle arrive ici « en attente ». Vérifiez sur PayPal que l'argent est bien arrivé, puis touchez « Paiement reçu » : la carte s'affiche alors chez l'acheteur, avec son code.</p>
+  let h = `<h2>Cartes cadeaux</h2><p class="small muted" style="margin:0">Quand une carte est commandée sur votre site, elle arrive ici « en attente ». Vérifiez sur PayPal (ou Wero) que l'argent est bien arrivé, puis touchez « Paiement reçu » : la carte s'affiche alors chez l'acheteur, avec son code.</p>
     <label class="f">Retrouver une carte (code ou prénom)<input type="search" data-cdq="1" value="${esc(ui.cdQ||"")}" placeholder="Ex. APD-7K4Q" autocapitalize="characters"></label>
     ${q ? "" : `<div class="chips"><button class="chip${tab==="wait"?" tu":""}" data-act="cdtab" data-v="wait">À valider (${n("wait")})</button><button class="chip${tab==="paid"?" tu":""}" data-act="cdtab" data-v="paid">Payées (${n("paid")})</button><button class="chip${tab==="done"?" tu":""}" data-act="cdtab" data-v="done">Utilisées, expirées (${n("done")})</button></div>`}`;
   if (!list.length) return h + `<div class="empty">${q ? "Aucune carte ne correspond." : tab === "wait" ? "Aucune carte en attente. Elles arrivent ici dès qu'un client en commande une sur www.apocadrive.com/cadeau." : tab === "paid" ? "Aucune carte payée à utiliser pour l'instant." : "Rien ici pour l'instant."}</div>`;
@@ -2071,7 +2071,7 @@ function viewCadeaux(){
       <p style="margin:0;font-size:20px;font-weight:600;letter-spacing:.06em" class="mono">${esc(c.code||"")}</p>
       ${c.message ? `<p class="small" style="margin:0;white-space:pre-wrap">« ${esc(c.message)} »</p>` : ""}
       <div class="small" style="display:flex;flex-direction:column;gap:2px">${c.email?`<span class="mono" style="user-select:all">${esc(c.email)}</span>`:""}${c.tel?`<span class="mono" style="user-select:all">${esc(c.tel)}</span>`:""}${c.expire?`<span class="muted">Valable jusqu'au ${esc(cdDate(c.expire))}</span>`:""}${c.usedAt?`<span class="muted">Utilisée le ${esc(new Date(c.usedAt).toLocaleDateString("fr-FR"))}</span>`:""}</div>
-      ${st === "En attente" ? `<p class="small muted" style="margin:0">Cherchez sur PayPal un paiement de <b>${esc(c.montant)} €</b> de ${esc(c.de||"l'acheteur")} avant de valider.</p>` : ""}
+      ${st === "En attente" ? `<p class="small muted" style="margin:0">Cherchez sur PayPal ou dans votre banque (Wero) un paiement de <b>${esc(c.montant)} €</b> de ${esc(c.de||"l'acheteur")} avant de valider.</p>` : ""}
       <div class="row" style="flex-wrap:wrap;gap:6px">
         ${st === "En attente" ? `<button class="btn sm primary" data-act="cdpaid" data-id="${c.id}">${ui.cdOk===c.id?"Confirmer : l'argent est arrivé":"Paiement reçu"}</button>` : ""}
         ${st === "Payée" || st === "Expirée" ? `${c.tel?`<a class="btn sm primary" href="https://wa.me/${wa(c.tel)}?text=${encodeURIComponent(cdMsg(c, c.id))}" target="_blank" rel="noopener">Envoyer sur WhatsApp</a>`:""}${c.email?`<a class="btn sm${c.tel?"":" primary"}" href="mailto:${esc(c.email)}?subject=${encodeURIComponent("Votre carte cadeau Apoca Drive")}&body=${encodeURIComponent(cdMsg(c, c.id))}">Envoyer par e-mail</a>`:""}<button class="btn sm" data-act="cdcopy" data-id="${c.id}">Copier le lien</button><a class="btn sm ghost" href="${cdLink(c.id)}" target="_blank" rel="noopener">Voir la carte</a>` : ""}
@@ -2566,6 +2566,7 @@ function viewSite(){
       ${sfTa("cadeau.montants","Montants proposés en euros (un par ligne)","50")}
       ${sfIn("cadeau.min","Montant minimum (€) pour « Autre montant »","50",6)}
       ${sfIn("cadeau.mois","Durée de validité (en mois, à partir du paiement)","12",3)}
+      ${sfIn("paiement.wero","Wero : votre numéro ou e-mail Wero (affiché comme 2e moyen de paiement)","06 07 05 53 84",80)}
       <div class="row" style="flex-wrap:wrap;gap:8px"><a class="btn" href="https://www.apocadrive.com/cadeau" target="_blank" rel="noopener">Voir la page</a><button class="btn ghost" data-act="go" data-v="cadeaux">Cartes vendues</button></div>
       <p class="small muted" style="margin:0">Pour cacher la bannière de l'accueil après Noël : onglet « Sections ».</p></section>`;
   } else if (t === "visites"){

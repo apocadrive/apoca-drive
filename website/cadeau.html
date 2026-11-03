@@ -74,6 +74,8 @@ textarea{resize:vertical;min-height:92px}
 .btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:56px;padding:14px 20px;border-radius:999px;border:1px solid var(--gold);background:var(--gold);color:var(--night);font:600 14px/1.1 var(--f-body);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;cursor:pointer}
 .btn.pp{background:var(--pp);border-color:var(--pp);color:#fff;letter-spacing:.06em;text-transform:none;font-size:16px}
 .btn.line{background:transparent;color:var(--cream);border-color:#6B6559}
+.wero{padding:16px;border-radius:12px;border:1px solid var(--line);background:#1D1A13;display:flex;flex-direction:column;gap:10px}
+.wero b.w{color:var(--gold);user-select:all;font-weight:500}
 .btn.wa{background:#25D366;border-color:#25D366;color:#0E0D0B}
 .btn[disabled]{opacity:.6;cursor:default}
 .how{margin-top:28px;padding:22px 20px;border-radius:16px;background:var(--panel);border:1px solid var(--line-2);display:flex;flex-direction:column;gap:14px}
@@ -124,7 +126,7 @@ const waNum = t => { let x = String(t || "").replace(/[^\d+]/g, "").replace(/^\+
 const rid = () => Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, "0")).join("");
 
 /* Réglages venant de l'appli (Mon site › Carte cadeau) */
-let CFG = { montants: [50, 100, 150, 250, 500], min: 50, mois: 12, pp: "ApocaDrive", tel: "+33 6 07 05 53 84" };
+let CFG = { montants: [50, 100, 150, 250, 500], min: 50, mois: 12, pp: "ApocaDrive", wero: "", tel: "+33 6 07 05 53 84" };
 async function loadCfg(){
   try {
     const s = await getDoc(doc(fs, "site", "content")); const c = s.exists() ? s.data() : {};
@@ -134,6 +136,7 @@ async function loadCfg(){
     const mn = Math.round(parseFloat(String(g.min || "").replace(",", "."))); if (mn >= 10 && mn <= 5000) CFG.min = mn;
     const mo = parseInt(g.mois, 10); if (mo >= 1 && mo <= 60) CFG.mois = mo;
     const pm = c.paiement || {}; for (const v of Object.values(pm)) { const m = String(v || "").match(/paypal\.me\/([A-Za-z0-9._-]+)/i); if (m){ CFG.pp = m[1]; break; } }
+    CFG.wero = String(pm.wero || "").trim().slice(0, 80);
     if (c.contact && c.contact.tel) CFG.tel = String(c.contact.tel);
   } catch(e){}
 }
@@ -189,10 +192,10 @@ function viewBuy(){
       </fieldset>
       <p class="err" id="err" role="alert"></p>
       <button class="btn pp" id="go" type="submit">Continuer vers le paiement</button>
-      <p class="hint" style="text-align:center">Paiement sécurisé par PayPal, carte bancaire acceptée même sans compte PayPal.</p>
+      <p class="hint" style="text-align:center">Paiement par PayPal${CFG.wero ? " ou Wero" : ""}, carte bancaire acceptée même sans compte PayPal.</p>
       <div class="how side">
         <p class="eye" style="letter-spacing:.24em">Comment ça marche</p>
-        <div class="s"><i>1</i><p>Vous remplissez la carte et payez en ligne avec PayPal (ou par carte bancaire via PayPal).</p></div>
+        <div class="s"><i>1</i><p>Vous remplissez la carte et payez en ligne avec PayPal${CFG.wero ? " ou Wero" : ""} (carte bancaire acceptée via PayPal).</p></div>
         <div class="s"><i>2</i><p>Dès que le paiement est confirmé, la carte s'affiche avec son code unique : imprimez-la ou envoyez-la.</p></div>
         <div class="s"><i>3</i><p>La personne réserve sa date avec le code, sur la prestation de son choix.</p></div>
         <p class="fine">Valable ${E(validTxt())} après le paiement · à partir de ${E(eur(CFG.min))}.</p>
@@ -248,14 +251,16 @@ function viewCard(){
         <div>${cardHTML(info)}</div>
         <div class="box">
           <h2>Payer <em>${E(eur(info.montant))}</em></h2>
-          <p>Le paiement se fait sur PayPal, avec un compte PayPal ou une carte bancaire.</p>
-          <p class="note">Dans le message PayPal, écrivez : <b>Carte cadeau pour ${E(info.pour)}</b></p>
+          <p>${CFG.wero ? "Au choix : PayPal (compte PayPal ou carte bancaire) ou Wero depuis l'appli de votre banque." : "Le paiement se fait sur PayPal, avec un compte PayPal ou une carte bancaire."}</p>
+          <p class="note">Dans le message du paiement, écrivez : <b>Carte cadeau pour ${E(info.pour)}</b></p>
           <div class="acts"><a class="btn pp" href="${E(ppLink(info.montant))}" target="_blank" rel="noopener">Payer ${E(eur(info.montant))} avec PayPal</a></div>
+          ${CFG.wero ? `<div class="wero"><p style="margin:0;color:var(--cream)"><b>Ou par Wero</b>, depuis l'appli de votre banque : envoyez <b>${E(eur(info.montant))}</b> à <b class="w" style="white-space:nowrap">${E(CFG.wero)}</b>.</p><button class="btn line" id="cw" type="button" style="min-height:46px">Copier le numéro Wero</button></div>` : ""}
           <p>Dès que le paiement est confirmé, <b>votre carte s'affiche sur cette page</b>, avec son code. Gardez ce lien précieusement :</p>
           <div class="acts"><button class="btn line" id="cp" type="button">Copier le lien de ma carte</button><a class="btn line" href="${E(wa)}" target="_blank" rel="noopener">Une question ? WhatsApp</a></div>
           <p class="hint">La confirmation se fait à la main, en général dans la journée.</p>
         </div>
       </div>`;
+      const cw = document.getElementById("cw"); if (cw) cw.onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(CFG.wero) : Promise.reject()).then(() => { cw.textContent = "Copié ✓"; }, () => prompt("Numéro Wero :", CFG.wero)); };
       const cp = document.getElementById("cp"); cp.onclick = () => { (navigator.clipboard ? navigator.clipboard.writeText(pageLink) : Promise.reject()).then(() => { cp.textContent = "Lien copié ✓"; }, () => prompt("Copiez ce lien :", pageLink)); };
       return;
     }
