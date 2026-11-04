@@ -2149,5 +2149,29 @@ onSnapshot(doc(fs, "public/availability"), (s) => { const b = s.exists() ? (s.da
   bar.addEventListener("click", function(){ try { if (window.__apocaHit) window.__apocaHit("resa"); } catch(e){} });
 })();
 </script>
+<style id="verre">
+/* ===== Verre liquide : 5 endroits seulement, toujours posé sur une image ou une vidéo ===== */
+:root{--glass-bg:linear-gradient(140deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 45%,rgba(255,255,255,.1) 100%);--glass-line:rgba(255,255,255,.26);--glass-hi:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(255,255,255,.07)}
+/* 1. Menu du haut posé sur la vidéo d'accueil */
+header:not(.scrolled){background:transparent}
+header:not(.scrolled)::before{content:"";position:absolute;left:10px;right:10px;top:calc(8px + env(safe-area-inset-top,0px));bottom:-2px;border-radius:999px;background:var(--glass-bg);-webkit-backdrop-filter:blur(10px) saturate(150%);backdrop-filter:blur(10px) saturate(150%);border:1px solid var(--glass-line);box-shadow:var(--glass-hi),0 14px 34px -18px rgba(0,0,0,.6);pointer-events:none;z-index:-1;transition:opacity .5s}
+header.scrolled::before{opacity:0}
+/* 2. Badges de l'accueil */
+.hbadges li{background:var(--glass-bg)!important;border-color:var(--glass-line)!important;-webkit-backdrop-filter:blur(9px) saturate(150%)!important;backdrop-filter:blur(9px) saturate(150%)!important;box-shadow:var(--glass-hi),0 8px 20px -12px rgba(0,0,0,.5)}
+/* 3. Étiquette « Filmmaker · Apoca Drive » sur la photo À propos */
+.ab-badge{background:linear-gradient(150deg,rgba(30,27,22,.55),rgba(30,27,22,.32))!important;-webkit-backdrop-filter:blur(12px) saturate(160%)!important;backdrop-filter:blur(12px) saturate(160%)!important;border:1px solid rgba(255,255,255,.22);box-shadow:var(--glass-hi),0 18px 40px -18px rgba(0,0,0,.6)!important}
+/* 4. Bouton lecture sur les vignettes de films */
+.film .play{background:var(--glass-bg);-webkit-backdrop-filter:blur(8px) saturate(150%);backdrop-filter:blur(8px) saturate(150%);border-color:var(--glass-line)!important;box-shadow:var(--glass-hi),0 10px 26px -12px rgba(0,0,0,.55)}
+/* 5. Barre « Votre date est libre ? » */
+@media (max-width:760px){.datebar{background:linear-gradient(140deg,rgba(40,36,30,.55),rgba(20,18,15,.45))!important;-webkit-backdrop-filter:blur(14px) saturate(170%)!important;backdrop-filter:blur(14px) saturate(170%)!important;border-color:rgba(255,255,255,.24)!important;box-shadow:var(--glass-hi),0 14px 34px -14px rgba(0,0,0,.6)!important}}
+/* Avis : la carte est entièrement posée sur le bas de la vidéo, sans bande noire */
+.proof{background:transparent!important;padding:0!important;height:0;display:block!important}
+.proof .pf-bg{display:none}
+.proof .in{position:absolute!important;left:16px;right:16px;bottom:22px;margin:0 auto!important;max-width:720px;padding:clamp(20px,4.5vw,34px) clamp(18px,5vw,44px)!important}
+.pf-q{font-size:clamp(17px,4.3vw,24px)!important;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.hero:has(+ .proof:not([hidden])) .hin{padding-bottom:calc(clamp(86px,12vh,130px) + 70px + env(safe-area-inset-bottom,0px))}
+.hero:has(+ .proof:not([hidden])) .hscroll{display:none}
+@media (max-height:740px){.hero:has(+ .proof:not([hidden])) .hbadges{display:none}}
+</style>
 </body>
 </html>
