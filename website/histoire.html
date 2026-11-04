@@ -56,6 +56,14 @@ a.vbox{display:grid;place-items:center;text-decoration:none}
 .more a::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 50%,rgba(14,13,11,.6))}
 .more b{position:absolute;z-index:1;left:16px;right:16px;bottom:16px;font:400 24px/1.1 var(--f-display)}
 @media (max-width:620px){.more{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* Photos en mosaïque : chaque photo garde sa forme, les colonnes sont décalées */
+#photos .pgrid{display:block;columns:3;column-gap:12px}
+#photos .pgrid button{display:block;width:100%;aspect-ratio:auto;margin:0 0 12px;break-inside:avoid;border-radius:16px;background:#E9E3D8}
+#photos .pgrid img{height:auto;min-height:120px}
+#photos .pgrid button:nth-child(6n+1) img{aspect-ratio:4/5;object-fit:cover}
+@media (min-width:621px){#photos .pgrid{column-gap:14px}#photos .pgrid button{margin-bottom:14px}}
+@media (max-width:620px){#photos .pgrid{columns:2;column-gap:8px}#photos .pgrid button{margin-bottom:8px;border-radius:12px}}
+
 </style>
 </head>
 <body>
