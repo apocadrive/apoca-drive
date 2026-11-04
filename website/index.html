@@ -933,7 +933,6 @@ html{overflow-x:hidden}body{overflow-x:clip}
   <div class="hbg" aria-hidden="true"><canvas id="hcv"></canvas><img id="himg" alt="" hidden><video id="hvid" muted loop playsinline preload="auto" hidden></video><video id="hdemo1" class="hdemo" muted playsinline preload="auto" hidden></video><video id="hdemo2" class="hdemo" muted playsinline preload="auto" hidden></video></div>
   <div class="hveil"></div>
   <div class="hin wrap"><div class="in hcontent">
-    <p class="heye reveal" id="h-eye">Vidéaste &amp; photographe de mariage · France</p>
     <h1 class="reveal r1" id="h-titre">Vos plus beaux jours, <em>filmés comme au cinéma.</em></h1>
     <p class="hlead reveal r2" id="h-acc">Mariages civils, religieux et coutumiers, clips et shootings, en photo et en vidéo, partout en France.</p>
     <div class="hctas reveal r3"><a class="btn gold" href="/films" id="h-films">Voir mes films</a><a class="btn line" href="#reserver">Réserver ma date</a></div>
@@ -1390,7 +1389,7 @@ function applyAll(){
     $("#cond-l").innerHTML = cl.map((x, i) => { const m = x.match(/^([^:]{2,40}) ?: ?(.+)$/); const up = t => t.charAt(0).toUpperCase() + t.slice(1); return `<li><i>${String(i + 1).padStart(2, "0")}</i><div>${m ? `<b>${E(up(m[1]))}</b>${E(up(m[2]))}` : E(x)}</div></li>`; }).join("");
     vis("#conditions", cl.length > 0 && !hide.conditions); vis('a[href="#conditions"]', cl.length > 0 && !hide.conditions); }
   /* accueil */
-  $("#h-eye").textContent = val(h, "eyebrow", "Vidéaste & photographe de mariage · France");
+  { const he = $("#h-eye"); if (he) he.textContent = val(h, "eyebrow", ""); }
   const t1 = val(h, "titre", "Vos plus beaux jours,"), t2 = val(h, "titreOr", "filmés comme au cinéma.");
   $("#h-titre").innerHTML = E(t1) + (t2 ? ` <em>${E(t2)}</em>` : "");
   const acc = val(h, "accroche", "Mariages civils, religieux et coutumiers, clips et shootings, en photo et en vidéo, partout en France."); $("#h-acc").textContent = acc; $("#h-acc").hidden = !acc;
