@@ -2230,5 +2230,16 @@ header.scrolled::before{opacity:0}
 @media (hover:hover){#bk-opts .bk-opt:hover{transform:translateY(-2px);border-color:rgba(201,163,94,.7)!important}}
 @media (max-width:360px){#bk-opts{grid-template-columns:1fr}#bk-opts .bk-opt{min-height:0}}
 </style>
+<script>
+/* Mode économie d'énergie (iPhone) ou lecture auto bloquée : on relance les vidéos visibles au premier toucher, au défilement et au retour sur la page */
+(function(){
+  function vis(v){ if (v.hidden || !v.isConnected) return false; var r = v.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight; }
+  function kick(){ document.querySelectorAll("video[muted], video").forEach(function(v){ if (!v.muted || !(v.currentSrc || v.getAttribute("src")) || !v.paused || v.dataset.userPaused) return; if (vis(v)) { var p = v.play(); if (p && p.catch) p.catch(function(){}); } }); }
+  ["touchstart","pointerdown","click","keydown"].forEach(function(t){ addEventListener(t, kick, {passive:true, capture:true}); });
+  var sc = 0; addEventListener("scroll", function(){ if (sc) return; sc = setTimeout(function(){ sc = 0; kick(); }, 250); }, {passive:true});
+  document.addEventListener("visibilitychange", function(){ if (!document.hidden) kick(); });
+  addEventListener("pageshow", kick);
+})();
+</script>
 </body>
 </html>
