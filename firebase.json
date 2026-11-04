@@ -184,6 +184,10 @@
       ],
       "rewrites": [
         {
+          "source": "/histoire/**",
+          "destination": "/histoire.html"
+        },
+        {
           "source": "/api/paypal",
           "function": {
             "functionId": "paypalCadeau",

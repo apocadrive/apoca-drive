@@ -284,7 +284,8 @@ window.__apocaSiteAdmin = {
       onSnapshot(collection(fs, "avis"), (q) => cb("avis", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("avis", [])),
       onSnapshot(collection(fs, "journal"), (q) => cb("journal", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("journal", [])),
       onSnapshot(collection(fs, "insta"), (q) => cb("insta", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("insta", [])),
-      onSnapshot(collection(fs, "moments"), (q) => cb("moments", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("moments", []))
+      onSnapshot(collection(fs, "moments"), (q) => cb("moments", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("moments", [])),
+      onSnapshot(collection(fs, "histoires"), (q) => cb("histoires", q.docs.map((d) => ({ id: d.id, ...d.data() }))), () => cb("histoires", []))
     ];
     return () => u.forEach((f) => f());
   },
@@ -335,6 +336,10 @@ window.__apocaSiteAdmin = {
   delJournal(id) { return deleteDoc(doc(fs, `journal/${id}`)); },
   saveInsta(id, d) { return setDoc(doc(fs, `insta/${id}`), JSON.parse(JSON.stringify(d)), { merge: true }); },
   delInsta(id) { return deleteDoc(doc(fs, `insta/${id}`)); },
+  saveHist(id, d) { return setDoc(doc(fs, `histoires/${id}`), JSON.parse(JSON.stringify(d)), { merge: true }); },
+  delHist(id) { return deleteDoc(doc(fs, `histoires/${id}`)); },
+  // envoie une photo (déjà réduite) dans le stockage et renvoie son lien
+  async upPhoto(dataUrl, folder) { const u = await dataUrlToFile(dataUrl, folder || "histoires"); if (/^data:/.test(u)) throw new Error("stockage indisponible"); return u; },
   saveMoment(id, d) { return setDoc(doc(fs, `moments/${id}`), JSON.parse(JSON.stringify(d)), { merge: true }); },
   delMoment(id) { return deleteDoc(doc(fs, `moments/${id}`)); },
   listenStats(cb) { return onSnapshot(collection(fs, "stats"), (q) => { const m = {}; q.docs.forEach((d) => { m[d.id] = d.data(); }); cb(m); }, () => cb({})); },

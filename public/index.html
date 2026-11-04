@@ -2167,13 +2167,13 @@ const SITE_SECS = [["apropos","À propos"],["pourquoi","Pourquoi Apoca Drive (co
 const FILM_CATS = [["mariage","Mariage"],["clip","Clip"],["event","Événement"],["corporate","Commercial"]];
 const RESA_ITEMS = [["mariage","Mariage",""],["mariage-civil","Mariage civil","Mariage"],["mariage-religieux","Mariage religieux","Mariage"],["mariage-civil-religieux","Mariage civil & religieux","Mariage"],["mariage-coutumier","Mariage coutumier","Mariage"],["fiancailles","Fiançailles","Mariage"],["clip","Clip musique",""],["anniversaire","Anniversaire",""],["podcast","Podcast",""],["shooting","Shooting photo & vidéo",""],["outfit","Outfit",""]];
 S.resa = null;
-S.siteJournal = null; S.siteInsta = null; S.siteMoments = null;
+S.siteJournal = null; S.siteInsta = null; S.siteMoments = null; S.siteHist = null;
 S.site = null; S.sitePh = {hero:null, about:null}; S.siteFilms = null; S.siteAvis = null; S.sitePend = null;
 const STAR_OPTS = [["5","★★★★★  5"],["4","★★★★  4"],["3","★★★  3"],["2","★★  2"],["1","★  1"],["0","Sans étoiles"]];
 const starTxt = n => { n = Math.max(0, Math.min(5, +n||0)); return n ? "★".repeat(n) + "☆".repeat(5-n) : ""; };
 let siteUnsub = null;
 function siteStart(){ if (siteUnsub || !window.__apocaSiteAdmin) return; siteUnsub = window.__apocaSiteAdmin.listen((k, v) => {
-  if (k === "content") S.site = v; else if (k === "heroPhoto") S.sitePh.hero = v; else if (k === "aboutPhoto") S.sitePh.about = v; else if (k === "coulisse1Photo") S.sitePh.coulisse1 = v; else if (k === "coulisse2Photo") S.sitePh.coulisse2 = v; else if (k === "heroVideoMeta"){ S.heroVid = v; if (v && v.n && !v.poster && !S.hvPosterTry && window.__apocaSiteAdmin.heroPoster){ S.hvPosterTry = 1; window.__apocaSiteAdmin.heroPoster(videoPoster).catch(() => {}); } } else if (k === "films") S.siteFilms = v; else if (k === "avis") S.siteAvis = v; else if (k === "journal") S.siteJournal = v; else if (k === "insta") S.siteInsta = v; else if (k === "moments") S.siteMoments = v;
+  if (k === "content") S.site = v; else if (k === "heroPhoto") S.sitePh.hero = v; else if (k === "aboutPhoto") S.sitePh.about = v; else if (k === "coulisse1Photo") S.sitePh.coulisse1 = v; else if (k === "coulisse2Photo") S.sitePh.coulisse2 = v; else if (k === "heroVideoMeta"){ S.heroVid = v; if (v && v.n && !v.poster && !S.hvPosterTry && window.__apocaSiteAdmin.heroPoster){ S.hvPosterTry = 1; window.__apocaSiteAdmin.heroPoster(videoPoster).catch(() => {}); } } else if (k === "films") S.siteFilms = v; else if (k === "avis") S.siteAvis = v; else if (k === "journal") S.siteJournal = v; else if (k === "insta") S.siteInsta = v; else if (k === "moments") S.siteMoments = v; else if (k === "histoires") S.siteHist = v;
   if (ui.view === "site") softRender(); });
   if (window.__apocaSiteAdmin.listenStats) window.__apocaSiteAdmin.listenStats(m => { S.stats = m; if (ui.view === "site") softRender(); });
   if (window.__apocaSiteAdmin.listenResa) window.__apocaSiteAdmin.listenResa(m => { S.resa = m; if (ui.view === "site") softRender(); });
@@ -2369,7 +2369,7 @@ function viewSite(){
   if (!window.__apocaSiteAdmin) return `<h2>Mon site</h2><div class="empty">Disponible dans l'appli en ligne uniquement.</div>`;
   const t = ui.siteTab || "accueil";
   const np = (S.sitePend||[]).length;
-  const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["pourquoi","Coulisses"],["films","Films"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["cadeau","Carte cadeau"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
+  const tabs = [["accueil","Accueil"],["realis","Réalisations"],["apropos","À propos"],["pourquoi","Coulisses"],["films","Films"],["histoires","Histoires"],["avis", np ? `Avis (${np} à valider)` : "Avis"],["reserver","Réserver"],["carte","Carte QR"],["cadeau","Carte cadeau"],["journal","Journal"],["insta","Instagram"],["moments","Moments"],["contact","Contact"],["visites","Visites"],["sections","Sections"]];
   let h = `<h2>Mon site</h2><p class="small muted" style="margin:0">Ce que vous changez ici s'affiche tout de suite sur <b>www.apocadrive.com</b>.</p>
     <div class="chips">${tabs.map(([k, l]) => `<button class="chip${t===k?" tu":""}" data-act="stab" data-v="${k}">${l}</button>`).join("")}</div>`;
   if (S.site === null) return h + `<div class="empty"><span class="spin"></span>Chargement…</div>`;
@@ -2464,6 +2464,39 @@ function viewSite(){
         <label class="f">Étoiles<select data-af="etoiles" data-aid="${x.id}">${opts(STAR_OPTS, String(+x.etoiles||0))}</select></label>
         <label class="row" style="gap:8px;font-size:14px"><input type="checkbox" data-ah="${x.id}" ${x.hidden?"checked":""}> Masquer cet avis sur le site</label>
         <div class="row" style="flex-wrap:wrap;gap:6px">${x.une ? `<span class="btn sm" style="pointer-events:none;background:#E6CC93;color:#16130F;border-color:#E6CC93">★ Affiché sur l'accueil</span>` : `<button class="btn sm" data-act="saune" data-id="${x.id}">★ Afficher sur l'accueil</button>`}${i ? `<button class="btn sm" data-act="satop" data-id="${x.id}">Mettre en premier</button>` : ""}<button class="btn ghost sm" data-act="sadel" data-id="${x.id}" style="color:var(--rec)">${ui.saDel===x.id?"Confirmer la suppression":"Supprimer l'avis"}</button></div></section>`).join("");
+  } else if (t === "histoires"){
+    const list = (S.siteHist||[]).slice().sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9) || (b.created||0) - (a.created||0));
+    h += `<p class="small muted" style="margin:0">Une page par couple : le film, l'histoire de la journée, les photos et leurs mots. Elles apparaissent dans « Histoires de mariés » sur votre site, et chaque histoire a sa propre page.</p>`;
+    h += ui.shForm ? `<section class="panel"><h3 style="margin:0">Nouvelle histoire</h3>
+        <label class="f">Les mariés<input type="text" id="shn-titre" maxlength="80" placeholder="Ex. : Sarah & Malik"></label>
+        <div class="row"><button class="btn primary" data-act="shsave">Créer l'histoire</button><button class="btn ghost" data-act="shcancel">Annuler</button></div></section>`
+      : `<button class="btn primary" data-act="shnew" style="align-self:flex-start">${ICON.plus.replace('<svg','<svg width="18" height="18"')} Nouvelle histoire</button>`;
+    if (S.siteHist === null) return h + `<div class="empty"><span class="spin"></span>Chargement…</div>`;
+    if (!list.length) return h + `<div class="empty">Aucune histoire pour l'instant. Tant qu'il n'y en a pas, « Histoires de mariés » est cachée sur le site.</div>`;
+    const HF = (x, f, label, ph, max) => `<label class="f">${label}<input type="text" data-hf="${f}" data-hid="${x.id}" value="${esc(x[f]||"")}" maxlength="${max||80}" placeholder="${ph||""}"></label>`;
+    h += list.map((x, i) => { const open = ui.shOpen === x.id, ph = Array.isArray(x.photos) ? x.photos : [], url = "https://www.apocadrive.com/histoire/" + encodeURIComponent(x.id);
+      return `<section class="panel">
+        <div class="row" style="gap:12px;align-items:center">
+          ${x.cover ? `<img src="${esc(x.cover)}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:12px;flex:none">` : `<div style="width:64px;height:64px;border-radius:12px;background:var(--line,#eee);flex:none"></div>`}
+          <div style="flex:1;min-width:0"><b style="display:block">${esc(x.titre||"Sans nom")}</b><span class="small muted">${esc([x.type, x.lieu, x.date].filter(Boolean).join(" · ") || "À compléter")}${x.hidden ? " · masquée" : ""}</span></div>
+          <button class="btn sm" data-act="shopen" data-id="${x.id}">${open ? "Fermer" : "Modifier"}</button>
+        </div>
+        ${open ? `
+        ${HF(x,"titre","Les mariés","Sarah & Malik")}
+        <div class="grid2">${HF(x,"type","Type de mariage","Mariage coutumier",40)}${HF(x,"date","Date","Juin 2026",30)}</div>
+        ${HF(x,"lieu","Lieu","Château de …, Lyon",80)}
+        <label class="f">Leur histoire<textarea data-hf="recit" data-hid="${x.id}" rows="5" maxlength="2000" placeholder="Racontez leur journée en quelques phrases.">${esc(x.recit||"")}</textarea></label>
+        ${HF(x,"film","Lien du film (Vimeo ou YouTube)","https://vimeo.com/…",300)}
+        <label class="f">Leurs mots (avis du couple)<textarea data-hf="mot" data-hid="${x.id}" rows="3" maxlength="600" placeholder="« Un film magnifique… »">${esc(x.mot||"")}</textarea></label>
+        <div><b class="small">Photo de couverture</b>
+          <div class="row" style="gap:10px;margin-top:8px;align-items:center">${x.cover ? `<img src="${esc(x.cover)}" alt="" style="width:120px;height:80px;object-fit:cover;border-radius:10px">` : ""}
+          ${ui.siteUp === "hc" + x.id ? `<span class="spin"></span>` : `<label class="btn sm" style="cursor:pointer">${x.cover ? "Changer" : "Ajouter"} la couverture<input type="file" accept="image/*" data-hcov="${x.id}" hidden></label>`}</div></div>
+        <div><b class="small">Photos (${ph.length}/30)</b>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">${ph.map((u, k) => `<div style="position:relative"><img src="${esc(u)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;display:block"><button class="btn sm" data-act="shphdel" data-id="${x.id}" data-k="${k}" aria-label="Retirer" style="position:absolute;top:4px;right:4px;padding:2px 8px;min-height:0">×</button></div>`).join("")}</div>
+          ${ui.siteUp === "hp" + x.id ? `<div class="row" style="margin-top:8px"><span class="spin"></span><span class="small">${esc(ui.shMsg||"Envoi des photos…")}</span></div>` : (ph.length < 30 ? `<label class="btn sm" style="cursor:pointer;margin-top:8px;display:inline-flex">Ajouter des photos<input type="file" accept="image/*" multiple data-hph="${x.id}" hidden></label>` : "")}</div>
+        <label class="row" style="gap:8px;font-size:14px"><input type="checkbox" data-hh="${x.id}" ${x.hidden?"checked":""}> Masquer cette histoire sur le site</label>
+        <div class="row" style="flex-wrap:wrap;gap:6px"><a class="btn sm" href="${url}" target="_blank" rel="noopener">Voir la page</a>${i ? `<button class="btn sm" data-act="shtop" data-id="${x.id}">Mettre en premier</button>` : ""}<button class="btn ghost sm" data-act="shdel" data-id="${x.id}" style="color:var(--rec)">${ui.shDel===x.id?"Confirmer la suppression":"Supprimer l'histoire"}</button></div>` : ""}
+      </section>`; }).join("");
   } else if (t === "journal"){
     const list = (S.siteJournal||[]).slice().sort((a, b) => (b.created||0) - (a.created||0)); const f = ui.sjForm;
     h += `<p class="small muted" style="margin:0">De petits articles (conseils, coulisses, récits de mariage) : ils apparaissent dans « Le journal » sur votre site et aident à être trouvé sur Google.</p>`;
@@ -2695,6 +2728,22 @@ async function siteMomentsAdd(files){
     try { const img = await photoData(files[i], 1100); await window.__apocaSiteAdmin.saveMoment(uid(), {img, created: t0 + (files.length - i)}); n++; } catch(e){} }
   ui.siteUp = null; ui.moMsg = ""; render(); toast(n ? `${n} photo${n>1?"s":""} ajoutée${n>1?"s":""} · visible${n>1?"s":""} sur le site` : "Les photos n'ont pas pu être envoyées. Connectez-vous avec apocadrive7@gmail.com.");
 }
+async function histCover(id, file){
+  ui.siteUp = "hc" + id; render();
+  try { const cover = await window.__apocaSiteAdmin.upPhoto(await photoData(file, 1800), "histoires"); const x = (S.siteHist||[]).find(y => y.id === id); if (x) x.cover = cover; await window.__apocaSiteAdmin.saveHist(id, {cover}); toast("Couverture changée"); }
+  catch(e){ toast("La photo n'a pas pu être envoyée. Vérifiez la connexion."); }
+  ui.siteUp = null; render();
+}
+async function histPhotos(id, files){
+  const x = (S.siteHist||[]).find(y => y.id === id); if (!x) return;
+  const ph = Array.isArray(x.photos) ? x.photos.slice() : []; files = files.slice(0, Math.max(0, 30 - ph.length));
+  ui.siteUp = "hp" + id; let n = 0;
+  for (const f of files){ ui.shMsg = `Envoi des photos… ${n + 1}/${files.length}`; render();
+    try { ph.push(await window.__apocaSiteAdmin.upPhoto(await photoData(f, 1600), "histoires")); n++; } catch(e){} }
+  x.photos = ph;
+  try { await window.__apocaSiteAdmin.saveHist(id, {photos: ph}); } catch(e){ siteErr(); }
+  ui.siteUp = null; ui.shMsg = ""; render(); toast(n ? `${n} photo${n>1?"s":""} ajoutée${n>1?"s":""}` : "Les photos n'ont pas pu être envoyées.");
+}
 async function siteInstaAdd(files){
   const room = 12 - (S.siteInsta||[]).length; files = files.slice(0, Math.max(0, room));
   ui.siteUp = "ig"; render(); let n = 0;
@@ -2898,6 +2947,10 @@ function siteChange(el){
   if (el.dataset.rp){ const f = el.files && el.files[0]; if (f) siteResaPhoto(el.dataset.rp, f); return true; }
   if (el.dataset.fphoto){ const f = el.files && el.files[0]; el.value = ""; if (f) siteFilmPhoto(f); return true; }
   if (el.dataset.fcov){ const f = el.files && el.files[0]; if (f) siteFilmCover(el.dataset.fcov, f); return true; }
+  if (el.dataset.hf){ const f = el.dataset.hf, x = (S.siteHist||[]).find(y => y.id === el.dataset.hid); let v = el.value.trim(); if (f === "film" && v && !/^https?:\/\//.test(v)) v = "https://" + v; if (x) x[f] = v; window.__apocaSiteAdmin.saveHist(el.dataset.hid, {[f]: v}).then(() => toast("Enregistré"), siteErr); return true; }
+  if (el.dataset.hh){ window.__apocaSiteAdmin.saveHist(el.dataset.hh, {hidden: el.checked}).then(() => toast(el.checked ? "Masquée sur le site" : "Visible sur le site"), siteErr); return true; }
+  if (el.dataset.hcov){ const f = el.files && el.files[0]; el.value = ""; if (f) histCover(el.dataset.hcov, f); return true; }
+  if (el.dataset.hph){ const fs = [...(el.files||[])]; el.value = ""; if (fs.length) histPhotos(el.dataset.hph, fs); return true; }
   if (el.dataset.jf){ window.__apocaSiteAdmin.saveJournal(el.dataset.jid, {[el.dataset.jf]: el.value.trim()}).then(() => toast("Enregistré"), siteErr); return true; }
   if (el.dataset.jh){ window.__apocaSiteAdmin.saveJournal(el.dataset.jh, {hidden: el.checked}).then(() => toast(el.checked ? "Masqué sur le site" : "Visible sur le site"), siteErr); return true; }
   if (el.dataset.jcov){ const f = el.files && el.files[0]; if (f) siteJournalCover(el.dataset.jcov, f); return true; }
@@ -2959,6 +3012,18 @@ function siteClick(a, b){
     case "galdel": { const id = b.dataset.id; if (ui.galDel !== id){ ui.galDel = id; render(); return true; } ui.galDel = null; const x = (S.gal[b.dataset.gk]||[]).find(y => y.id === id); if (x) window.__apocaGal.del(x).then(() => toast("Supprimé"), siteErr); return true; }
     case "rprm": A.setResa(b.dataset.k, null).then(() => { delete S.resa[b.dataset.k]; toast("Photo retirée"); render(); }, siteErr); return true;
     case "sprm": A.setPhoto(b.dataset.w, null).then(() => { S.sitePh[b.dataset.w] = ""; toast("Photo retirée"); render(); }, siteErr); return true;
+    case "shnew": ui.shForm = true; render(); setTimeout(() => { const e = $("#shn-titre"); if (e) e.focus(); }, 30); return true;
+    case "shcancel": ui.shForm = null; render(); return true;
+    case "shsave": { const titre = $("#shn-titre").value.trim(); if (!titre){ toast("Écrivez les prénoms des mariés."); return true; }
+      const base = titre.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/&/g, " et ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50) || "histoire";
+      let id = base, n = 2; while ((S.siteHist||[]).some(x => x.id === id)) id = base + "-" + n++;
+      const min = Math.min(0, ...(S.siteHist||[]).map(x => x.order ?? 0)), d = {titre, photos: [], created: Date.now(), order: min - 1, hidden: true};
+      S.siteHist = [...(S.siteHist||[]), {id, ...d}]; ui.shForm = null; ui.shOpen = id;
+      A.saveHist(id, d).then(() => toast("Histoire créée · masquée tant que vous la remplissez"), siteErr); render(); return true; }
+    case "shopen": ui.shOpen = ui.shOpen === b.dataset.id ? null : b.dataset.id; ui.shDel = null; render(); return true;
+    case "shtop": { const min = Math.min(0, ...(S.siteHist||[]).map(x => x.order ?? 0)); A.saveHist(b.dataset.id, {order: min - 1}).then(() => toast("Placée en premier"), siteErr); return true; }
+    case "shphdel": { const x = (S.siteHist||[]).find(y => y.id === b.dataset.id); if (!x) return true; const ph = (x.photos||[]).slice(); ph.splice(+b.dataset.k, 1); x.photos = ph; A.saveHist(x.id, {photos: ph}).then(() => toast("Photo retirée"), siteErr); render(); return true; }
+    case "shdel": { const id = b.dataset.id; if (ui.shDel !== id){ ui.shDel = id; render(); return true; } ui.shDel = null; ui.shOpen = null; A.delHist(id).then(() => toast("Histoire supprimée"), siteErr); return true; }
     case "sjnew": ui.sjForm = true; render(); setTimeout(() => { const e = $("#sjn-titre"); if (e) e.focus(); }, 30); return true;
     case "sjcancel": ui.sjForm = null; render(); return true;
     case "sjsave": { const titre = $("#sjn-titre").value.trim(); if (!titre){ toast("Donnez un titre à l'article."); return true; }
@@ -3365,7 +3430,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-04-avis-fixe";
+const APP_VER = "2026-11-04-histoires";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
