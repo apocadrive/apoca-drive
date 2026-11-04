@@ -32,3 +32,8 @@ jobs:
             exit 1
           fi
           echo "::notice::Mise en ligne réussie"
+      - name: Règles du stockage de fichiers (photos et vidéos)
+        continue-on-error: true
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: npx --yes firebase-tools@14 deploy --only storage --project apoca-drive --non-interactive --force

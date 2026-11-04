@@ -199,10 +199,11 @@ window.__jourP = new Promise(function(done){
       .then(function(r){ return r.ok ? r.json() : {}; })
       .then(function(d){
         var j = fv(d && d.fields && d.fields.jour);
-        if (!(j && j.on && j.vid && j.vid.n)){ ready(); done("none"); return; }
+        if (!(j && j.on && j.vid && (j.vid.n || j.vid.url))){ ready(); done("none"); return; }
         var C = window.__carte; C.jour(j); C.none();
         if (j.poster){ film.poster = j.poster; film.style.backgroundImage = 'url("' + String(j.poster).replace(/"/g, "") + '")'; }
         ready();
+        if (j.vid.url){ C.video(j.vid.url); done("ok"); return; }
         // tous les morceaux de la vidéo en même temps
         var ids = []; for (var i = 0; i < j.vid.n; i++) ids.push(i);
         return Promise.all(ids.map(function(i){ return fetch(API + "carteJour/" + j.vid.v + "_" + i + KEY).then(function(r){ if (!r.ok) throw 0; return r.json(); }).then(function(x){ return b64(x.fields.b.bytesValue); }); }))
@@ -250,8 +251,9 @@ const chunks = async (col, field, val, n, type) => {
   const jr = await (window.__jourP || Promise.resolve("none"));
   if (jr === "ok") return;
   const j = cfg.jour || {};
-  if (jr === "none" && j.on && j.vid && j.vid.n) {
+  if (jr === "none" && j.on && j.vid && (j.vid.n || j.vid.url)) {
     C.jour(j); C.none(); // la mise en page du film du jour s'affiche tout de suite, la vidéo arrive ensuite
+    if (j.vid.url) { C.video(j.vid.url); return; }
     const u = await chunks("carteJour", "v", j.vid.v, j.vid.n, j.vid.type).catch(() => "");
     if (u) { C.video(u); return; }
     C.unjour();
@@ -260,6 +262,7 @@ const chunks = async (col, field, val, n, type) => {
   if (cfg.fond === "aucun") { C.none(); return; }
   try {
     const m = (await getDoc(doc(fs, "site/heroVideoMeta"))).data();
+    if (m && m.url) { C.video(m.url); return; }
     if (m && m.n) {
       const parts = (await getDocs(collection(fs, "heroVideo"))).docs.map((d) => d.data()).filter((d) => d.v === m.updated && d.i < m.n).sort((a, b) => a.i - b.i);
       if (parts.length === m.n) { C.video(URL.createObjectURL(new Blob(parts.map((d) => d.b.toUint8Array()), { type: m.type || "video/mp4" }))); return; }

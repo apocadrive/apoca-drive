@@ -1960,6 +1960,7 @@ window.__apocaSite = {
     return { items, info: inf && inf.exists() ? inf.data() : {} };
   },
   galVideo: async (x) => {
+    if (x.url) return x.url;
     const parts = (await getDocs(query(collection(fs, "galerieChunks"), where("vid", "==", x.id)))).docs.map((d) => d.data()).sort((a, b) => a.i - b.i);
     if (!parts.length || (x.n && parts.length !== x.n)) return "";
     return URL.createObjectURL(new Blob(parts.map((d) => d.b.toUint8Array()), { type: x.mime || "video/mp4" }));
@@ -1973,13 +1974,16 @@ onSnapshot(doc(fs, "site/content"), (s) => q("content", s.exists() ? s.data() : 
 let hvStamp = null;
 /* Vidéo d'accueil gardée sur le téléphone : à la visite suivante, elle s'affiche tout de suite */
 const HVC = "apoca-hero-v1";
-(async () => { try { const st = localStorage.getItem("apoca_hv"); if (!st || +st <= HERO_STATIC.ts) return; if (!st || !("caches" in window)) return;
+(() => { try { const u = localStorage.getItem("apoca_hvu"), t = localStorage.getItem("apoca_hvut"); if (u && +t > HERO_STATIC.ts && hvStamp === null){ hvStamp = t; q("heroVideo", u); } } catch (e) {} })();
+(async () => { try { if (localStorage.getItem("apoca_hvu")) return; const st = localStorage.getItem("apoca_hv"); if (!st || +st <= HERO_STATIC.ts) return; if (!st || !("caches" in window)) return;
   const r = await (await caches.open(HVC)).match("/__hero/" + st); if (r && hvStamp === null){ const b = await r.blob(); if (hvStamp === null){ hvStamp = st; q("heroVideo", URL.createObjectURL(b)); } } } catch (e) {} })();
 onSnapshot(doc(fs, "site/heroVideoMeta"), async (s) => {
   const m = s.exists() ? s.data() : null;
-  if (!m || !m.n || !(+m.updated > HERO_STATIC.ts)) return;
+  if (!m || !(m.n || m.url) || !(+m.updated > HERO_STATIC.ts)) return;
   if (!m || !m.n){ hvStamp = null; try { localStorage.removeItem("apoca_hv"); } catch (e) {} q("heroVideo", ""); return; }
   if (m.poster){ try { localStorage.setItem("apoca_hvp", m.poster); } catch (e) {} q("heroPoster", m.poster); }
+  if (m.url){ try { localStorage.setItem("apoca_hvu", m.url); localStorage.setItem("apoca_hvut", String(m.updated)); } catch (e) {} if (String(hvStamp) !== String(m.updated)){ hvStamp = String(m.updated); q("heroVideo", m.url); } return; }
+  try { localStorage.removeItem("apoca_hvu"); } catch (e) {}
   if (String(hvStamp) === String(m.updated)) return; hvStamp = String(m.updated); q("hvLoading", 1);
   try {
     const parts = (await getDocs(collection(fs, "heroVideo"))).docs.map((d) => d.data()).filter((d) => d.v === m.updated && d.i < m.n).sort((a, b) => a.i - b.i);

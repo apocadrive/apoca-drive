@@ -1,6 +1,6 @@
 // Apoca Drive service worker: offline cache + push notifications.
 // Push messages are displayed here directly (always), which is the reliable path on iPhone.
-const CACHE = "apoca-v7";
+const CACHE = "apoca-v8";
 self.addEventListener("install", (e) => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then((c) => c.addAll(["/", "/fb.js", "/manifest.json"]))); });
 self.addEventListener("activate", (e) => { e.waitUntil(caches.keys().then((ks) => Promise.all(ks.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", (e) => {
