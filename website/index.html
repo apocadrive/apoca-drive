@@ -934,7 +934,6 @@ html{overflow-x:hidden}body{overflow-x:clip}
   <div class="hveil"></div>
   <div class="hin wrap"><div class="in hcontent">
     <h1 class="reveal r1" id="h-titre">Vos plus beaux jours, <em>filmés comme au cinéma.</em></h1>
-    <p class="hlead reveal r2" id="h-acc">Mariages civils, religieux et coutumiers, clips et shootings, en photo et en vidéo, partout en France.</p>
     <div class="hctas reveal r3"><a class="btn gold" href="/films" id="h-films">Voir mes films</a><a class="btn line" href="#reserver">Réserver ma date</a></div>
     <ul class="hbadges reveal r3" id="h-badges"><li>Livré en 2 à 4 semaines</li><li>Partout en France</li><li>Acompte 30 % en ligne</li><li>Shooting dès 150 €</li></ul>
   </div></div>
@@ -1392,7 +1391,7 @@ function applyAll(){
   { const he = $("#h-eye"); if (he) he.textContent = val(h, "eyebrow", ""); }
   const t1 = val(h, "titre", "Vos plus beaux jours,"), t2 = val(h, "titreOr", "filmés comme au cinéma.");
   $("#h-titre").innerHTML = E(t1) + (t2 ? ` <em>${E(t2)}</em>` : "");
-  const acc = val(h, "accroche", "Mariages civils, religieux et coutumiers, clips et shootings, en photo et en vidéo, partout en France."); $("#h-acc").textContent = acc; $("#h-acc").hidden = !acc;
+
   const vid = $("#hvid"), img = $("#himg"), v = val(h, "video", "") || SITE.heroVideo || "";
   const known = !!v || SITE.heroVideo !== undefined || window.__heroGiveUp;
   const showPoster = () => { const P = SITE.heroPoster; if (!P){ img.hidden = true; return; } if (img.dataset.p !== "1" || img.getAttribute("src") !== P){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.dataset.p = "1"; img.src = P; if (img.complete && img.naturalWidth) img.classList.add("on"); } img.hidden = false; };
