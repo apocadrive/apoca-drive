@@ -32,13 +32,32 @@
 <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Apoca Drive","alternateName":["Apocadrive","Apoca Drive Filmmaker"],"url":"https://www.apocadrive.com/"}</script>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
-/* ---------- Preuve sous l'accueil ---------- */
-.proof{background:var(--night,#0E0D0B);color:#F4EFE6;padding:28px 0 30px;text-align:center;border-top:1px solid rgba(201,163,94,.25);border-bottom:1px solid rgba(201,163,94,.18)}
-.proof .in{max-width:760px;margin:0 auto;padding:0 22px}
-.pf-note{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(244,239,230,.75);font:400 11px/1 var(--f-body);letter-spacing:.22em;text-transform:uppercase}
-.pf-st{color:#D9BE86;letter-spacing:.12em;font-size:13px}
-.pf-q{margin:14px 0 0;font:italic 400 clamp(19px,4.6vw,24px)/1.4 var(--f-display);color:#F4EFE6}
-.pf-who{margin:10px 0 0;font:400 11px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:#D9BE86}
+/* ---------- Preuve sous l'accueil : verre liquide sur la vidéo ---------- */
+.proof{position:relative;overflow:hidden;isolation:isolate;background:#0E0D0B;color:#F4EFE6;padding:clamp(34px,7vw,64px) 16px;text-align:center}
+.pf-bg{position:absolute;inset:-6%;z-index:-1;background:#0E0D0B var(--pfp,none) center/cover no-repeat;animation:pfDrift 24s ease-in-out infinite alternate}
+.pf-bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity 1.2s ease}
+.pf-bg video.on{opacity:1}
+.pf-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,11,.55),rgba(14,13,11,.25) 45%,rgba(14,13,11,.6))}
+.pf-orb{position:absolute;z-index:1;width:46vmax;height:46vmax;border-radius:50%;filter:blur(40px);opacity:.38;mix-blend-mode:screen;pointer-events:none}
+.pf-orb.a{left:-18%;top:-30%;background:radial-gradient(circle,rgba(217,190,134,.75),transparent 65%);animation:pfOrbA 16s ease-in-out infinite alternate}
+.pf-orb.b{right:-22%;bottom:-40%;background:radial-gradient(circle,rgba(201,163,94,.55),transparent 65%);animation:pfOrbB 19s ease-in-out infinite alternate}
+.proof .in{position:relative;max-width:720px;margin:0 auto;padding:clamp(26px,5vw,40px) clamp(20px,5vw,46px);border-radius:30px;
+  background:linear-gradient(140deg,rgba(255,255,255,.17) 0%,rgba(255,255,255,.06) 42%,rgba(255,255,255,.1) 100%);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.08),inset 0 0 0 1px rgba(217,190,134,.08),0 24px 60px -20px rgba(0,0,0,.55);overflow:hidden}
+.proof .in::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(120% 60% at 15% 0%,rgba(255,255,255,.28),transparent 55%);mix-blend-mode:overlay}
+.proof .in::after{content:"";position:absolute;top:-50%;bottom:-50%;width:40%;left:-60%;transform:rotate(18deg);pointer-events:none;background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);animation:pfSheen 7s ease-in-out infinite}
+.pf-note{position:relative;display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:rgba(244,239,230,.85);font:400 11px/1 var(--f-body);letter-spacing:.22em;text-transform:uppercase}
+.pf-st{color:#E6CC93;letter-spacing:.12em;font-size:13px;text-shadow:0 0 12px rgba(230,204,147,.45)}
+.pf-q{position:relative;margin:16px 0 0;font:italic 400 clamp(19px,4.6vw,25px)/1.42 var(--f-display);color:#fff;text-shadow:0 1px 14px rgba(0,0,0,.35)}
+.pf-who{position:relative;margin:12px 0 0;font:400 11px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:#E6CC93}
+@supports not ((backdrop-filter:blur(2px)) or (-webkit-backdrop-filter:blur(2px))){.proof .in{background:rgba(30,27,22,.82)}}
+@keyframes pfDrift{from{transform:scale(1.04) translate3d(-1.5%,-1%,0)}to{transform:scale(1.12) translate3d(1.5%,1%,0)}}
+@keyframes pfOrbA{to{transform:translate3d(30%,25%,0) scale(1.15)}}
+@keyframes pfOrbB{to{transform:translate3d(-28%,-22%,0) scale(.9)}}
+@keyframes pfSheen{0%,55%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.pf-bg,.pf-orb,.proof .in::after{animation:none}}
 /* ---------- Coulisses à onglets ---------- */
 .coul-h{padding-top:clamp(64px,9vw,110px);padding-bottom:0;text-align:center;background:var(--ivory)}
 .coul > #journal,.coul > #insta{background:var(--ivory)!important;border-block:0!important}
@@ -927,7 +946,7 @@ html{overflow-x:hidden}body{overflow-x:clip}
   <a class="hscroll" href="#apropos">Défiler<span></span></a>
 </section>
 
-<div class="proof" id="proof" hidden><div class="in">
+<div class="proof" id="proof" hidden><div class="pf-bg" aria-hidden="true"><video id="pf-v" muted loop playsinline preload="none"></video><span class="pf-orb a"></span><span class="pf-orb b"></span></div><div class="in">
   <a class="pf-note" href="#avis"><span class="pf-st" aria-hidden="true">★★★★★</span><span id="pf-m"></span></a>
   <p class="pf-q" id="pf-q"></p>
   <p class="pf-who" id="pf-who"></p>
@@ -2132,6 +2151,29 @@ onSnapshot(doc(fs, "public/availability"), (s) => { const b = s.exists() ? (s.da
   }
   new MutationObserver(upd).observe(bk, {attributes:true, attributeFilter:["hidden"]});
   bar.addEventListener("click", function(){ try { if (window.__apocaHit) window.__apocaHit("resa"); } catch(e){} });
+})();
+</script>
+<script>
+/* Bande d'avis en verre liquide : la vidéo d'accueil passe derrière, au ralenti et floutée */
+(function(){
+  var P = document.getElementById("proof"), V = document.getElementById("pf-v"), bg = P.querySelector(".pf-bg");
+  var hv = document.getElementById("hvid"), hi = document.getElementById("himg"), seen = false;
+  function poster(){ var u = (hi && hi.getAttribute("src")) || (typeof SITE !== "undefined" && SITE.heroPoster) || "accueil.jpg?v=2"; if (u && u.indexOf("data:image/gif") !== 0) bg.style.setProperty("--pfp", 'url("' + String(u).replace(/"/g, "") + '")'); }
+  function sync(){
+    poster();
+    if (!seen) return;
+    var u = hv && (hv.currentSrc || hv.getAttribute("src"));
+    if (!u || V.getAttribute("src") === u) return;
+    V.src = u; V.playbackRate = 0.7;
+    V.addEventListener("playing", function(){ V.classList.add("on"); }, {once:true});
+    V.play().catch(function(){});
+  }
+  if (hv) new MutationObserver(sync).observe(hv, {attributes:true, attributeFilter:["src"]});
+  if (hi) new MutationObserver(poster).observe(hi, {attributes:true, attributeFilter:["src"]});
+  if ("IntersectionObserver" in window){
+    new IntersectionObserver(function(es){ var on = es[0].isIntersecting; if (on){ seen = true; sync(); if (V.src && V.paused) V.play().catch(function(){}); } else if (!V.paused) V.pause(); }, {rootMargin:"200px"}).observe(P);
+  } else { seen = true; }
+  sync();
 })();
 </script>
 </body>
