@@ -1661,7 +1661,7 @@ cal();
 
 /* page « Réserver » : prestation → précision → date → coordonnées (photos modifiables dans l'appli) */
 const BK_CATS = [
-  {k:"mariage", t:"Mariage", opts:[["Album photo des mariés","Un bel album imprimé avec vos plus belles photos"],["Panneau de bienvenue","Pour accueillir vos invités à l'entrée"],["Save the date","Une petite vidéo ou carte pour annoncer la date"]], subs:{t:'Quel type de <em>mariage ?</em>', o:[["mariage-civil","Mariage civil"],["mariage-religieux","Mariage religieux"],["mariage-civil-religieux","Mariage civil & religieux"],["mariage-coutumier","Mariage coutumier"],["fiancailles","Fiançailles"]]}},
+  {k:"mariage", t:"Mariage", opts:[["Séance pré‑mariage","Photos et petit film du couple, quelques semaines avant","pre"],["Film du jour","Un film monté le jour même, à voir pendant la soirée","fdj","Le soir même"],["Album photo des mariés","Un bel album imprimé avec vos plus belles photos","album"],["Save the date","Une petite vidéo ou carte pour annoncer la date","std"],["Panneau de bienvenue","Pour accueillir vos invités à l'entrée","pan"]], subs:{t:'Quel type de <em>mariage ?</em>', o:[["mariage-civil","Mariage civil"],["mariage-religieux","Mariage religieux"],["mariage-civil-religieux","Mariage civil & religieux"],["mariage-coutumier","Mariage coutumier"],["fiancailles","Fiançailles"]]}},
   {k:"clip", t:"Clip musique"},
   {k:"anniversaire", t:"Anniversaire"},
   {k:"podcast", t:"Podcast"},
@@ -1681,7 +1681,14 @@ function bkTiles(){
 }
 function bkOpts(){
   const o = (BK.cat && BK.cat.opts) || [];
-  $("#bk-opts").innerHTML = o.map(([l, d], i) => `<button type="button" class="bk-opt" data-o="${i}" aria-pressed="${BK.opts.includes(l)}"><span class="ck"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span class="tx">${ESC(l)}${d?`<small>${ESC(d)}</small>`:""}</span></button>`).join("");
+  const IC = {
+    pre:'<circle cx="9" cy="13" r="5"/><circle cx="15" cy="13" r="5"/><path d="M12 4l1.2 2.2L15.5 7l-2.3.8L12 10l-1.2-2.2L8.5 7l2.3-.8z"/>',
+    fdj:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M3 11h18M7 7l2-3M12 7l2-3M17 7l2-3"/><path d="M10.5 13.5v4l3.5-2z" fill="currentColor" stroke="none"/>',
+    album:'<path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/><path d="M6.5 15l2-2.5 1.5 1.5M15 9.5h3M15 12h3"/>',
+    std:'<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M12 17.2l-2.6-2.5a1.6 1.6 0 0 1 2.3-2.3l.3.3.3-.3a1.6 1.6 0 0 1 2.3 2.3z"/>',
+    pan:'<rect x="5" y="3.5" width="14" height="11" rx="1.5"/><path d="M8 7.5h8M9.5 10.5h5M8 21l2.5-6.5M16 21l-2.5-6.5M12 14.5V21"/>'
+  };
+  $("#bk-opts").innerHTML = o.map(([l, d, ic, tag], i) => { const on = BK.opts.includes(l); return `<button type="button" class="bk-opt" data-o="${i}" aria-pressed="${on}"><span class="ic" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">${IC[ic] || IC.album}</svg></span><span class="ck" aria-hidden="true"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span><span class="tx">${ESC(l)}${d?`<small>${ESC(d)}</small>`:""}</span>${tag ? `<span class="tg">${ESC(tag)}</span>` : ""}</button>`; }).join("");
   $("#bk-opt-ok").textContent = BK.opts.length ? `Continuer (${BK.opts.length} option${BK.opts.length>1?"s":""})` : "Continuer";
 }
 const bkNextStep = () => (BK.cat && BK.cat.opts) ? 5 : 3;
@@ -2201,6 +2208,27 @@ header.scrolled::before{opacity:0}
 .hst-c .pl{position:absolute;z-index:1;top:14px;right:14px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(140deg,rgba(255,255,255,.18),rgba(255,255,255,.05));-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3)}
 @media (max-width:860px){.hst-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.hst-g{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;margin-left:-22px;margin-right:-22px;padding:0 22px 6px;scrollbar-width:none}.hst-g::-webkit-scrollbar{display:none}.hst-c{flex:0 0 78%;scroll-snap-align:center}}
+</style>
+<style id="options-css">
+/* Options du mariage : cartes élégantes, sélection en noir et or */
+#bk-opts{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important;margin:6px 0 4px!important}
+#bk-opts .bk-opt{position:relative;display:flex!important;flex-direction:column;align-items:flex-start;gap:0!important;padding:20px 18px 20px!important;min-height:190px;border:1px solid rgba(201,163,94,.35)!important;border-radius:24px;background:linear-gradient(160deg,#FFFDF8,#F7F1E5)!important;box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 10px 24px -18px rgba(22,19,15,.35);transition:transform .35s cubic-bezier(.22,1,.36,1),background .4s,border-color .4s,box-shadow .4s,color .4s!important;-webkit-tap-highlight-color:transparent}
+#bk-opts .bk-opt:active{transform:scale(.97)}
+#bk-opts .bk-opt:last-child:nth-child(odd){grid-column:1/-1;min-height:0;flex-direction:row;align-items:center;gap:16px!important}
+#bk-opts .bk-opt:last-child:nth-child(odd) .tx{margin-top:0;padding-right:34px}
+#bk-opts .ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:none;color:#B08A4A;background:radial-gradient(circle at 30% 25%,#fff,#F3E8D2);border:1px solid rgba(201,163,94,.45);transition:all .4s}
+#bk-opts .tx{display:block;margin-top:16px;font:400 clamp(20px,5.2vw,23px)/1.12 var(--f-display);color:var(--ink)}
+#bk-opts .tx small{margin-top:8px;font:400 12.5px/1.45 var(--f-body);color:var(--ink-2)}
+#bk-opts .ck{position:absolute;top:16px;right:16px;width:26px!important;height:26px!important;border-radius:50%;border:1px solid rgba(201,163,94,.6)!important;background:#fff!important;color:transparent!important;display:grid;place-items:center;transition:all .35s cubic-bezier(.22,1,.36,1)!important}
+#bk-opts .tg{display:inline-block;margin-top:12px;font:500 9.5px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:#8C6A33;background:rgba(201,163,94,.16);padding:6px 9px;border-radius:999px}
+#bk-opts .bk-opt[aria-pressed="true"]{background:radial-gradient(120% 90% at 0% 0%,#2A251D,#14120F)!important;border-color:rgba(226,198,140,.7)!important;box-shadow:0 18px 36px -18px rgba(14,13,11,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+#bk-opts .bk-opt[aria-pressed="true"] .tx{color:#F6F1E7}
+#bk-opts .bk-opt[aria-pressed="true"] .tx small{color:rgba(246,241,231,.65)}
+#bk-opts .bk-opt[aria-pressed="true"] .ic{color:#E6CC93;background:rgba(226,198,140,.1);border-color:rgba(226,198,140,.5)}
+#bk-opts .bk-opt[aria-pressed="true"] .ck{background:#E6CC93!important;border-color:#E6CC93!important;color:#16130F!important;transform:scale(1.08)}
+#bk-opts .bk-opt[aria-pressed="true"] .tg{color:#E6CC93;background:rgba(226,198,140,.14)}
+@media (hover:hover){#bk-opts .bk-opt:hover{transform:translateY(-2px);border-color:rgba(201,163,94,.7)!important}}
+@media (max-width:360px){#bk-opts{grid-template-columns:1fr}#bk-opts .bk-opt{min-height:0}}
 </style>
 </body>
 </html>
