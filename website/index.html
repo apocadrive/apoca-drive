@@ -1482,7 +1482,7 @@ function applyAll(){
     const sum = $("#avsum"); if (rated.length){ const m = rated.reduce((t, x) => t + Math.min(5, +x.etoiles), 0) / rated.length; sum.innerHTML = `<b>${m.toFixed(1).replace(".", ",")}</b><span class="stars" aria-hidden="true">★</span><span>sur 5 · ${rated.length} avis</span>`; sum.hidden = false; } else sum.hidden = true;
     AVN = av.length; $("#avstrip").innerHTML = av.map(x => `<figure class="av">${st5(x.etoiles)}<blockquote>${E(x.texte)}</blockquote><figcaption>${x.nom ? `<b>${E(x.nom)}</b>` : ""}${x.type ? `<span>${E(x.type)}</span>` : ""}</figcaption></figure>`).join("");
     $("#avis").hidden = !av.length;
-    { const best = av.filter(x => (+x.etoiles || 5) >= 4 && x.texte.length >= 40).sort((x, y) => Math.abs(x.texte.length - 140) - Math.abs(y.texte.length - 140))[0] || av[0];
+    { const best = av.find(x => x.une) || av.filter(x => (+x.etoiles || 5) >= 4 && x.texte.length >= 40).sort((x, y) => Math.abs(x.texte.length - 140) - Math.abs(y.texte.length - 140))[0] || av[0];
       const pf = $("#proof");
       if (best && !hide.avis){ const t = best.texte.length > 190 ? best.texte.slice(0, 185).replace(/\s+\S*$/, "") + "…" : best.texte;
         $("#pf-q").textContent = "« " + t + " »"; $("#pf-who").textContent = [best.nom, best.type].filter(Boolean).join(" · ");

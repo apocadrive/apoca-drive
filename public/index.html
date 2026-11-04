@@ -2462,7 +2462,7 @@ function viewSite(){
         <div class="grid2"><label class="f">Prénom(s)<input type="text" data-af="nom" data-aid="${x.id}" value="${esc(x.nom||"")}" maxlength="60"></label><label class="f">Prestation<input type="text" data-af="type" data-aid="${x.id}" value="${esc(x.type||"")}" maxlength="40"></label></div>
         <label class="f">Étoiles<select data-af="etoiles" data-aid="${x.id}">${opts(STAR_OPTS, String(+x.etoiles||0))}</select></label>
         <label class="row" style="gap:8px;font-size:14px"><input type="checkbox" data-ah="${x.id}" ${x.hidden?"checked":""}> Masquer cet avis sur le site</label>
-        <div class="row" style="flex-wrap:wrap;gap:6px">${i ? `<button class="btn sm" data-act="satop" data-id="${x.id}">Mettre en premier</button>` : ""}<button class="btn ghost sm" data-act="sadel" data-id="${x.id}" style="color:var(--rec)">${ui.saDel===x.id?"Confirmer la suppression":"Supprimer l'avis"}</button></div></section>`).join("");
+        <div class="row" style="flex-wrap:wrap;gap:6px">${x.une ? `<span class="btn sm" style="pointer-events:none;background:#E6CC93;color:#16130F;border-color:#E6CC93">★ Affiché sur l'accueil</span>` : `<button class="btn sm" data-act="saune" data-id="${x.id}">★ Afficher sur l'accueil</button>`}${i ? `<button class="btn sm" data-act="satop" data-id="${x.id}">Mettre en premier</button>` : ""}<button class="btn ghost sm" data-act="sadel" data-id="${x.id}" style="color:var(--rec)">${ui.saDel===x.id?"Confirmer la suppression":"Supprimer l'avis"}</button></div></section>`).join("");
   } else if (t === "journal"){
     const list = (S.siteJournal||[]).slice().sort((a, b) => (b.created||0) - (a.created||0)); const f = ui.sjForm;
     h += `<p class="small muted" style="margin:0">De petits articles (conseils, coulisses, récits de mariage) : ils apparaissent dans « Le journal » sur votre site et aident à être trouvé sur Google.</p>`;
@@ -2982,6 +2982,7 @@ function siteClick(a, b){
     case "sasave": { const texte = $("#san-texte").value.trim(); if (!texte){ toast("Copiez le message du client"); return true; }
       const id = uid(), d = {texte, nom:$("#san-nom").value.trim(), type:$("#san-type").value.trim(), etoiles:+$("#san-et").value, created:Date.now()};
       S.siteAvis = [...(S.siteAvis||[]), {id, ...d}]; A.saveAvis(id, d).then(() => toast("Avis ajouté · visible sur le site"), siteErr); ui.saForm = null; render(); return true; }
+    case "saune": { const id = b.dataset.id; (S.siteAvis||[]).forEach(x => { const on = x.id === id; if (!!x.une !== on){ x.une = on; A.saveAvis(x.id, {une: on}).catch(siteErr); } }); toast("Cet avis s'affiche maintenant sur l'accueil du site"); render(); return true; }
     case "satop": { const min = Math.min(0, ...(S.siteAvis||[]).map(x => x.order ?? 0)); A.saveAvis(b.dataset.id, {order: min - 1}).then(() => toast("Placé en premier"), siteErr); return true; }
     case "salink": { const v = "https://www.apocadrive.com/#avis-client"; (navigator.clipboard ? navigator.clipboard.writeText(v) : Promise.reject()).then(() => toast("Lien copié"), () => { const e = $("#sa-link"); if (e){ e.focus(); e.select(); } toast("Sélectionnez le lien pour le copier"); }); return true; }
     case "sapub": { const x = (S.sitePend||[]).find(p => p.id === b.dataset.id); if (!x) return true; const d = {texte:x.texte||"", nom:x.nom||"", type:x.type||"", etoiles:+x.etoiles||0, created:Date.now(), source:"site"};
@@ -3363,7 +3364,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-04-stockage";
+const APP_VER = "2026-11-04-avis-une";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
