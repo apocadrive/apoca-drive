@@ -1482,14 +1482,12 @@ function applyAll(){
     const sum = $("#avsum"); if (rated.length){ const m = rated.reduce((t, x) => t + Math.min(5, +x.etoiles), 0) / rated.length; sum.innerHTML = `<b>${m.toFixed(1).replace(".", ",")}</b><span class="stars" aria-hidden="true">★</span><span>sur 5 · ${rated.length} avis</span>`; sum.hidden = false; } else sum.hidden = true;
     AVN = av.length; $("#avstrip").innerHTML = av.map(x => `<figure class="av">${st5(x.etoiles)}<blockquote>${E(x.texte)}</blockquote><figcaption>${x.nom ? `<b>${E(x.nom)}</b>` : ""}${x.type ? `<span>${E(x.type)}</span>` : ""}</figcaption></figure>`).join("");
     $("#avis").hidden = !av.length;
-    { const pf = $("#proof");
-      const good = av.filter(x => (+x.etoiles || 5) >= 4 && x.texte.length >= 25);
-      const list = (good.length ? good : av).slice().sort((x, y) => (y.une ? 1 : 0) - (x.une ? 1 : 0));
-      if (list.length && !hide.avis){
-        $("#pf-m").textContent = rated.length ? (rated.reduce((t2, x) => t2 + Math.min(5, +x.etoiles), 0) / rated.length).toFixed(1).replace(".", ",") + " sur 5 · " + rated.length + " avis" : av.length + " avis clients";
-        window.__pfList = list.map(x => ({ q: "« " + (x.texte.length > 190 ? x.texte.slice(0, 185).replace(/\s+\S*$/, "") + "…" : x.texte) + " »", w: [x.nom, x.type].filter(Boolean).join(" · ") }));
-        if (window.__pfShow) window.__pfShow(0, true);
-        pf.hidden = false; } else { window.__pfList = []; pf.hidden = true; } }
+    { const pf = $("#proof"), x = av.find(y => y.une) || av[0];
+      if (x && !hide.avis){
+        const t = String(x.court || x.texte || "").trim();
+        $("#pf-m").textContent = rated.length ? (rated.reduce((t2, y) => t2 + Math.min(5, +y.etoiles), 0) / rated.length).toFixed(1).replace(".", ",") + " sur 5 · " + rated.length + " avis" : av.length + " avis clients";
+        $("#pf-q").textContent = "« " + t + " »"; $("#pf-who").textContent = [x.nom, x.type].filter(Boolean).join(" · ");
+        pf.hidden = false; } else pf.hidden = true; }
   }
   vis("#avis", !hide.avis);
   /* sections masquées */
@@ -2175,22 +2173,5 @@ header.scrolled::before{opacity:0}
 .hero:has(+ .proof:not([hidden])) .hscroll{display:none}
 @media (max-height:740px){.hero:has(+ .proof:not([hidden])) .hbadges{display:none}}
 </style>
-<script>
-/* Carte d'avis : un nouvel avis toutes les 7 secondes, en fondu */
-(function(){
-  var P = document.getElementById("proof"), Q = document.getElementById("pf-q"), W = document.getElementById("pf-who"), i = 0, t = null, vis = true;
-  var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-  function set(k){ var L = window.__pfList || []; if (!L.length) return; i = (k + L.length) % L.length; Q.textContent = L[i].q; W.textContent = L[i].w; }
-  window.__pfShow = function(k, now){
-    if (now){ set(k); return; }
-    Q.style.opacity = W.style.opacity = "0";
-    setTimeout(function(){ set(k); Q.style.opacity = W.style.opacity = "1"; }, 450);
-  };
-  Q.style.transition = W.style.transition = "opacity .45s ease";
-  function tick(){ var L = window.__pfList || []; if (L.length > 1 && vis && !document.hidden && !P.hidden) window.__pfShow(i + 1); }
-  if (!calm) t = setInterval(tick, 7000);
-  if ("IntersectionObserver" in window) new IntersectionObserver(function(es){ vis = es[0].isIntersecting; }).observe(P.querySelector(".in"));
-})();
-</script>
 </body>
 </html>

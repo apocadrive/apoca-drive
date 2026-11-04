@@ -2460,6 +2460,7 @@ function viewSite(){
     h += list.map((x, i) => `<section class="panel">
         <label class="f">Message<textarea data-af="texte" data-aid="${x.id}" rows="3" maxlength="600">${esc(x.texte||"")}</textarea></label>
         <div class="grid2"><label class="f">Prénom(s)<input type="text" data-af="nom" data-aid="${x.id}" value="${esc(x.nom||"")}" maxlength="60"></label><label class="f">Prestation<input type="text" data-af="type" data-aid="${x.id}" value="${esc(x.type||"")}" maxlength="40"></label></div>
+        ${x.une ? `<label class="f">Phrase courte pour l'accueil <span class="muted">(facultatif, sinon le message entier)</span><input type="text" data-af="court" data-aid="${x.id}" value="${esc(x.court||"")}" maxlength="140" placeholder="Ex. : Un film magnifique, on a pleuré en le regardant."></label>` : ""}
         <label class="f">Étoiles<select data-af="etoiles" data-aid="${x.id}">${opts(STAR_OPTS, String(+x.etoiles||0))}</select></label>
         <label class="row" style="gap:8px;font-size:14px"><input type="checkbox" data-ah="${x.id}" ${x.hidden?"checked":""}> Masquer cet avis sur le site</label>
         <div class="row" style="flex-wrap:wrap;gap:6px">${x.une ? `<span class="btn sm" style="pointer-events:none;background:#E6CC93;color:#16130F;border-color:#E6CC93">★ Affiché sur l'accueil</span>` : `<button class="btn sm" data-act="saune" data-id="${x.id}">★ Afficher sur l'accueil</button>`}${i ? `<button class="btn sm" data-act="satop" data-id="${x.id}">Mettre en premier</button>` : ""}<button class="btn ghost sm" data-act="sadel" data-id="${x.id}" style="color:var(--rec)">${ui.saDel===x.id?"Confirmer la suppression":"Supprimer l'avis"}</button></div></section>`).join("");
@@ -3364,7 +3365,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-04-avis-une";
+const APP_VER = "2026-11-04-avis-fixe";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
