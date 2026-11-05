@@ -1028,7 +1028,7 @@ function viewHome(){
   let popHTML = "";
   if (sdUp.length){ const f = sdUp[0], dd = daysUntil(f.v.date);
     popHTML = `<button class="sdpop" data-act="sdopen" data-id="${f.id}" aria-label="Shooting à venir"><span class="sdpop-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg></span><span class="sdpop-t"><b>${dd===0?"Shooting aujourd'hui":dd===1?"Shooting demain":"Shooting dans "+dd+" jours"}</b><small>${esc(f.v.name || "Sans nom")}${f.v.place ? " · " + esc(f.v.place) : ""}</small></span></button>`; }
-  { const weds = up.filter(x => x.category === "mariage" && x !== next && !x.example).slice(0, 3);
+  { const weds = up.filter(x => x.category === "mariage" && x !== next && !x.example);
     nextHTML += weds.map((w, i) => { const d = daysUntil(w.date), dt = parseD(w.date); return `<button class="glass wedb${ui.wedAnim ? "" : " in"}" style="--i:${i}" data-act="open" data-id="${w.id}"><span class="wed-r" aria-hidden="true">💍</span><span class="rdv-tx"><b>${esc(w.client || w.title)}</b><small>${esc(dt.toLocaleDateString("fr-FR",{weekday:"long",day:"numeric",month:"long"}))}${w.city ? " · " + esc(w.city) : ""}</small></span><span class="rdv-cd">${d===0?"Aujourd'hui":d===1?"Demain":"J-"+d}</span></button>`; }).join("");
     nextHTML += `<button class="glass wedadd" data-act="wednew">💍 Ajouter un mariage</button>`; ui.wedAnim = 1; }
   { const ups = rdvUpcoming(); if (ups.length){ const r = ups[0], at = rdvAt(r), d = new Date(at), first = !ui.rdvAnimDone; ui.rdvAnimDone = true;
@@ -3428,7 +3428,7 @@ ui.enterAnim = false; let lastKey = "";
 })();
 
 /* ---------- Mise à jour automatique de l'appli ---------- */
-const APP_VER = "2026-11-04-histoires";
+const APP_VER = "2026-11-05-mariages";
 async function checkVer(){ try { const r = await fetch("/version.json?t=" + Date.now(), {cache:"no-store"}); if (!r.ok) return; const v = (await r.json()).v; if (v && v !== APP_VER && !isEditing()){ location.reload(); } } catch(e){} }
 document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") checkVer(); });
 setTimeout(checkVer, 3000);
