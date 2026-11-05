@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /medias-stories/
 
 Sitemap: https://www.apocadrive.com/sitemap.xml
