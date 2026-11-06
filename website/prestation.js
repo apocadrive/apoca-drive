@@ -7,7 +7,7 @@ const E = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "
 /* Réserver : ouvre la fenêtre de réservation de l'accueil directement sur cette prestation */
 document.addEventListener("click", (e) => {
   const a = e.target.closest && e.target.closest("a[data-book]"); if (!a) return;
-  try { if (P.book) sessionStorage.setItem("bkRestore", JSON.stringify({ c: P.book.c, s: P.book.s ?? -1, p: 3 })); } catch (err) {}
+  try { if (P.book) sessionStorage.setItem("bkRestore", JSON.stringify({ c: P.book.c, s: (P.book.s != null ? P.book.s : -1), p: 3 })); } catch (err) {}
 });
 
 /* apparition douce au défilement */
@@ -35,13 +35,13 @@ const ytId = (u) => { const m = String(u || "").match(/(?:youtu\.be\/|v=|shorts\
     const fs = getFirestore(app);
     const res = await Promise.all(P.cats.map((c) => getDocs(query(collection(fs, "galerie"), where("cat", "==", c))).catch(() => null)));
     const items = res.flatMap((q) => (q ? q.docs.map((d) => ({ id: d.id, ...d.data() })) : [])).filter((x) => !x.hidden && x.img)
-      .sort((a, b) => (b.hero ? 1 : 0) - (a.hero ? 1 : 0) || (a.order ?? 1e9) - (b.order ?? 1e9) || (a.created || 0) - (b.created || 0)).slice(0, 12);
+      .sort((a, b) => (b.hero ? 1 : 0) - (a.hero ? 1 : 0) || ((a.order != null ? a.order : 1e9)) - ((b.order != null ? b.order : 1e9)) || (a.created || 0) - (b.created || 0)).slice(0, 12);
     const G = $("#ggrid");
     if (items.length && G) {
       PH = items.map((x) => x.img);
       G.innerHTML = items.map((x, i) => `<button type="button" data-i="${i}" aria-label="${x.type === "video" ? "Vidéo" : "Photo"} en grand"><img src="${E(x.img)}" alt="" loading="lazy">${x.type === "video" ? `<span class="pl"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>` : ""}</button>`).join("");
       G.addEventListener("click", (e) => { const b = e.target.closest("button[data-i]"); if (!b) return; const x = items[+b.dataset.i];
-        if (x.type === "video") { try { sessionStorage.setItem("bkRestore", JSON.stringify({ c: P.book.c, s: P.book.s ?? -1, p: 3 })); } catch (err) {} location.href = "/#reserver"; return; }
+        if (x.type === "video") { try { sessionStorage.setItem("bkRestore", JSON.stringify({ c: P.book.c, s: (P.book.s != null ? P.book.s : -1), p: 3 })); } catch (err) {} location.href = "/#reserver"; return; }
         show(PH.indexOf(x.img)); });
       $("#gal").hidden = false;
       /* la plus belle photo devient le fond du haut de page, si la page n'a pas d'image à elle */

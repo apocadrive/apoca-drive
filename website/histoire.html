@@ -194,7 +194,7 @@ let PH = [];
   if (d.mot){ $("#mtxt").textContent = "« " + String(d.mot).replace(/^[«"\s]+|[»"\s]+$/g, "") + " »"; $("#mwho").textContent = t; const bg = PH[1] || cov; if (bg) $("#motbg").style.backgroundImage = `url("${String(bg).replace(/"/g, "")}")`; $("#mots").hidden = false; }
   /* autres histoires */
   try {
-    const all = (await getDocs(collection(fs, "histoires"))).docs.map((x) => ({ id: x.id, ...x.data() })).filter((h) => h.id !== id && !h.hidden && h.titre && (h.cover || (h.photos || []).length)).sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9)).slice(0, 3);
+    const all = (await getDocs(collection(fs, "histoires"))).docs.map((x) => ({ id: x.id, ...x.data() })).filter((h) => h.id !== id && !h.hidden && h.titre && (h.cover || (h.photos || []).length)).sort((a, b) => ((a.order != null ? a.order : 1e9)) - ((b.order != null ? b.order : 1e9))).slice(0, 3);
     $("#more").innerHTML = all.map((h) => `<a href="/histoire/${encodeURIComponent(h.id)}"><img src="${E(h.cover || h.photos[0])}" alt="" loading="lazy"><b>${E(h.titre)}</b></a>`).join("");
     $("#autres").hidden = !all.length;
   } catch (e) {}

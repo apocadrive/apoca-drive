@@ -1362,7 +1362,7 @@ function renderMoments(t, off){
   $("#mo-eye").textContent = String(t.eyebrow || "").trim() || "Récemment";
   const a = String(t.titre || "").trim() || "Une année de", b = String(t.titreOr || "").trim() || "moments.";
   $("#mo-titre").innerHTML = `${E(a)} <em>${E(b)}</em>`;
-  const L = Array.isArray(SITE.moments) ? SITE.moments.filter(x => x.img && !x.hidden).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0)) : [];
+  const L = Array.isArray(SITE.moments) ? SITE.moments.filter(x => x.img && !x.hidden).sort((x, y) => ((x.order != null ? x.order : 1e9)) - ((y.order != null ? y.order : 1e9)) || (y.created||0) - (x.created||0)) : [];
   S2.hidden = off || !L.length; if (S2.hidden) return;
   const key = L.map(x => x.id + (x.pos || "")).join(",") + "|" + Math.round(innerWidth / 200); if (key === MO_KEY) return; MO_KEY = key;
   /* une série au moins aussi large que l'écran, posée 2 fois : quand la 1re est passée, on revient au début sans que ça se voie */
@@ -1454,7 +1454,7 @@ function applyAll(){
   /* films */
   if (Array.isArray(SITE.films)){
     const isPh = f => f.kind === "photo";
-    const fl = SITE.films.filter(f => !f.hidden && (isPh(f) ? f.cover : (f.titre || f.url))).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0));
+    const fl = SITE.films.filter(f => !f.hidden && (isPh(f) ? f.cover : (f.titre || f.url))).sort((x, y) => ((x.order != null ? x.order : 1e9)) - ((y.order != null ? y.order : 1e9)) || (y.created||0) - (x.created||0));
     const phHtml = f => `<a class="film isph" data-ph="1" data-lieu="${E(f.lieu||"")}" data-k="${E(f.cat||"mariage")}" href="#films"><div class="frame"><img class="fc" src="${E(f.cover)}" alt="${E(f.titre||"Photo Apoca Drive")}" loading="lazy"></div><div class="cap">${f.titre ? `<b>${E(f.titre)}</b>` : ""}<span>${E(["Photo", CAT[f.cat]||"", f.lieu||""].filter(Boolean).join(" · "))}</span></div>${f.histoire ? `<p class="fstory">${fWords(f.histoire)}</p>` : ""}</a>`;
     $("#gfilms").innerHTML = fl.map(f => { if (isPh(f)) return phHtml(f); const cov = f.cover || (ytId(f.url) ? `https://i.ytimg.com/vi/${ytId(f.url)}/hqdefault.jpg` : "");
       return `<a class="film" data-lieu="${E(f.lieu||"")}" data-k="${E(f.cat||"mariage")}" href="${/^https?:\/\//.test(f.url||"") ? E(f.url) : "#films"}" ${f.url ? 'target="_blank" rel="noopener"' : ""}><div class="frame">${cov ? `<img class="fc" src="${E(cov)}" alt="" loading="lazy">` : `<div class="ph">${E(f.titre||"")}</div>`}<span class="play"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div><div class="cap"><b>${E(f.titre||"")}</b><span>${E([CAT[f.cat]||"", f.lieu||""].filter(Boolean).join(" · "))}</span></div>${(f.quand || f.invites) ? `<div class="fmeta">${f.lieu ? `<div><span>Lieu</span>${E(f.lieu)}</div>` : ""}${f.quand ? `<div><span>Date</span>${E(f.quand)}</div>` : ""}${f.invites ? `<div><span>Invités</span>${E(f.invites)}</div>` : ""}</div>` : ""}${f.histoire ? `<p class="fstory">${fWords(f.histoire)}</p>` : ""}</a>`; }).join("");
@@ -1483,7 +1483,7 @@ function applyAll(){
     if (vOn) $("#h-films").href = "/films"; }
   /* avis */
   if (Array.isArray(SITE.avis)){
-    const av = SITE.avis.filter(x => !x.hidden && x.texte).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0));
+    const av = SITE.avis.filter(x => !x.hidden && x.texte).sort((x, y) => ((x.order != null ? x.order : 1e9)) - ((y.order != null ? y.order : 1e9)) || (y.created||0) - (x.created||0));
     const st5 = n => { n = Math.max(0, Math.min(5, Math.round(+n||0))); return n ? `<span class="stars" aria-label="${n} sur 5">${"★".repeat(n)}<i>${"★".repeat(5-n)}</i></span>` : ""; };
     const rated = av.filter(x => +x.etoiles >= 1);
     const sum = $("#avsum"); if (rated.length){ const m = rated.reduce((t, x) => t + Math.min(5, +x.etoiles), 0) / rated.length; sum.innerHTML = `<b>${m.toFixed(1).replace(".", ",")}</b><span class="stars" aria-hidden="true">★</span><span>sur 5 · ${rated.length} avis</span>`; sum.hidden = false; } else sum.hidden = true;
@@ -1516,7 +1516,7 @@ function applyAll(){
   /* instagram */
   if (Array.isArray(SITE.insta)){
     const igUrl = social(val(k, "instagram", "apocadrive"), "https://www.instagram.com/");
-    const il = SITE.insta.filter(x => x.img).sort((x, y) => (x.order ?? 1e9) - (y.order ?? 1e9) || (y.created||0) - (x.created||0)).slice(0, 12);
+    const il = SITE.insta.filter(x => x.img).sort((x, y) => ((x.order != null ? x.order : 1e9)) - ((y.order != null ? y.order : 1e9)) || (y.created||0) - (x.created||0)).slice(0, 12);
     $("#igrid").innerHTML = il.map(x => `<a href="${E(/^https?:\/\//.test(x.url||"") ? x.url : igUrl)}" target="_blank" rel="noopener" aria-label="Voir sur Instagram"><img src="${E(x.img)}" alt="" loading="lazy"></a>`).join("");
     const hdl = $("#ig-h"); hdl.href = igUrl; hdl.textContent = "@" + (igUrl.replace(/\/+$/, "").split("/").pop() || "apocadrive");
     $("#insta").hidden = !il.length || !!hide.insta;
@@ -2032,7 +2032,7 @@ window.__apocaSite = {
   send: async (d) => { const r = await addDoc(collection(fs, "bookings"), { ...d, at: serverTimestamp() }); __hit("demande"); return r; },
   galerie: async (cat) => {
     const [q, inf] = await Promise.all([getDocs(query(collection(fs, "galerie"), where("cat", "==", cat))), getDoc(doc(fs, "galerieInfo", cat)).catch(() => null)]);
-    const items = q.docs.map((x) => ({ id: x.id, ...x.data() })).filter((x) => !x.hidden).sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9) || (a.created || 0) - (b.created || 0));
+    const items = q.docs.map((x) => ({ id: x.id, ...x.data() })).filter((x) => !x.hidden).sort((a, b) => ((a.order != null ? a.order : 1e9)) - ((b.order != null ? b.order : 1e9)) || (a.created || 0) - (b.created || 0));
     return { items, info: inf && inf.exists() ? inf.data() : {} };
   },
   galVideo: async (x) => {
@@ -2079,7 +2079,7 @@ onSnapshot(collection(fs, "journal"), (x) => q("journal", x.docs.map((d) => ({ i
 onSnapshot(collection(fs, "insta"), (x) => q("insta", x.docs.map((d) => ({ id: d.id, ...d.data() }))), () => q("insta", null));
 onSnapshot(collection(fs, "histoires"), (x) => {
   const E2 = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const L = x.docs.map((d) => ({ id: d.id, ...d.data() })).filter((h) => !h.hidden && h.titre && (h.cover || (h.photos || []).length)).sort((a, b) => (a.order ?? 1e9) - (b.order ?? 1e9) || (b.created || 0) - (a.created || 0));
+  const L = x.docs.map((d) => ({ id: d.id, ...d.data() })).filter((h) => !h.hidden && h.titre && (h.cover || (h.photos || []).length)).sort((a, b) => ((a.order != null ? a.order : 1e9)) - ((b.order != null ? b.order : 1e9)) || (b.created || 0) - (a.created || 0));
   const g = document.getElementById("hst-g"), sec = document.getElementById("histoires");
   g.innerHTML = L.map((h) => `<a class="hst-c" href="/histoire/${encodeURIComponent(h.id)}"><img src="${E2(h.cover || h.photos[0])}" alt="${E2(h.titre)}" loading="lazy">${h.film ? '<span class="pl" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>' : ""}<div class="gl"><b>${E2(h.titre)}</b><span>${E2([h.type, h.lieu].filter(Boolean).join(" · "))}</span></div></a>`).join("");
   sec.hidden = !L.length; document.querySelectorAll("[data-hl]").forEach((a) => { a.hidden = !L.length; });
@@ -2242,5 +2242,26 @@ header.scrolled::before{opacity:0}
   addEventListener("pageshow", kick);
 })();
 </script>
+<style id="tablette-css">
+/* Tablettes en portrait (iPad, Galaxy Tab…) : vraie mise en page tablette au lieu de la version téléphone étirée */
+@media (min-width:700px) and (max-width:860px){
+  .wrap,.in{padding-left:clamp(32px,5vw,48px);padding-right:clamp(32px,5vw,48px)}
+  .about{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)!important;gap:40px!important;align-items:center}
+  .ab-ph{margin:0!important;max-width:100%}
+  .serv{grid-template-columns:1fr 1fr}
+  .coll{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important}
+  .offer{padding:26px 18px 28px!important}
+  .offer h3{font-size:32px}
+  .offer .price b{font-size:24px}
+  .offer li{font-size:14px;padding:10px 0}
+  .steps ol{grid-template-columns:1fr 1fr!important;gap:44px 36px!important}
+  .jgrid{grid-template-columns:1fr 1fr!important}
+  .hst-g{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .igrid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .faq-l,.faq .in>details{max-width:680px;margin-left:auto;margin-right:auto}
+  .ft{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:32px 28px!important}
+  .ft .brand{grid-column:1/-1!important;max-width:560px}
+}
+</style>
 </body>
 </html>
