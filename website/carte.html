@@ -22,6 +22,9 @@ html,body{height:100%;margin:0}
 body{background:var(--night);color:var(--paper);font:300 17px/1.5 var(--body);-webkit-font-smoothing:antialiased;overflow:hidden}
 .film{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;background:var(--night) center 30%/cover no-repeat;animation:kb 12s ease-out both}
 .film[hidden]{display:none}
+/* iPhone en mode économie d'énergie : jamais de bouton play par-dessus, juste l'image en douceur */
+.film{pointer-events:none}
+.film::-webkit-media-controls,.film::-webkit-media-controls-panel,.film::-webkit-media-controls-start-playback-button,.film::-webkit-media-controls-overlay-play-button{display:none!important;-webkit-appearance:none;opacity:0!important}
 .veil{position:fixed;inset:0;background:linear-gradient(180deg,rgba(14,13,11,.25) 0%,rgba(14,13,11,0) 18%,rgba(14,13,11,.35) 34%,rgba(14,13,11,.55) 48%,rgba(14,13,11,.6) 65%,rgba(14,13,11,.78) 100%)}
 @keyframes kb{0%{opacity:0;transform:scale(1.06)}15%{opacity:1}100%{opacity:1;transform:scale(1.01)}}
 .stage{position:relative;height:100%;display:flex;align-items:flex-end;justify-content:center;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px));padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(22px + env(safe-area-inset-bottom,0px));overflow-y:auto}
@@ -81,7 +84,7 @@ body.jour .row .b svg{width:21px;height:21px}
 </style>
 </head>
 <body class="wait">
-<video class="film" id="film" muted loop playsinline autoplay preload="auto" aria-hidden="true"></video>
+<video class="film" id="film" muted loop playsinline webkit-playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback aria-hidden="true" tabindex="-1"></video>
 <div class="veil" aria-hidden="true"></div>
 <button type="button" class="sound" id="sound" hidden>🔊 Activer le son</button>
 <div class="stage"><main id="main">
