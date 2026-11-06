@@ -1269,7 +1269,7 @@ const has = (o, k) => o && Object.prototype.hasOwnProperty.call(o, k);
 const val = (o, k, d) => has(o, k) && o[k] != null ? String(o[k]).trim() : d;
 const SITE = {content:{}, heroPhoto:"", aboutPhoto:"", films:undefined, avis:undefined};
 /* Vidéo d'accueil servie directement par le site (rapide). Une vidéo envoyée plus tard depuis l'appli la remplace. */
-const HERO_STATIC = {v: "accueil.mp4", poster: "accueil.jpg?v=2", ts: 1793079464015};
+const HERO_STATIC = {v: "accueil.mp4?v=3", poster: "accueil.jpg?v=2", ts: 1793079464015};
 SITE.heroVideo = HERO_STATIC.v; SITE.heroPoster = HERO_STATIC.poster;
 const digits = t => String(t||"").replace(/[^\d+]/g, "");
 const waNum = t => { let d = digits(t).replace(/^\+/, ""); if (d.startsWith("00")) d = d.slice(2); if (d.startsWith("0")) d = "33" + d.slice(1); return d; };
@@ -1404,10 +1404,10 @@ function applyAll(){
   if (demoOn) demoStart(); else demoStop();
   if (v){ if (vid.getAttribute("src") !== v){ vid.classList.remove("on"); let started = false;
       vid.onplaying = () => { vid.classList.add("on"); setTimeout(() => { if (vid.classList.contains("on")) img.hidden = true; }, 2000); };
-      /* on attend que la vidéo soit assez chargée pour jouer sans à-coups (l'image d'attente reste affichée en attendant) */
+      /* la vidéo démarre dès qu'elle peut jouer (environ 1,5 s chargée) ; l'image d'attente reste affichée jusque-là */
       const go = () => { if (started) return; started = true; vid.play && vid.play().catch(() => {}); };
-      const enough = () => { try { const b = vid.buffered; if (vid.readyState >= 4 || (b.length && b.end(b.length - 1) >= Math.min(4, (vid.duration || 4) - 0.1))) go(); } catch(e){} };
-      vid.oncanplaythrough = go; vid.onprogress = enough; vid.onloadeddata = enough; setTimeout(go, 6000);
+      const enough = () => { try { const b = vid.buffered; if (vid.readyState >= 3 || (b.length && b.end(b.length - 1) >= Math.min(1.5, (vid.duration || 2) - 0.1))) go(); } catch(e){} };
+      vid.oncanplay = go; vid.oncanplaythrough = go; vid.onprogress = enough; vid.onloadeddata = enough; setTimeout(go, 2500);
       vid.src = v; vid.load && vid.load(); } vid.hidden = false; if (vid.classList.contains("on")) img.hidden = true; else showPoster(); hcv.hidden = true; }
   else if (demoOn){ img.hidden = true; vid.hidden = true; hcv.hidden = true; }
   else if (SITE.heroPhoto){ img.dataset.p = ""; if (img.src !== SITE.heroPhoto){ img.classList.remove("on"); img.onload = () => img.classList.add("on"); img.src = SITE.heroPhoto; } img.hidden = false; vid.hidden = true; hcv.hidden = true; }
